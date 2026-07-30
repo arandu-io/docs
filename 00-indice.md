@@ -43,14 +43,16 @@ Escopo vem antes de nomes de propósito: só se nomeia o que vai existir.
   projeto (ADR 0006)
 - Driver de Postgres vive no esqueleto, não no core; migrador mínimo em
   `data.Migrate` até o Atlas da Fase 2 (ADR 0007)
+- Licença **MIT**, a mesma do Laravel, nos quatro repositórios (ADR 0008)
 
 ## Decisões abertas
 
 - `oka` como nome do starter kit — "oca" também é vazio/oco em português
 - Nome da camada de view: `porang` confirmado, sem impedimento
 - Verificação etimológica das palavras marcadas `[C]` e `[?]` em `07-pacotes.md`
-- Licença do core, antes da Fase 2
 - Tornar os quatro repositórios públicos — decidido que sim, ao fim da Fase 1
+- Titular do copyright: `Paulo Lima` pessoa física, no `LICENSE.md`. Trocar para a
+  pessoa jurídica se a marca for registrada em nome dela (ADR 0008)
 
 ## Estado do código
 
