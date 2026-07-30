@@ -39,6 +39,12 @@ Consequências que valem registrar por serem irreversíveis na prática:
 
 ## Consequência
 
-O `replace` para `../framework` no `go.mod` do esqueleto é temporário: existe
-porque `arandu-io/framework` é privado e sem tag. Sai quando o repositório for
-público e tagueado — é a única linha do arquivo que não deve ser publicada.
+O esqueleto depende do framework por versão (`v0.1.0`), sem `replace`. Enquanto o
+repositório for privado, quem clonar precisa de `GOPRIVATE=github.com/arandu-io`
+e de acesso de leitura — o CI faz isso com um token. Quando os repositórios
+virarem públicos, as duas linhas do workflow deixam de ser necessárias e nada no
+`go.mod` muda.
+
+Durante o desenvolvimento simultâneo dos dois repositórios, use um `go.work`
+local apontando para os dois diretórios; ele não é versionado, e é o que evita
+ter que tagear o framework a cada alteração.
