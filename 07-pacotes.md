@@ -122,7 +122,7 @@ crepúsculo, flâmula), nunca santos nem cargos religiosos. A regra é a mesma.
 
 | Laravel | Função | Arandu | Significado | St |
 |---|---|---|---|---|
-| Pint | formatador de código | **katu** | bom, bem-feito | V |
+| Pint | formatador de código | — | não existe em Go: `gofmt` + `aru doctor`. Ver `packages/pint.md` | — |
 | Dusk | testes de navegador | **pytuna** | noite, escuridão | C |
 | Pennant | feature flags | **kanitar** | canitar, cocar — insígnia que se veste | C |
 
@@ -160,6 +160,11 @@ crepúsculo, flâmula), nunca santos nem cargos religiosos. A regra é a mesma.
 |---|---|---|---|
 | Camada de view (templ + HTMX) | **porang** | belo | V |
 | Registry de módulos (marketplace) | **moitara** | moitará, troca ritual de bens | ? |
+
+## Detalhe por pacote
+
+Cada um dos 14 pacotes principais do Laravel tem documento próprio em
+`packages/`, com veredito, justificativa e gatilho. Um só vira repositório novo.
 
 ## Triagem de escopo
 
@@ -207,8 +212,9 @@ Onde checar, e só aqui:
 | Domínio `.dev` / `.com` | marca | não bloqueia pacote |
 | INPI classes 9 e 42 | marca | juridicamente sim |
 
-Única exceção onde npm importa: `porang`, **se** distribuir plugin de Tailwind
-(o Basecoat é distribuído por npm). Um pacote, não o ecossistema.
+Não há exceção: npm não entra no grafo em nenhum pacote, inclusive `porang`.
+O CSS do Basecoat é vendorizado com a licença. Ver `14-view-e-assets.md`
+e a REGRA 13 — esta linha revoga a exceção que este documento abria antes.
 
 ### Estado conhecido
 
