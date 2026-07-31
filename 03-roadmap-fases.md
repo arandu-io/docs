@@ -104,23 +104,33 @@ passa a ter uma razão para alguém trocar.
 
 Entregas:
 
-- console `/_arandu/debug` — ring buffer dos últimos N requests, com queries,
-  dumps, eventos, jobs e chamadas externas (equivalente ao Telescope, mas core)
-- detector de N+1 com aviso no log e badge no console
-- timeline do request: quanto tempo em SQL, em template, em HTTP externo
-- `aru trace <request_id>` — reconstrói um request pelo terminal
-- link "abrir na IDE" funcionando em VS Code, Cursor, GoLand e Zed
-- exportador OpenTelemetry opcional, para quem já tem Grafana/Datadog
-- modo produção com header `X-Arandu-Trace` autenticado, para tracing sob demanda
+- console `/_arandu/debug` — ring buffer dos últimos 200 requests, com queries,
+  dumps, eventos e chamadas externas (equivalente ao Telescope, mas core) —
+  **feito**
+- detector de N+1 com aviso no log, nomeando o statement e a contagem, e
+  diagnóstico no topo da página do console — **feito**
+- timeline do request: quanto tempo em SQL, em template, em HTTP externo, e
+  quanto sobra — **feito**
+- `aru trace <request_id>` — reconstrói um request pelo terminal, lendo o
+  console da aplicação que está de pé — **feito**
+- link "abrir na IDE" em VS Code, Cursor, GoLand e Zed — **feito**, uma
+  implementação só, compartilhada pela página de erro e pelo console
+- modo produção com header `X-Arandu-Trace` autenticado — **feito**
+- relay do outbox, fila morta e atraso no health check (doc 27) — **feito**
+- `kernel.Diagnostic`: o módulo diz o que está errado, e aparece na página de
+  erro — **feito**
+- exportador OpenTelemetry opcional — **adiado com gatilho**, ver ADR 0015
 
 Critério de saída:
 
 1. Um bug real de um dos seus produtos foi diagnosticado exclusivamente pelo
-   console, sem `fmt.Println`
-2. O overhead do Collector em produção **desligado** é mensurável e zero
-   (benchmark comparando com e sem, no mesmo binário)
+   console, sem `fmt.Println` — **aberto**, depende do proprietário
+2. O overhead do Collector em produção **desligado** é mensurável e zero —
+   **verificado**, e como teste em vez de benchmark: código instrumentado e
+   código sem instrumentação alocam exatamente igual, e 22 chamadas de `Record`
+   com o Collector ausente custam 0 alocações e 0 bytes
 3. Um dev externo consegue instalar, quebrar de propósito e entender o erro
-   sem ler documentação
+   sem ler documentação — **aberto**, depende de pessoa
 
 ---
 

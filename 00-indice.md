@@ -83,6 +83,12 @@ Escopo vem antes de nomes de propósito: só se nomeia o que vai existir.
   permissões contra o AST: usada e não declarada é erro (doc 18)
 - Toolchain de view gerenciado pela `aru` em `~/.arandu/bin`, fixado em
   `arandu.toml`. `templ` e `tailwindcss` standalone, zero Node (doc 14)
+- O relay do outbox faz **polling**, não `LISTEN/NOTIFY`: o caminho específico
+  do Postgres poria driver no core e daria a SQLite e MySQL um segundo caminho
+  de código (doc 27)
+- Exportador OpenTelemetry **adiado com gatilho** — um cliente real com Grafana,
+  Datadog ou Honeycomb já em produção. APM próprio segue fora de escopo para
+  sempre (ADR 0015)
 - Titular do copyright é a **pessoa jurídica**: HYZIS - Serviços Digitais LTDA,
   CNPJ 57.283.262/0001-28. Vale em todos os repositórios, e é em nome dela que a
   marca vai ao INPI (ADR 0008)
