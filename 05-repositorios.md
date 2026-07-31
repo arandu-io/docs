@@ -100,7 +100,8 @@ opcional que o usuário esquece de instalar. `starter-auth` traz só as telas.
 ```
 arandu-io/porang     camada de view em templ, ligada aos contratos do core
 arandu-io/moitara    registry de módulos — ver 18-marketplace.md
-arandu-io/examples   apps de exemplo
+arandu-io/examples   a aplicacao que demonstra o framework, e a forma canonica
+                     que o gerador da Fase 2 vai emitir
 ```
 
 ## O que é diferente do Laravel, e importa
@@ -132,7 +133,9 @@ Separado, o core continua com duas dependências.
 ## Ordem de criação
 
 Fase 1: `framework`, `arandu`, `aru`, `docs` — **feito**, os quatro existem,
-compilam e estão publicados
+compilam e estão publicados. `examples` entrou junto: escrever à mão o módulo que
+o gerador vai emitir é o passo que transforma "template que pareceu bom" em
+"template já usado"
 Fase 2: `database`, `kv`, `porang`, `oka`, `homebrew-tap`
 Fase D: `website` (aplicacao Arandu, depende do porang)
 Fase 4+: `taba` (painel administrativo) e a camada de IA, ainda sem nome.

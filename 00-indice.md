@@ -91,6 +91,7 @@ privados por enquanto:
 | `aru` | CLI, módulo próprio sem dependência; `key:generate`, `serve`, `migrate`, `routes` |
 | `arandu` | esqueleto; sobe, serve `/auth/login`, health e shutdown gracioso. `database/seeders` no padrão Laravel |
 | `docs` | estes documentos e os ADRs |
+| `examples` | a aplicação de demonstração: dois módulos escritos à mão e um tour guiado |
 
 Critérios de saída da Fase 1 (`03-roadmap-fases.md`): 1, 2, 4 e 5 verificados por
 teste automatizado. O critério 3 — um produto real rodando o login em cima do
