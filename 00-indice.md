@@ -74,9 +74,9 @@ Escopo vem antes de nomes de propósito: só se nomeia o que vai existir.
   relicenciável, porque o componente pago vive em repositório separado (doc 20)
 - O starter kit é `aru make:auth`, **não um repositório**: em Go o que se importa
   não se edita, e editar a tela de login é a primeira coisa que se faz (ADR 0012)
-- Não existe `arandu-io/database`: `database/sql` já é a interface comum,
-  `framework/data` já é o contrato, e o driver entra por blank import no
-  projeto (ADR 0013)
+- O contrato de dados fica no core e o driver no adapter, **um módulo por
+  driver**: um projeto que só fala SQLite não carrega Postgres no go.sum nem na
+  superfície de vulnerabilidade (ADR 0014, substitui a 0013)
 - Eventos só por **outbox**, dentro da transação da escrita. Não existe
   `Publish()` direto, e `Store` fora de `data.Transaction` é erro (doc 27)
 - Todo módulo declara `arandu.mod.toml`, e o `doctor` confere a declaração de

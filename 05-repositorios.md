@@ -53,6 +53,7 @@ fornecedor multiplica repositório sem isolar dependência nenhuma. A divisão �
 **domínio**, com driver pesado em submódulo:
 
 ```
+arandu-io/database    registro, pool e erro; submodulos pgx, sqlite, mysql
 arandu-io/kv          go-redis (RESP): cobre Redis, Dragonfly, Valkey, KeyDB
 arandu-io/mail        interface + SMTP; submódulos ses, resend, postmark, mailgun
 arandu-io/storage     interface + disco local; submódulos s3, gcs, azure
@@ -133,10 +134,10 @@ Fase 1: `framework`, `arandu`, `aru`, `docs` — **feito**, os quatro existem,
 compilam e estão publicados. `examples` entrou junto: escrever à mão o módulo que
 o gerador vai emitir é o passo que transforma "template que pareceu bom" em
 "template já usado"
-Fase 2: `porang`, `kv`, `homebrew-tap` — **feito**, os três existem e estão
-publicados. `database` e `oka` saíram da lista: ver ADR 0013 (o domínio de dados
-é `framework/data`, e o driver é escolhido pelo projeto) e ADR 0012 (o starter
-kit é `aru make:auth`, não um repositório)
+Fase 2: `porang`, `kv`, `database`, `homebrew-tap` — **feito**, os quatro
+existem e estão publicados. `oka` saiu da lista: o starter kit é `aru make:auth`,
+não um repositório (ADR 0012). O `database` é um repositório com quatro módulos —
+o contrato fica no core e cada driver tem o seu (ADR 0014)
 Fase D: `website` (aplicacao Arandu, depende do porang)
 Fase 4+: `taba` (painel administrativo) e a camada de IA, ainda sem nome.
 Ver a triagem em `06-escopo.md`

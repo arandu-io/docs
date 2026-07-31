@@ -1,7 +1,10 @@
 # ADR 0013-sem-repositorio-database — O `database` já existe, e é `framework/data`
 
-**Status:** Aceita. Altera `11-adapters.md` e `05-repositorios.md`, que previam
-`arandu-io/database` como repositório da Fase 2.
+**Status:** **Substituída pela ADR 0014.** Fica registrada em vez de apagada,
+porque o erro dela é instrutivo: concluiu que o driver de banco não pesa no grafo
+de dependência porque `database/sql` é a interface comum. Pesa — todo projeto
+gerado carregava pgx **e** modernc/sqlite, e o `govulncheck` achou uma CVE de pgx
+num projeto que podia ser SQLite puro. Ver ADR 0014.
 
 ## Contexto
 
