@@ -72,7 +72,8 @@ Escopo vem antes de nomes de propósito: só se nomeia o que vai existir.
 - `oka` como nome do starter kit — "oca" também é vazio/oco em português
 - Nome da camada de view: `porang` confirmado, sem impedimento
 - Verificação etimológica das palavras marcadas `[C]` e `[?]` em `07-pacotes.md`
-- Tornar os quatro repositórios públicos — decidido que sim, ao fim da Fase 1
+- Redesenhar o `docs` como aplicação Arandu, e só então torná-lo público. Depende
+  do `porang`, ou seja, da Fase 2
 - Titular do copyright: `Paulo Lima` pessoa física, no `LICENSE.md`. Trocar para a
   pessoa jurídica se a marca for registrada em nome dela (ADR 0008)
 - O esqueleto pesa 23 MB de binário por causa do SQLite puro-Go (`modernc.org`,
@@ -82,8 +83,9 @@ Escopo vem antes de nomes de propósito: só se nomeia o que vai existir.
 
 ## Estado do código
 
-Fase 1 compila e passa nos testes. Quatro repositórios criados na org, todos
-privados por enquanto:
+Fase 1 compila e passa nos testes. Cinco repositórios na org, quatro deles
+públicos desde 31/07/2026 — `docs` segue privado até ser redesenhado como
+aplicação Arandu:
 
 | Repositório | Estado |
 |---|---|
