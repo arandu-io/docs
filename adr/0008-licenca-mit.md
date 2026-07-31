@@ -11,10 +11,18 @@ restritiva não recupera o que já foi distribuído sob a anterior.
 ## Decisão
 
 MIT, no mesmo formato do Laravel: arquivo `LICENSE.md`, texto padrão MIT,
-`Copyright (c) Paulo Lima`, sem ano — o Laravel omite o ano, e ano fixo obriga a
-editar o arquivo todo janeiro.
+`Copyright (c) Paulo R. Lima (HYZIS)`, sem ano — o Laravel omite o ano, e ano
+fixo obriga a editar o arquivo todo janeiro.
 
-Vale nos quatro repositórios: `framework`, `arandu`, `aru` e `docs`.
+O titular é **Paulo R. Lima (HYZIS)**: o software pertence à HYZIS, e a forma do
+aviso registra as duas coisas — a pessoa que detém o direito autoral e a empresa
+a que o software pertence. Uma linha só, porque um aviso de copyright que exige
+interpretação não protege ninguém.
+
+Vale em **todos** os repositórios da organização, sem exceção: `framework`,
+`aru`, `arandu`, `examples`, `porang`, `kv`, `database`, `homebrew-tap` e
+`docs`. Um repositório novo nasce com o mesmo arquivo — copiar a licença é parte
+de criar o repositório, não um passo posterior.
 
 Por que MIT e não Apache 2.0, que é o outro padrão do ecossistema Go: MIT é o que
 o mercado de framework web espera — Laravel, Rails, Django (BSD), React e Vue são
