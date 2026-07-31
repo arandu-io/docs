@@ -25,11 +25,11 @@ Ordem de leitura. Cada documento decide algo que o seguinte assume como dado.
 | 19 | `19-dsl-e-geracao.md` | a DSL é um conjunto fechado |
 | 20 | `20-licenca.md` | análise de licença; a decisão está no ADR 0008 |
 | 21 | `21-modelo-de-negocio.md` | onde o dinheiro entra |
-| 22 | *não escrito* | pesquisa: as dores dos desenvolvedores |
+| 22 | `22-dores-dos-devs.md` | pesquisa: o que os desenvolvedores reclamam nos frameworks |
 | 23 | `23-estabilidade.md` | versionamento, depreciação e o que autoriza um breaking change |
 | 24 | `24-seguranca-processo.md` | como uma vulnerabilidade é reportada, tratada e divulgada |
 | 25 | `25-saida-e-nao-objetivos.md` | quando **não** usar o Arandu, e como sair dele |
-| 26 | *não escrito* | pesquisa: a revisão externa que originou a REGRA 17 e o doc 27 |
+| 26 | `26-revisao-externa.md` | a revisão externa: o que absorvemos e o que rejeitamos |
 | 27 | `27-eventos-e-outbox.md` | eventos de domínio e outbox; sem `Publish()` direto |
 | — | `packages/` | um documento por pacote do Laravel, com veredito e gatilho |
 | — | `adr/` | decisões arquiteturais com justificativa |
@@ -80,9 +80,6 @@ Escopo vem antes de nomes de propósito: só se nomeia o que vai existir.
 - Verificação etimológica das palavras marcadas `[C]` e `[?]` em `07-pacotes.md`
 - Redesenhar o `docs` como aplicação Arandu, e só então torná-lo público. Depende
   do `porang`, ou seja, da Fase 2
-- **Os documentos 22 e 26 não existem.** A REGRA 17 cita o 26 e o doc 27 cita os
-  dois como origem de decisões já tomadas — então a ausência é dívida de
-  registro, não de decisão. O `plans/checklist.sh` aponta enquanto faltarem
 - Titular do copyright: `Paulo Lima` pessoa física, no `LICENSE.md`. Trocar para a
   pessoa jurídica se a marca for registrada em nome dela (ADR 0008)
 - O esqueleto pesa 23 MB de binário por causa do SQLite puro-Go (`modernc.org`,
@@ -103,6 +100,9 @@ aplicação Arandu:
 | `arandu` | esqueleto; sobe, serve `/auth/login`, health e shutdown gracioso. `database/seeders` no padrão Laravel |
 | `docs` | estes documentos e os ADRs |
 | `examples` | a aplicação de demonstração: dois módulos escritos à mão e um tour guiado |
+
+Os 27 documentos estão publicados, sem buraco na sequência. Para o estado
+verificado do projeto a qualquer momento: `./plans/checklist.sh`.
 
 Critérios de saída da Fase 1 (`03-roadmap-fases.md`): 1, 2, 4 e 5 verificados por
 teste automatizado. O critério 3 — um produto real rodando o login em cima do
