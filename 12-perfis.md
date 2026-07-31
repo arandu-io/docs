@@ -1,0 +1,103 @@
+# Perfis — convencional e performance
+
+O Arandu entrega **dois conjuntos de recursos**: perfil convencional e perfil de
+performance. Não são dois frameworks e não são dois caminhos de código escritos
+à mão. São duas fiações da mesma arquitetura.
+
+## Por que é viável aqui
+
+Porque existe gerador determinístico. `aru make:module` emite `queries.sql` e
+`queries.cql` a partir da mesma especificação. A duplicação fica **dentro do
+gerador**, não espalhada no código do cliente.
+
+Um framework onde o dev escreve a query à mão não consegue fazer isso sem dobrar
+o trabalho de todo mundo. Aqui a conta fica com a engine.
+
+## O que é idêntico nos dois perfis
+
+Isto não muda, e é o que preserva a REGRA 9:
+
+- `security.Grant` e Policy — mesmo caminho obrigatório de autorização
+- contrato de módulo `Routes(r *httpx.Router)`
+- validação, CSRF, sessão, rate limit, headers
+- Collector, página de erro, `aru doctor`
+- templ + HTMX na view
+- toda a CLI
+
+**A API pública é a mesma.** Trocar de perfil não muda uma linha do handler,
+do service ou da policy.
+
+## O que muda
+
+| Camada | Convencional | Performance |
+|---|---|---|
+| Banco | PostgreSQL + sqlc | ScyllaDB + gocql |
+| KV / cache / sessão | Dragonfly (RESP) | Dragonfly (RESP) |
+| Filas | `kv` ou Postgres | NATS |
+| Tempo real | SSE (`net/http`) | WebSocket (`gobwas/ws`) |
+| Escopo de tenant | coluna `tenant_id` | chave de partição |
+
+Dragonfly é o mesmo nos dois: protocolo RESP, mesmo driver, custo zero.
+
+## A restrição que o perfil de performance impõe
+
+CQL não é SQL: sem join, sem transação entre partições, sem foreign key, schema
+modelado por query.
+
+Consequência, e ela precisa estar clara para quem escreve módulo:
+
+> **O perfil de performance só suporta módulos com acesso agregado.**
+> Uma entidade por vez, sem join entre entidades, sem transação cruzando
+> agregados.
+
+Isso não é limitação nossa — é a natureza de banco wide-column. A boa notícia é
+que o contrato `data.Repository` **já é agregado por construção**: `Find`,
+`List`, `Create`, `Update`, `Delete` sobre uma entidade, com `Grant`. Nunca
+expusemos join nem query ad-hoc. O desenho já estava certo.
+
+## Módulo declara o perfil que suporta
+
+```go
+// Tiered e opcional. Sem ele, o modulo suporta apenas o perfil convencional.
+type Tiered interface {
+    Perfis() []Perfil   // PerfilPadrao, PerfilPerformance
+}
+```
+
+`aru doctor --perfil=performance` falha quando:
+
+1. um módulo do projeto não declara suporte ao perfil
+2. um `queries.sql` usa `JOIN`, subquery correlacionada ou `BEGIN`/`COMMIT`
+   cruzando agregados
+3. uma entidade não tem chave de partição definida
+4. o tenant não vem do `Grant` para compor a partição
+
+Regra do ecossistema: **módulo de primeira parte suporta os dois perfis.** Módulo
+de comunidade declara o que suporta, e a registry mostra isso na listagem.
+
+## Como se escolhe
+
+```bash
+aru new crm                          # convencional, o padrão
+aru new crm --perfil=performance
+aru make:module cliente              # emite queries.sql
+aru make:module cliente --perfil=ambos   # emite queries.sql e queries.cql
+```
+
+O perfil vive em `internal/wire/` — o arquivo de fiação gerado. Trocar de perfil
+é regerar a fiação e as queries, não reescrever a aplicação.
+
+## Ordem de construção
+
+O perfil convencional é a Fase 2. O perfil de performance entra depois do
+convencional estar em produção, porque ele **compila contra o mesmo contrato** —
+sem o contrato estável, o segundo perfil vira adivinhação.
+
+Não é "se houver demanda": é sequência técnica. O alvo precisa existir antes de
+ter dois atiradores.
+
+## O que continua fora
+
+Socket.IO e µWebSockets.js são Node. Nenhum perfil traz um segundo runtime para
+dentro da aplicação — isso não é performance, é o problema que o Octane existe
+para remediar no PHP. Ver `09-uma-forma-so.md`.

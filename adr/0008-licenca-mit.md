@@ -28,6 +28,17 @@ para o que ela pode simplesmente usar. Os produtos pagos previstos
 (`taba`, na Fase 4) são repositórios separados e podem ter licença própria —
 MIT no core não obriga MIT no que vem depois.
 
+## Divergência registrada
+
+`20-licenca.md` recomendava Apache-2.0 pela cláusula de patente. O proprietário
+decidiu MIT, e a decisão prevalece — o documento foi atualizado para registrar as
+duas posições em vez de esconder a que perdeu.
+
+O que se adota do documento 20 mesmo com MIT: **DCO, não CLA**. O contribuidor
+assina `git commit -s` afirmando que pode contribuir; ninguém cede direito. Como
+o componente pago vive em repositório separado com licença própria, o core nunca
+precisa ser relicenciável, e CLA seria custo sem retorno.
+
 ## Consequência
 
 O core fica utilizável comercialmente sem contrapartida, inclusive por quem
