@@ -38,11 +38,10 @@ Matriz de drivers é o caso em que multi-módulo paga o próprio custo.
 
 | Pacote | Núcleo (sem dep pesada) | Submódulos |
 |---|---|---|
-| `database` | interface `Repository` + pgx | `mysql`, `sqlite` |
 | `kv` | go-redis (RESP) | nenhum |
 | `mail` | interface + SMTP (`net/smtp`) | `ses`, `resend`, `postmark`, `mailgun` |
 | `storage` | interface + disco local | `s3`, `gcs`, `azure` |
-| `queue` | interface + driver sobre `kv` e sobre `database` | `nats`, `sqs`, `rabbitmq` |
+| `queue` | interface + driver sobre `kv` e sobre `framework/data` | `nats`, `sqs`, `rabbitmq` |
 | `ws` | `coder/websocket` e `gobwas/ws` | nenhum |
 
 Dois padrões que aparecem sozinhos e mantêm a conta baixa:
@@ -121,6 +120,8 @@ Nesse dia, avaliar — e a avaliação começa pelo custo de manter duas camadas
 
 ## Ordem de construção
 
-Fase 2: `database` (pgx) e `kv`. Sem os dois o framework não roda.
+Fase 2: `kv` — **feito**. O `database` saiu da lista: `database/sql` já é a
+interface comum, `framework/data` já é o contrato, e o driver entra por blank
+import no projeto. Ver ADR 0013.
 Fase 3: `queue` (sobre `kv`, depois `nats`), `storage` (local, depois `s3`).
 Com demanda: `mail`, `ws`, e os submódulos de cada domínio.

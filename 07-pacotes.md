@@ -86,7 +86,7 @@ crepúsculo, flâmula), nunca santos nem cargos religiosos. A regra é a mesma.
 
 | Laravel | Função | Arandu | Significado | St |
 |---|---|---|---|---|
-| Breeze | starter kit | **oka** | casa indígena. Ressalva: "oca" também é vazio/oco em PT — decisão aberta | C |
+| Breeze | starter kit | — | não é repositório: é `aru make:auth`, ver ADR 0012. O nome `oka` fica livre | — |
 | Fortify | auth headless, sem telas | — | é core: pacote `security/` | — |
 | Sanctum | tokens de API | — | é core: `security/token.go` | — |
 | Passport | servidor OAuth2 | — | deferido, ver `06-escopo.md` | — |

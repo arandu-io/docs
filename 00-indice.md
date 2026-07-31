@@ -72,10 +72,20 @@ Escopo vem antes de nomes de propósito: só se nomeia o que vai existir.
   passa no `Check`. Aplicação single-tenant usa uma constante, não vazio (REGRA 14)
 - Contribuição por **DCO** (`git commit -s`), nunca CLA — o core não precisa ser
   relicenciável, porque o componente pago vive em repositório separado (doc 20)
+- O starter kit é `aru make:auth`, **não um repositório**: em Go o que se importa
+  não se edita, e editar a tela de login é a primeira coisa que se faz (ADR 0012)
+- Não existe `arandu-io/database`: `database/sql` já é a interface comum,
+  `framework/data` já é o contrato, e o driver entra por blank import no
+  projeto (ADR 0013)
+- Eventos só por **outbox**, dentro da transação da escrita. Não existe
+  `Publish()` direto, e `Store` fora de `data.Transaction` é erro (doc 27)
+- Todo módulo declara `arandu.mod.toml`, e o `doctor` confere a declaração de
+  permissões contra o AST: usada e não declarada é erro (doc 18)
+- Toolchain de view gerenciado pela `aru` em `~/.arandu/bin`, fixado em
+  `arandu.toml`. `templ` e `tailwindcss` standalone, zero Node (doc 14)
 
 ## Decisões abertas
 
-- `oka` como nome do starter kit — "oca" também é vazio/oco em português
 - Nome da camada de view: `porang` confirmado, sem impedimento
 - Verificação etimológica das palavras marcadas `[C]` e `[?]` em `07-pacotes.md`
 - Redesenhar o `docs` como aplicação Arandu, e só então torná-lo público. Depende

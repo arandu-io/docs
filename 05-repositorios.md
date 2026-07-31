@@ -53,11 +53,10 @@ fornecedor multiplica repositório sem isolar dependência nenhuma. A divisão �
 **domínio**, com driver pesado em submódulo:
 
 ```
-arandu-io/database    Repository + pgx; submódulos mysql, sqlite
 arandu-io/kv          go-redis (RESP): cobre Redis, Dragonfly, Valkey, KeyDB
 arandu-io/mail        interface + SMTP; submódulos ses, resend, postmark, mailgun
 arandu-io/storage     interface + disco local; submódulos s3, gcs, azure
-arandu-io/queue       interface + driver sobre kv e sobre database; submódulos nats, sqs
+arandu-io/queue       interface + driver sobre kv e sobre framework/data; submódulos nats, sqs
 arandu-io/ws          coder/websocket e gobwas/ws
 ```
 
@@ -66,7 +65,7 @@ que o Laravel faz — `Illuminate\Mail` traz SMTP, Mailgun, Postmark, SES e Rese
 juntos; `Illuminate\Database` traz MySQL, Postgres e SQLite juntos.
 
 Convenção de nome: **sem prefixo redundante e em inglês funcional**. É
-`arandu-io/database`, não `arandu-io/arandu-postgres` — a org já carrega o nome, e
+`arandu-io/kv`, não `arandu-io/arandu-redis` — a org já carrega o nome, e
 o nome tupi fica nos produtos (`porang`, `marandu`), não na infraestrutura.
 
 ### Módulos de primeira parte
@@ -77,9 +76,7 @@ O equivalente aos pacotes first-party do Laravel. Cada um implementa
 ```
 Nomes definidos em `docs/07-pacotes.md`. Os principais:
 
-arandu-io/oka        starter kit (Breeze)
 arandu-io/curupira   tokens de API (Sanctum)
-arandu-io/oka        starter kit (Breeze)
 arandu-io/marandu    inspetor de requests em dev (Telescope)
 arandu-io/maraca     performance da aplicação (Pulse)
 arandu-io/boitata    APM em produção (Nightwatch)
@@ -136,7 +133,10 @@ Fase 1: `framework`, `arandu`, `aru`, `docs` — **feito**, os quatro existem,
 compilam e estão publicados. `examples` entrou junto: escrever à mão o módulo que
 o gerador vai emitir é o passo que transforma "template que pareceu bom" em
 "template já usado"
-Fase 2: `database`, `kv`, `porang`, `oka`, `homebrew-tap`
+Fase 2: `porang`, `kv`, `homebrew-tap` — **feito**, os três existem e estão
+publicados. `database` e `oka` saíram da lista: ver ADR 0013 (o domínio de dados
+é `framework/data`, e o driver é escolhido pelo projeto) e ADR 0012 (o starter
+kit é `aru make:auth`, não um repositório)
 Fase D: `website` (aplicacao Arandu, depende do porang)
 Fase 4+: `taba` (painel administrativo) e a camada de IA, ainda sem nome.
 Ver a triagem em `06-escopo.md`
