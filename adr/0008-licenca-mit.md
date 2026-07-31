@@ -11,13 +11,31 @@ restritiva não recupera o que já foi distribuído sob a anterior.
 ## Decisão
 
 MIT, no mesmo formato do Laravel: arquivo `LICENSE.md`, texto padrão MIT,
-`Copyright (c) Paulo R. Lima (HYZIS)`, sem ano — o Laravel omite o ano, e ano
-fixo obriga a editar o arquivo todo janeiro.
+`Copyright (c) HYZIS - Serviços Digitais LTDA`, sem ano — o Laravel omite o ano,
+e ano fixo obriga a editar o arquivo todo janeiro.
 
-O titular é **Paulo R. Lima (HYZIS)**: o software pertence à HYZIS, e a forma do
-aviso registra as duas coisas — a pessoa que detém o direito autoral e a empresa
-a que o software pertence. Uma linha só, porque um aviso de copyright que exige
-interpretação não protege ninguém.
+## O titular
+
+O software pertence à **pessoa jurídica**, que é quem o desenvolve:
+
+| | |
+|---|---|
+| Razão social | HYZIS - SERVIÇOS DIGITAIS LTDA |
+| Nome fantasia | HYZIS - Desenvolvimento Digital |
+| CNPJ | 57.283.262/0001-28 (matriz) |
+| Sede | Rua Bom Pastor, 529, sala 03 — Ipiranga, São Paulo/SP, 04203-050 |
+| Contato | contact@hyz.is |
+
+No `LICENSE.md` vai só a razão social. CNPJ e endereço ficam aqui: um aviso de
+copyright é para dizer quem detém o direito, e todo dado a mais nele é uma linha
+que alguém vai ter que manter em nove arquivos.
+
+**Por que a PJ e não a pessoa física.** É ela quem desenvolve, é em nome dela que
+a marca vai ao INPI (`04-marca.md`) e é ela que assina contrato de suporte ou de
+licença comercial do componente pago (`taba`, Fase 4). Titularidade dividida
+entre pessoa física e jurídica é o tipo de coisa que só aparece como problema no
+dia de uma aquisição ou de uma disputa — quando já não dá para arrumar sem
+rastrear cada contribuição.
 
 Vale em **todos** os repositórios da organização, sem exceção: `framework`,
 `aru`, `arandu`, `examples`, `porang`, `kv`, `database`, `homebrew-tap` e

@@ -83,6 +83,9 @@ Escopo vem antes de nomes de propósito: só se nomeia o que vai existir.
   permissões contra o AST: usada e não declarada é erro (doc 18)
 - Toolchain de view gerenciado pela `aru` em `~/.arandu/bin`, fixado em
   `arandu.toml`. `templ` e `tailwindcss` standalone, zero Node (doc 14)
+- Titular do copyright é a **pessoa jurídica**: HYZIS - Serviços Digitais LTDA,
+  CNPJ 57.283.262/0001-28. Vale em todos os repositórios, e é em nome dela que a
+  marca vai ao INPI (ADR 0008)
 
 ## Decisões abertas
 
@@ -90,8 +93,6 @@ Escopo vem antes de nomes de propósito: só se nomeia o que vai existir.
 - Verificação etimológica das palavras marcadas `[C]` e `[?]` em `07-pacotes.md`
 - Redesenhar o `docs` como aplicação Arandu, e só então torná-lo público. Depende
   do `porang`, ou seja, da Fase 2
-- Titular do copyright: `Paulo Lima` pessoa física, no `LICENSE.md`. Trocar para a
-  pessoa jurídica se a marca for registrada em nome dela (ADR 0008)
 - O esqueleto pesa 23 MB de binário por causa do SQLite puro-Go (`modernc.org`,
   que carrega um compilador C). Aceito pelo ganho de rodar sem instalar nada;
   revisitar se o tamanho incomodar em produção — quem usa só Postgres remove o

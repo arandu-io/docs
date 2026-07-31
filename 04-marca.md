@@ -92,9 +92,11 @@ A fazer, e nesta ordem:
 3. Org no GitHub: **`arandu-io`** (`@Arandu` e `Arandusoft` estão tomados).
    Módulo: `github.com/arandu-io/framework`.
 4. Fórmula do Homebrew: registrar como `aru`, não `arandu`
-5. INPI classes 9 e 42 — buscar anterioridade. Existem `arandu.studio` e
-   `Arandusoft` em classes adjacentes; vale opinião de advogado antes de
-   investir em identidade visual.
+5. INPI classes 9 e 42, **em nome de HYZIS - Serviços Digitais LTDA**
+   (CNPJ 57.283.262/0001-28), que é a titular do copyright — marca e código no
+   mesmo titular, ou a separação vira problema no dia de uma aquisição. Buscar
+   anterioridade antes: existem `arandu.studio` e `Arandusoft` em classes
+   adjacentes, e vale opinião de advogado antes de investir em identidade visual.
 6. **Não** usar ccTLD como vanity import path. `.io` é o código do Território
    Britânico do Oceano Índico, que deixa de existir pelo tratado de 2025 —
    se o código sair do ISO 3166-1, a ICANN inicia aposentadoria em cinco anos.
