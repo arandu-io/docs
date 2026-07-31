@@ -69,11 +69,15 @@ Critério: sem esses quatro não existe produto.
 ## CONSTRUIR — Fase 2
 
 ```
-arandu-io/postgres     adapter — sem ele o framework não roda
-arandu-io/redis        adapter — sessão e rate limit distribuídos
+arandu-io/database     adapter de SQL — sem ele o framework não roda
+arandu-io/kv           adapter de chave-valor — sessão e rate limit distribuídos
 arandu-io/porang       camada de view (templ + HTMX + Basecoat)
 arandu-io/oka          starter kit: telas de auth
 ```
+
+Os nomes seguem `11-adapters.md`: um pacote por **domínio**, não por fornecedor.
+`database` cobre Postgres, MySQL e SQLite; `kv` cobre Redis, Dragonfly, Valkey e
+KeyDB, porque falam o mesmo protocolo.
 
 `porang` é o único com valor competitivo real da lista — é a camada que liga
 componente a Grant, validação e CSRF, e nenhuma biblioteca genérica pode fazer.
