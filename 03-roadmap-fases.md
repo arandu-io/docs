@@ -57,23 +57,44 @@ O que **não** entra na fase 1: templ, HTMX, geração de código, IA, deploy.
 **Objetivo:** parar de escrever CRUD à mão, e transformar as regras de
 arquitetura em verificação automática.
 
-Entregas:
+Entregas — **todas feitas**:
 
-- `aru make:module` — gerador determinístico (templates, zero LLM)
-- `aru doctor` — as 10 regras de análise estática listadas em `cmd/arandu/doctor.go`
-- camada de view: templ + HTMX, com o template base já trazendo o
-  `hx-headers` do CSRF (a armadilha nº 1 desse stack)
+- `aru make:module` — gerador determinístico (templates, zero LLM), com golden
+  files e blocos `arandu:begin custom` preservados na regeração
+- `aru doctor` — onze regras de análise estática. A décima primeira confere o
+  `arandu.mod.toml` contra o AST: permissão usada e não declarada é erro
+- `porang` — camada de view em templ + HTMX, com o `hx-headers` do CSRF no
+  layout base (a armadilha nº 1 desse stack)
 - `aru make:module --tenant` — escopo de tenant no SQL gerado, vindo do Grant
-- migrações coletadas dos módulos, com Atlas
-- golden files para toda saída do gerador
+- `aru make:auth` — o starter kit, publicado no projeto e não importado
+  (ADR 0012)
+- `aru view:build` e `aru dev` — toolchain de view gerenciado pela CLI,
+  `templ` e `tailwindcss` standalone, fixados em `arandu.toml`, cacheados em
+  `~/.arandu/bin`. Zero Node
+- `data.Transaction` e `events.Outbox` — evento gravado na mesma transação da
+  escrita, nunca `Publish()` direto (doc 27)
+- `arandu-io/kv` — cache, sessão, rate limit e lock sobre RESP (doc 11)
+- `arandu-io/homebrew-tap` — `brew install arandu-io/tap/aru`
+- migrações coletadas dos módulos. **Sem Atlas**: `data.Migrate` cobre o que a
+  Fase 2 precisa, e um segundo migrador seria uma segunda forma de fazer a mesma
+  coisa
 
 Critério de saída:
 
 1. `aru make:module cliente --campos "..."` gera módulo que compila, passa
-   `doctor` e tem teste verde sem edição manual
-2. `doctor` roda em CI e falha em pelo menos 3 violações plantadas de propósito
-3. Um CRUD real de um dos seus produtos foi substituído por módulo gerado
-4. Tempo medido: do zero ao CRUD funcionando em menos de 5 minutos
+   `doctor` e tem teste verde sem edição manual — **verificado**, e o checklist
+   gera num projeto temporário e compila o resultado a cada execução
+2. `doctor` roda em CI e falha em pelo menos 3 violações plantadas de propósito —
+   **verificado**: oito violações plantadas em `aru/internal/doctor/testdata`,
+   e o esqueleto passa no próprio `doctor --strict`
+3. Um CRUD real de um dos seus produtos foi substituído por módulo gerado —
+   **aberto**, depende do proprietário
+4. Tempo medido: do zero ao CRUD funcionando em menos de 5 minutos —
+   **verificado**, medido em 2 segundos
+
+O que **não** entra na Fase 2: relay do outbox, fila morta e painel de eventos
+(Fase 3, doc 27); registry de módulos (Fase 4, doc 18); documentação de uso
+(fase própria, doc 08).
 
 ---
 
