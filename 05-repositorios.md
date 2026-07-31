@@ -47,16 +47,27 @@ arandu-io/homebrew-tap  fórmula do `aru` (nome da fórmula: aru, não arandu).
 
 Existem para manter o core sem dependência de terceiros (ADR 0004).
 
+**Esta seção foi substituída por `11-adapters.md`**, que resolveu um problema que
+não estava visto aqui: em Go não existe dependência opcional, então um pacote por
+fornecedor multiplica repositório sem isolar dependência nenhuma. A divisão é por
+**domínio**, com driver pesado em submódulo:
+
 ```
-arandu-io/postgres
-arandu-io/redis
-arandu-io/nats
-arandu-io/s3
-arandu-io/smtp
+arandu-io/database    Repository + pgx; submódulos mysql, sqlite
+arandu-io/kv          go-redis (RESP): cobre Redis, Dragonfly, Valkey, KeyDB
+arandu-io/mail        interface + SMTP; submódulos ses, resend, postmark, mailgun
+arandu-io/storage     interface + disco local; submódulos s3, gcs, azure
+arandu-io/queue       interface + driver sobre kv e sobre database; submódulos nats, sqs
+arandu-io/ws          coder/websocket e gobwas/ws
 ```
 
-Convenção de nome: **sem prefixo redundante**. É `arandu-io/postgres`, não
-`arandu-io/arandu-postgres` — a org já carrega o nome, igual `laravel/horizon`.
+Seis pacotes no lugar dos quinze que a lista por fornecedor produziria. É o mesmo
+que o Laravel faz — `Illuminate\Mail` traz SMTP, Mailgun, Postmark, SES e Resend
+juntos; `Illuminate\Database` traz MySQL, Postgres e SQLite juntos.
+
+Convenção de nome: **sem prefixo redundante e em inglês funcional**. É
+`arandu-io/database`, não `arandu-io/arandu-postgres` — a org já carrega o nome, e
+o nome tupi fica nos produtos (`porang`, `marandu`), não na infraestrutura.
 
 ### Módulos de primeira parte
 
@@ -87,8 +98,8 @@ opcional que o usuário esquece de instalar. `starter-auth` traz só as telas.
 ### UI e distribuição
 
 ```
-arandu-io/ui         camada de view em templ, ligada aos contratos do core
-arandu-io/registry   JSON estático servido em registry.arandu.dev
+arandu-io/porang     camada de view em templ, ligada aos contratos do core
+arandu-io/moitara    registry de módulos — ver 18-marketplace.md
 arandu-io/examples   apps de exemplo
 ```
 
@@ -120,8 +131,9 @@ Separado, o core continua com duas dependências.
 
 ## Ordem de criação
 
-Fase 1: `framework`, `arandu`, `aru`, `docs`, `.github`
-Fase 2: `postgres`, `redis`, `ui`, `registry`, `homebrew-tap`
+Fase 1: `framework`, `arandu`, `aru`, `docs` — **feito**, os quatro existem,
+compilam e estão publicados
+Fase 2: `database`, `kv`, `porang`, `oka`, `homebrew-tap`
 Fase D: `website` (aplicacao Arandu, depende do porang)
 Fase 4+: `taba` (painel administrativo) e a camada de IA, ainda sem nome.
 Ver a triagem em `06-escopo.md`
