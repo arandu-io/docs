@@ -10,13 +10,24 @@ Um binário estático. `CGO_ENABLED=0`, assets embutidos por `go:embed`
 `vendor/`, sem `node_modules`, sem servidor web na frente obrigatório.
 
 ```
-aru build            # binário + checksum + versão via ldflags
-aru build --docker   # imagem distroless, ~25 MB
+aru build            # binário + checksum + versão via ldflags — feito
+aru build --docker   # imagem distroless a partir do Dockerfile — feito
 ```
 
-O `aru new` já gera `Dockerfile` e `compose.yml`. Isso cobre Dokploy, Coolify,
-Kamal, Fly, Railway, ECS e Kubernetes sem nenhum código nosso — todos consomem
-imagem OCI.
+O esqueleto traz `Dockerfile` e `compose.yml`, e `aru new` os copia. Isso cobre
+Dokploy, Coolify, Kamal, Fly, Railway, ECS e Kubernetes sem nenhum código nosso
+— todos consomem imagem OCI.
+
+Três propriedades da imagem, verificadas por teste no esqueleto porque falham
+tarde e caro:
+
+- **`CGO_ENABLED=0`** — é o que faz o binário rodar numa base sem libc. Com cgo
+  ligado a imagem constrói e o contêiner sai na hora com "no such file or
+  directory", nomeando o binário que está bem ali
+- **`USER nonroot`** — contêiner rodando como root está a um escape de ser root
+  no nó
+- **migration não roda no entrypoint** (REGRA 16), e o entrypoint é exatamente
+  onde alguém colocaria
 
 ## O que já existe no kernel e conta como deploy
 

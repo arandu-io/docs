@@ -15,18 +15,28 @@ Interface opcional do módulo, no mesmo modelo de `Migrations()`:
 ```go
 func (m *Module) Schedule() []kernel.Task {
     return []kernel.Task{{
-        ID:       "billing.fechar-ciclo",
-        Spec:     "0 3 * * *",       // cron de 5 campos
-        Escopo:   kernel.PorTenant,   // ou kernel.Global
-        Timeout:  10 * time.Minute,
+        ID:        "billing.close-cycle",
+        Spec:      "0 3 * * *",        // cron de 5 campos
+        Scope:     kernel.PerTenant,   // ou kernel.Global
+        Timeout:   10 * time.Minute,
         Singleton: true,
-        Acao:     ActionCicloFechar,  // vira SystemGrant
+        Action:    ActionCycleClose,   // vira o SystemGrant
+        Run:       m.closeCycle,
     }}
 }
 ```
 
-`Escopo: PorTenant` faz o scheduler expandir a tarefa para cada tenant ativo,
-cada uma com seu `SystemGrant` e seu lock. `Global` roda uma vez.
+Em inglês porque é código, e código é inglês (REGRA 6, ADR 0005).
+
+`Scope: PerTenant` faz o scheduler expandir a tarefa para cada tenant ativo,
+cada uma com seu `SystemGrant` e seu lock. `Global` roda uma vez — e recebe o
+`Grant` zero, porque `SystemGrant` recusa tenant vazio (REGRA 14). Consequência
+registrada: **tarefa Global não alcança repositório nenhum.** Isso é restrição,
+não esquecimento: trabalho global é limpar arquivo temporário e aquecer cache;
+o que lê linha de cliente é `PerTenant`, e ter que dizer isso é o ponto.
+
+A lista de tenants ativos é injetada em `scheduler.Options.Tenants`, porque o
+core não sabe onde a aplicação guarda a dela.
 
 ## Réplica: o problema que o cron esconde
 
@@ -46,17 +56,38 @@ tarefa aparece no console de debug igual à de um request.
 Retentativa **não** é do scheduler: a tarefa enfileira um job e a fila cuida do
 retry. Scheduler dispara, fila persiste.
 
-## Workers de fila
+## Workers de fila — **feito**
 
-Mesmo binário, subcomando: `aru work --fila=default --workers=4`. Não é um
+Mesmo binário, subcomando: `aru work --queue=default --workers=4`. Não é um
 segundo artefato, é a mesma imagem com outro argumento — o que mantém o deploy
-com um artefato só (`17-deploy.md`).
+com um artefato só (`17-deploy.md`), e impede que o worker rode uma versão
+diferente do código que o servidor.
 
-## Comandos
+A fila é `arandu-io/queue` (ADR 0016). O driver padrão é a tabela da própria
+aplicação, porque um job empurrado dentro de `data.Transaction` é comitado pela
+mesma transação da linha que o produziu.
+
+## Comandos — **feitos**
 
 - `aru schedule:list` — o que está registrado, com próxima execução
-- `aru schedule:run <id> [--tenant=…]` — execução manual, mesma trilha de auditoria
-- `aru work` — worker de fila
+- `aru schedule:run <id> [--tenant=…]` — execução manual, mesmo lock, mesmo
+  `Grant`, mesma instrumentação. Rota diferente seria porta dos fundos, e as
+  duas divergiriam
+- `aru work [--queue=…] [--workers=…]` — worker de fila
+
+Os três são o mesmo binário com outro argumento, o que mantém o deploy em um
+artefato só (`17-deploy.md`).
+
+## O que o scheduler não faz
+
+**Retentativa.** Uma tarefa que falha é registrada no log e no
+`kernel.Diagnostic`, e a próxima janela roda de novo. Trabalho que precisa de
+orçamento de retry enfileira um job, e a fila cuida — `arandu-io/queue`, com
+backoff exponencial e fila morta. Scheduler dispara, fila persiste.
+
+**Cron de segundos.** Cinco campos, não seis. Um framework que oferece cron de
+segundo oferece um jeito de escrever busy loop por acidente, e trabalho que
+precisa acontecer a cada poucos segundos é worker, não agendamento.
 
 ## O que não construímos
 

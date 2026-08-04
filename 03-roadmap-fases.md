@@ -119,6 +119,14 @@ Entregas:
 - relay do outbox, fila morta e atraso no health check (doc 27) — **feito**
 - `kernel.Diagnostic`: o módulo diz o que está errado, e aparece na página de
   erro — **feito**
+- agendamento: `kernel.Task`, scheduler in-process com lock, escopo por tenant,
+  e a tarefa instrumentada como request no console (doc 16) — **feito**
+- fila: `arandu-io/queue` sobre a tabela e sobre RESP, com backoff, fila morta e
+  `aru work` — **feito**, ADR 0016
+- storage: `arandu-io/storage` em disco e sobre o protocolo S3, com R2 como
+  padrão — **feito**, ADR 0016
+- deploy: `aru build`, `aru build --docker` e o Dockerfile distroless do
+  esqueleto (doc 17) — **feito**
 - exportador OpenTelemetry opcional — **adiado com gatilho**, ver ADR 0015
 
 Critério de saída:

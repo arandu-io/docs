@@ -71,6 +71,22 @@ queries, um caminho de autorização. Trocar o driver não duplica nada.
 
 ## Alta performance — o que entra e o que não
 
+### Cloudflare R2 — o padrão de object storage
+
+Mesma lógica do Dragonfly abaixo: um produto recomendado atrás de um protocolo
+que já é padrão. A API do S3 cobre R2, S3, Spaces, B2 e MinIO, então adotar R2
+custa uma linha de configuração.
+
+**O motivo é a conta.** R2 não cobra egresso. Num SaaS que devolve arquivo para
+quem o enviou — nota fiscal, relatório, anexo — o egresso é a maior parte da
+fatura de storage em S3, e cresce com o número de clientes. É o tipo de custo
+que só aparece quando o produto começa a dar certo.
+
+Ressalva registrada: R2 não implementa a API inteira do S3. O que este adapter
+usa — PUT, GET, HEAD, DELETE e ListObjectsV2 com paginação — é suportado; ACL
+por objeto, versionamento e classes de armazenamento não são, e nenhum deles
+está no contrato `storage.Store`.
+
 ### Dragonfly — entra como padrão recomendado
 
 Compatível com o protocolo Redis (RESP2 e RESP3); o `go-redis` conecta sem
@@ -124,5 +140,17 @@ Nesse dia, avaliar — e a avaliação começa pelo custo de manter duas camadas
 Fase 2: `database` e `kv` — **feitos**. O contrato de dados fica no core
 (`framework/data`, onde o `Grant` é obrigatório) e o `database` fica com tudo que
 precisa de driver, um módulo por driver. Ver ADR 0014.
-Fase 3: `queue` (sobre `kv`, depois `nats`), `storage` (local, depois `s3`).
+Fase 3: `queue` e `storage` — **feitos**, e são o décimo e o décimo primeiro
+repositórios, autorizados pela ADR 0016.
+
+A fila padrão é a **tabela da própria aplicação**, não o Redis: um job empurrado
+dentro de `data.Transaction` é comitado pela mesma transação da linha que o
+produziu, que é a garantia do outbox aplicada a trabalho. O driver RESP é o
+segundo, para volume que a tabela não aguenta.
+
+O object storage padrão é o **Cloudflare R2**. Não cobra egresso, e num SaaS que
+devolve arquivo para quem o enviou o egresso é a maior parte da conta em todo o
+resto — é a linha que cresce junto com o sucesso. O pacote se chama `s3` porque
+é o nome do protocolo, que cobre R2, S3, Spaces, B2 e MinIO; o produto
+recomendado aparece em `s3.R2(...)`, como o Dragonfly aparece no `kv`.
 Com demanda: `mail`, `ws`, e os submódulos de cada domínio.

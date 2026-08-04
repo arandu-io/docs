@@ -55,9 +55,10 @@ fornecedor multiplica repositório sem isolar dependência nenhuma. A divisão �
 ```
 arandu-io/database    registro, pool e erro; submodulos pgx, sqlite, mysql
 arandu-io/kv          go-redis (RESP): cobre Redis, Dragonfly, Valkey, KeyDB
+arandu-io/queue       fila sobre a tabela; submodulo kv para volume
+arandu-io/storage     disco local; submodulo s3, com R2 como padrao
 arandu-io/mail        interface + SMTP; submódulos ses, resend, postmark, mailgun
 arandu-io/storage     interface + disco local; submódulos s3, gcs, azure
-arandu-io/queue       interface + driver sobre kv e sobre framework/data; submódulos nats, sqs
 arandu-io/ws          coder/websocket e gobwas/ws
 ```
 
@@ -138,6 +139,8 @@ Fase 2: `porang`, `kv`, `database`, `homebrew-tap` — **feito**, os quatro
 existem e estão publicados. `oka` saiu da lista: o starter kit é `aru make:auth`,
 não um repositório (ADR 0012). O `database` é um repositório com quatro módulos —
 o contrato fica no core e cada driver tem o seu (ADR 0014)
+Fase 3: `queue` e `storage` — **feito**. São o décimo e o décimo primeiro
+repositórios, autorizados pela ADR 0016; a REGRA 3 passa a valer com onze
 Fase D: `website` (aplicacao Arandu, depende do porang)
 Fase 4+: `taba` (painel administrativo) e a camada de IA, ainda sem nome.
 Ver a triagem em `06-escopo.md`

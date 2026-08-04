@@ -89,6 +89,16 @@ Escopo vem antes de nomes de propósito: só se nomeia o que vai existir.
 - Exportador OpenTelemetry **adiado com gatilho** — um cliente real com Grafana,
   Datadog ou Honeycomb já em produção. APM próprio segue fora de escopo para
   sempre (ADR 0015)
+- `queue` e `storage` são o décimo e o décimo primeiro repositórios, autorizados
+  pelo proprietário. A REGRA 3 passa a valer com onze (ADR 0016)
+- A fila padrão é a **tabela da aplicação**, não o Redis: job empurrado dentro de
+  `data.Transaction` é comitado com a linha que o produziu
+- O object storage padrão é **Cloudflare R2**, porque não cobra egresso — a maior
+  parte da conta num SaaS que devolve arquivo para quem o enviou. O pacote se
+  chama `s3` porque é o protocolo, e cobre R2, S3, Spaces, B2 e MinIO
+- Tarefa **Global** recebe o `Grant` zero e por isso não alcança repositório:
+  trabalho que lê linha de cliente é `PerTenant`, e ter que dizer isso é o ponto
+  (doc 16, REGRA 14)
 - Titular do copyright é a **pessoa jurídica**: HYZIS - Serviços Digitais LTDA,
   CNPJ 57.283.262/0001-28. Vale em todos os repositórios, e é em nome dela que a
   marca vai ao INPI (ADR 0008)
@@ -106,17 +116,26 @@ Escopo vem antes de nomes de propósito: só se nomeia o que vai existir.
 
 ## Estado do código
 
-Fase 1 compila e passa nos testes. Cinco repositórios na org, quatro deles
-públicos desde 31/07/2026 — `docs` segue privado até ser redesenhado como
-aplicação Arandu:
+Fases 1, 2 e 3 entregues, com quatro critérios em aberto que dependem de pessoa
+e não de código. **Onze repositórios** na org, dez públicos — `docs` segue
+privado até ser redesenhado como aplicação Arandu.
 
-| Repositório | Estado |
+Para o estado verificado a cada execução, rode `./plans/checklist.sh`: ele checa
+por comando, e separa o que depende de pessoa.
+
+| Repositório | O que é |
 |---|---|
-| `framework` | 10 pacotes, `go build`, `go vet` e `go test -race` limpos |
-| `aru` | CLI, módulo próprio sem dependência; `key:generate`, `serve`, `migrate`, `routes` |
-| `arandu` | esqueleto; sobe, serve `/auth/login`, health e shutdown gracioso. `database/seeders` no padrão Laravel |
+| `framework` | a biblioteca: kernel, security, data, httpx, validation, observability, events, jobs, scheduler, storage, config |
+| `aru` | a CLI, módulo próprio sem dependência: `new`, `dev`, `serve`, `migrate*`, `db:seed`, `make:module`, `make:auth`, `make:policy`, `view:build`, `build`, `schedule:*`, `work`, `trace`, `doctor`, `routes` |
+| `arandu` | o esqueleto: sobe, autentica, migra, agenda, drena fila, e constrói uma imagem distroless |
+| `porang` | a camada de view: templ, HTMX, Tailwind standalone, zero Node |
+| `database` | conexão e pool; um módulo por driver (`pgx`, `sqlite`, `mysql`) |
+| `kv` | cache, sessão, rate limit e lock sobre RESP |
+| `queue` | fila sobre a tabela; submódulo `kv` para volume |
+| `storage` | disco local; submódulo `s3`, com R2 como padrão |
+| `homebrew-tap` | `brew install arandu-io/tap/aru` |
+| `examples` | a aplicação de demonstração |
 | `docs` | estes documentos e os ADRs |
-| `examples` | a aplicação de demonstração: dois módulos escritos à mão e um tour guiado |
 
 Os 27 documentos estão publicados, sem buraco na sequência. Para o estado
 verificado do projeto a qualquer momento: `./plans/checklist.sh`.
