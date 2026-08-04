@@ -148,24 +148,43 @@ para compilar contra.
 
 Entregas:
 
-- DSL declarativa (`.arandu.yaml` ou HCL) descrevendo módulo, entidades, campos,
-  relações, permissões e telas
-- `aru generate` — DSL → código, determinístico, mesma engine da fase 2
-- schema JSON da DSL publicado — é isso que faz o LLM gerar spec válida sem
-  ter sido treinado no framework
-- validação da spec **antes** de gerar: erro de spec nunca vira código quebrado
-- `arandu ai` — o LLM produz **apenas a DSL**, nunca Go; a spec é revisada pelo
-  humano antes de gerar
-- round-trip: código gerado → DSL → código idêntico (prova de que não há drift)
+- DSL declarativa em YAML (`module.arandu.yaml`) descrevendo módulo, campos e
+  permissões — **feito**. Sem relações e sem telas: ver "o que ficou de fora"
+- `aru generate` — DSL → código, determinístico, **a mesma engine** do
+  `make:module`, com os mesmos golden files — **feito**
+- `aru schema` — o JSON Schema da DSL, gerado das mesmas constantes que o
+  validador usa, com exemplo que passa na própria validação — **feito**
+- validação da spec **antes** de gerar, reportando todos os problemas de uma
+  vez, e sem escrever arquivo nenhum quando reprova — **feito**
+- round-trip: código gerado → DSL → código idêntico byte a byte, verificado por
+  teste — **feito**
+- `arandu ai` — **não construído**. O que ele faria é pedir a DSL a um modelo, e
+  isso é o que qualquer assistente já faz melhor com o schema na mão. O produto
+  desta camada é o schema, não um wrapper de chamada
 
 Critério de saída:
 
-1. A partir de uma descrição em português, sai módulo que compila, passa
-   `doctor` e tem teste verde, **sem edição manual**
-2. Um LLM sem qualquer fine-tuning, recebendo só o schema da DSL, acerta a spec
-   em 9 de 10 tentativas
-3. Regenerar um módulo existente não perde código customizado (blocos
-   protegidos por marcador)
+1. A partir de uma descrição, sai módulo que compila, passa `doctor` e tem teste
+   verde, **sem edição manual** — **verificado**, e o checklist gera num projeto
+   temporário e roda os três a cada execução
+2. Um LLM sem fine-tuning, recebendo só o schema, acerta a spec em 9 de 10
+   tentativas — **aberto**, depende de medição
+3. Regenerar não perde o código customizado — **verificado**
+
+### O que ficou de fora da DSL, e por quê
+
+`relações` e `telas` estavam na lista e não entraram. O motivo é a REGRA 15: a
+DSL é um conjunto fechado, e cada coisa que entra nela é mantida para sempre.
+
+- **relações** — `belongs_to` e `has_many` só fazem sentido dentro do agregado,
+  e o `data.Repository` já é por agregado. Uma relação na DSL viraria join
+  gerado, e join gerado é o começo de um ORM
+- **telas** — `list`, `form` e `show` gerariam templ, e a forma canônica de uma
+  tela ainda não existe: `make:auth` publica a primeira, e é dela que se aprende
+  o que uma tela gerada deve parecer. Gerar antes disso é adivinhar
+
+Ambas voltam à mesa quando houver um módulo real pedindo, que é o mesmo gatilho
+de todo o resto.
 
 ---
 

@@ -56,9 +56,18 @@ Nunca remover e avisar na mesma versão.
 
 ## Migração é código, não texto
 
-`aru upgrade` roda migrações automáticas quando a mudança é mecânica (renomear
-símbolo, mover pacote, ajustar assinatura). Migração que não pode ser automática
-vira item explícito no `UPGRADE.md` com exemplo antes/depois.
+Migração que não pode ser automática vira item explícito no `UPGRADE.md`, com
+exemplo antes e depois.
+
+**`aru upgrade` — ainda não existe, e tem gatilho.** Ele rodaria as migrações
+mecânicas (renomear símbolo, mover pacote, ajustar assinatura) como um codemod.
+Não foi construído porque o framework está em `v0.x` e ainda não houve uma
+mudança mecânica para automatizar — escrever o codemod antes da primeira seria
+adivinhar a forma dela.
+
+**Gatilho:** a primeira mudança de minor que exija a mesma edição em mais de um
+lugar de um projeto real. Nesse dia o codemod se escreve contra aquela mudança,
+que é o único jeito de saber se a ferramenta serve.
 
 O alvo, escrito porque é o que se cobra da gente: **subir de minor não deve
 tomar mais que dez minutos** num projeto médio.
