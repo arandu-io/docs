@@ -168,7 +168,29 @@ Critério de saída:
    verde, **sem edição manual** — **verificado**, e o checklist gera num projeto
    temporário e roda os três a cada execução
 2. Um LLM sem fine-tuning, recebendo só o schema, acerta a spec em 9 de 10
-   tentativas — **aberto**, depende de medição
+   tentativas — **verificado**, medido em 05/08/2026
+
+   Dez modelos, dez pedidos em português, nada além do schema. Primeira rodada
+   **8 de 10**, abaixo do critério, e as duas falhas eram a mesma linha: uma
+   `description` escrita como frase, com dois-pontos, sem aspas — o que encerra
+   o valor YAML e faz o parser ler o resto como chave aninhada.
+
+   O que ele dizia era *"mapping values are not allowed in this context"*, que
+   nomeia um conceito de YAML e nenhuma ação. **O defeito era nosso**: quem
+   escreve uma frase em português cai nisso. A mensagem passou a nomear a linha,
+   o dois-pontos e a linha corrigida pronta para colar, e o schema avisa no
+   único campo que guarda frase.
+
+   Remedido com **dez pedidos novos** — não os mesmos, que mediriam o quanto o
+   produto foi ajustado ao teste: **10 de 10**. Sete das dez descrições traziam
+   dois-pontos, e as sete vieram com aspas.
+
+   Gerar os dez achou o segundo defeito, e esse é pior: a assinatura da Policy
+   liga `ctx`, `s` e `a`, então uma entidade cuja inicial é uma delas —
+   `Subscription`, `Account`, `Category` — sombreava o parâmetro de que
+   precisava, e o arquivo não compilava. Todos os golden files usavam
+   `purchase_order`, que começa com `p`. **Gerador testado com um módulo só
+   nunca vê isso.**
 3. Regenerar não perde o código customizado — **verificado**
 
 ### O que ficou de fora da DSL, e por quê
