@@ -1,7 +1,8 @@
 # Pilar: logs e debug
 
-Esta é a razão de existir do framework. As outras partes são commodity — dá para
-montar com Chi, sqlc e templ em uma semana. Isso não.
+Esta é a razão de existir do framework. As outras partes são commodity: com o
+que já existe no ecossistema Go lá fora — Chi, sqlc, templ — se monta um
+equivalente em uma semana. Isso não.
 
 ## Por que é aqui que dá para ganhar
 

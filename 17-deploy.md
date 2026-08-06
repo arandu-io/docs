@@ -6,8 +6,10 @@ metade disso já está pronta e a outra metade não deve ser construída agora.
 ## O artefato
 
 Um binário estático. `CGO_ENABLED=0`, assets embutidos por `go:embed`
-(`14-view-e-assets.md`), templates compilados pelo templ. Sem runtime, sem
-`vendor/`, sem `node_modules`, sem servidor web na frente obrigatório.
+(`14-view-e-assets.md`), views compiladas pelo `kyse` antes do build — o `.go`
+gerado ao lado de cada `.kyse.go` entra no binário como código normal. Sem
+runtime, sem `vendor/`, sem `node_modules`, sem servidor web na frente
+obrigatório.
 
 ```
 aru build            # binário + checksum + versão via ldflags — feito

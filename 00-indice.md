@@ -4,39 +4,44 @@ Ordem de leitura. Cada documento decide algo que o seguinte assume como dado.
 
 | # | Documento | O que decide |
 |---|---|---|
-| 01 | `01-arquitetura.md` | o caminho obrigatório, o Grant, módulo vertical, o que não portamos do Laravel |
+| 01 | `01-arquitetura.md` | o caminho obrigatório, o Grant, a estrutura do Laravel, o que não portamos do Laravel |
 | 02 | `02-observabilidade.md` | o pilar de logs e debug — o diferencial do produto |
-| 03 | `03-roadmap-fases.md` | Fases 1 a 4, com critério de saída verificável em cada uma |
+| 03 | `03-roadmap-fases.md` | Fases 1 a 4, com critério de saída verificável |
 | 04 | `04-marca.md` | nome, posicionamento, tom de voz, atribuição da língua |
-| 05 | `05-repositorios.md` | como os repositórios se dividem, espelhando o Laravel |
-| 06 | `06-escopo.md` | **o que construir e o que não** — 10 repos, não 25 |
-| 07 | `07-pacotes.md` | nomes dos pacotes, filtros aplicados e vetos |
+| 05 | `05-repositorios.md` | como os repositórios se dividem |
+| 06 | `06-escopo.md` | **o que construir e o que não** |
+| 07 | `07-pacotes.md` | nomes dos pacotes, filtros e vetos |
 | 08 | `08-documentacao.md` | quando documentar, e por que o site é feito no próprio Arandu |
-| 09 | `09-uma-forma-so.md` | a regra anti-complexidade, e a evidência no tree do Laravel |
-| 10 | `10-de-para-laravel.md` | o de-para de vocabulário; o modelo mental é Laravel + Inertia |
-| 11 | `11-adapters.md` | seis pacotes por domínio; adapter não é modo |
-| 12 | `12-perfis.md` | perfil convencional e perfil de performance, uma API só |
-| 13 | `13-estrutura-illuminate.md` | o que o tree do `Illuminate` ensina sobre organizar o core |
-| 14 | `14-view-e-assets.md` | view é binário, nunca Node |
-| 15 | `15-multi-tenancy.md` | coluna discriminadora, tenant sempre vindo do `Grant` |
-| 16 | `16-agendamento.md` | scheduler e lock por tenant |
-| 17 | `17-deploy.md` | migration é passo de pipeline, nunca boot |
-| 18 | `18-marketplace.md` | distribuição de módulos |
-| 19 | `19-dsl-e-geracao.md` | a DSL é um conjunto fechado |
-| 20 | `20-licenca.md` | análise de licença; a decisão está no ADR 0008 |
-| 21 | `21-modelo-de-negocio.md` | onde o dinheiro entra |
-| 22 | `22-dores-dos-devs.md` | pesquisa: o que os desenvolvedores reclamam nos frameworks |
-| 23 | `23-estabilidade.md` | versionamento, depreciação e o que autoriza um breaking change |
-| 24 | `24-seguranca-processo.md` | como uma vulnerabilidade é reportada, tratada e divulgada |
-| 25 | `25-saida-e-nao-objetivos.md` | quando **não** usar o Arandu, e como sair dele |
-| 26 | `26-revisao-externa.md` | a revisão externa: o que absorvemos e o que rejeitamos |
-| 27 | `27-eventos-e-outbox.md` | eventos de domínio e outbox; sem `Publish()` direto |
-| — | `packages/` | um documento por pacote do Laravel, com veredito e gatilho |
+| 09 | `09-uma-forma-so.md` | **a regra anti-complexidade** |
+| 10 | `10-de-para-laravel.md` | a curva de aprendizado: Laravel → Arandu |
+| 11 | `11-adapters.md` | os seis pacotes de adapter, e o que conta como modo |
+| 12 | `12-perfis.md` | perfil **convencional** e perfil de **performance** |
+| 13 | `13-estrutura-illuminate.md` | mapa componente a componente do `Illuminate/*` |
+| 14 | `14-view-e-assets.md` | camada de view, toolchain sem Node, limite do Alpine |
+| 15 | `15-multi-tenancy.md` | coluna discriminadora, tenant vindo do Grant |
+| 16 | `16-agendamento.md` | scheduler no binário, lock distribuído, workers |
+| 17 | `17-deploy.md` | binário estático, migration fora do boot |
+| 18 | `18-marketplace.md` | `moitara`, selo, `arandu.mod.toml` e permissões |
+| 19 | `19-dsl-e-geracao.md` | o que a DSL expressa, o que não, e a saída de emergência |
+| 20 | `20-licenca.md` | **MIT e DCO** |
+| 21 | `21-modelo-de-negocio.md` | **o que se vende**, e por que muda a Fase 2 |
+| 22 | `22-dores-dos-devs.md` | dores em 10 frameworks, e onde estamos expostos |
+| 23 | `23-estabilidade.md` | versionamento, depreciação, o que autoriza breaking change |
+| 24 | `24-seguranca-processo.md` | canal, prazos, CVE, supply chain |
+| 25 | `25-saida-e-nao-objetivos.md` | **quando não usar** e como sair |
+| 26 | `26-revisao-externa.md` | o que absorvemos e rejeitamos das consultas externas |
+| 27 | `27-eventos-e-outbox.md` | evento de domínio, outbox transacional, idempotência |
+| 28 | `28-estrutura-do-projeto.md` | o esqueleto que `aru new` gera — de-para de diretório com o Laravel |
+| — | `packages/` | um documento por pacote do Laravel: construir, não construir, gatilho |
 | — | `adr/` | decisões arquiteturais com justificativa |
 
-Uma observação sobre estes arquivos: eles são os únicos, junto com os ADRs, que
-ficam em português. Todo o código e toda a saída do produto são em inglês — ver
-`adr/0005-idioma-do-codigo.md`.
+Fora da ordem de leitura, no mesmo diretório:
+
+| Arquivo | O que é |
+|---|---|
+| `CONTRIBUTING.md` | DCO, o que rodar antes do PR, mensagem de commit, quando abrir ADR |
+| `LICENSE.md` | a licença MIT |
+| `SECURITY.md` | canal de report, prazos e política de CVE |
 
 Escopo vem antes de nomes de propósito: só se nomeia o que vai existir.
 
@@ -53,97 +58,113 @@ Escopo vem antes de nomes de propósito: só se nomeia o que vai existir.
 - Sem equivalentes de Octane, Sail, Herd, Valet, Volt e Tinker — resolvem
   problemas do PHP
 - APM em produção via OpenTelemetry, não produto próprio
+- Seis pacotes de adapter por domínio, driver pesado em submódulo
+- **Dois perfis**: convencional (Postgres) e performance (Scylla). Mesma API,
+  mesma Policy, mesmo contrato de módulo — muda a fiação gerada. Ver `12-perfis.md`
+- Dragonfly como padrão de KV nos dois perfis
+- Dos 14 pacotes principais do Laravel, **um** vira repositório novo. Ver `packages/`
 - Documentação de uso é **fase própria, depois da Fase 3**. Comentário de doc em
   Go e ADR continuam obrigatórios durante o desenvolvimento
+- View: `kyse` + Bootstrap vendorizado, como o `laravel/ui`. Nenhum binário de
+  CSS baixado pela `aru`. Assets por `go:embed`, sem CDN e sem npm.
+  Ver `14-view-e-assets.md` e ADR 0022
 - `arandu-io/website` é uma **aplicação Arandu** — dogfood, e primeiro cliente real
+- **Uma forma só de fazer cada coisa.** Um frontend (kyse + HTMX), um runtime,
+  um caminho de autorização, um caminho de dados, zero Node no core
+- Modelo mental para o usuário: **Laravel + Inertia, sem o build de JavaScript**
 
-- Todo o código e toda a saída do produto em **inglês**; português fica na
-  conversa e nestes documentos (ADR 0005)
-- A CLI é módulo próprio e delega `serve`, `migrate` e `routes` ao binário do
-  projeto (ADR 0006)
-- Driver de Postgres vive no esqueleto, não no core; migrador mínimo em
-  `data.Migrate` até o Atlas da Fase 2 (ADR 0007)
-- Licença **MIT**, a mesma do Laravel, nos quatro repositórios (ADR 0008)
-- **SQLite por padrão** e Postgres em produção, com SQL portável em vez de query
-  builder; migrações com lote, rollback e status, no modelo do Laravel (ADR 0009)
-- Estrutura de views no formato do Inertia — `pages`, `layouts`, `components`,
-  mais `partials` para os fragmentos do HTMX — na Fase 2 (ADR 0010)
-- `SystemGrant` com tenant vazio **não existe**: devolve o `Grant` zero, que não
-  passa no `Check`. Aplicação single-tenant usa uma constante, não vazio (REGRA 14)
-- Contribuição por **DCO** (`git commit -s`), nunca CLA — o core não precisa ser
-  relicenciável, porque o componente pago vive em repositório separado (doc 20)
-- O starter kit é `aru make:auth`, **não um repositório**: em Go o que se importa
-  não se edita, e editar a tela de login é a primeira coisa que se faz (ADR 0012)
-- O contrato de dados fica no core e o driver no adapter, **um módulo por
-  driver**: um projeto que só fala SQLite não carrega Postgres no go.sum nem na
-  superfície de vulnerabilidade (ADR 0014, substitui a 0013)
-- Eventos só por **outbox**, dentro da transação da escrita. Não existe
-  `Publish()` direto, e `Store` fora de `data.Transaction` é erro (doc 27)
-- Todo módulo declara `arandu.mod.toml`, e o `doctor` confere a declaração de
-  permissões contra o AST: usada e não declarada é erro (doc 18)
-- Toolchain de view gerenciado pela `aru` em `~/.arandu/bin`, fixado em
-  `arandu.toml`. `templ` e `tailwindcss` standalone, zero Node (doc 14)
-- O relay do outbox faz **polling**, não `LISTEN/NOTIFY`: o caminho específico
-  do Postgres poria driver no core e daria a SQLite e MySQL um segundo caminho
-  de código (doc 27)
-- Exportador OpenTelemetry **adiado com gatilho** — um cliente real com Grafana,
-  Datadog ou Honeycomb já em produção. APM próprio segue fora de escopo para
-  sempre (ADR 0015)
-- `queue` e `storage` são o décimo e o décimo primeiro repositórios, autorizados
-  pelo proprietário. A REGRA 3 passa a valer com onze (ADR 0016)
-- A fila padrão é a **tabela da aplicação**, não o Redis: job empurrado dentro de
-  `data.Transaction` é comitado com a linha que o produziu
-- O object storage padrão é **Cloudflare R2**, porque não cobra egresso — a maior
-  parte da conta num SaaS que devolve arquivo para quem o enviou. O pacote se
-  chama `s3` porque é o protocolo, e cobre R2, S3, Spaces, B2 e MinIO
-- Tarefa **Global** recebe o `Grant` zero e por isso não alcança repositório:
-  trabalho que lê linha de cliente é `PerTenant`, e ter que dizer isso é o ponto
-  (doc 16, REGRA 14)
-- Titular do copyright é a **pessoa jurídica**: HYZIS - Serviços Digitais LTDA,
-  CNPJ 57.283.262/0001-28. Vale em todos os repositórios, e é em nome dela que a
-  marca vai ao INPI (ADR 0008)
+- Tenancy por coluna discriminadora; tenant vem sempre do `Grant`. Ver `15`
+- Scheduler embutido no binário com lock em `kv`; sem cron do sistema. Ver `16`
+- Artefato de deploy é um binário; `aru deploy` não entra agora. Ver `17`
+- `arandu.mod.toml` com permissões declaradas existe desde a Fase 2. Ver `18`
+- DSL em YAML com JSON Schema publicado, conjunto fechado. Ver `19`
+- **MIT + DCO**, a mesma do Laravel; componente pago em repositório separado. Ver `20` e ADR 0008
+
+## A virada de agosto/2026
+
+Quatro decisões substituíram desenho anterior. Se algum documento contradisser o
+que está abaixo, o documento está velho.
+
+1. **Estrutura idêntica à do Laravel**, diretório a diretório — `app/Http/
+   Controllers`, `app/Models`, `app/Policies`, `bootstrap/`, `config/`,
+   `database/`, `resources/views`, `routes/`, `storage/`, `public/`. O
+   `modules/` vertical **caiu**. Motivo: reconhecimento do dev Laravel vale mais
+   que elegância de organização (doc 28)
+2. **Motor de template próprio: `kyse`**, do guarani *kysê*, faca — o Blade do
+   Arandu. O **templ caiu**. `resources/views/home.kyse.go` é o que se escreve,
+   `resources/views/home.go` é o que o `aru view:build` gera ao lado, e
+   `@go`/`@endgo` é o `@php` com Go de verdade dentro (doc 14, ADR 0020)
+3. **CSS é Bootstrap**, como o `laravel/ui`. O Tailwind **caiu**, e com ele o
+   binário standalone que a `aru` baixava (ADR 0022)
+4. **O `porang` foi dissolvido.** No Laravel a view mora no esqueleto: as views
+   foram para `arandu/resources/views/`, o runtime para `framework/view/`.
+   De onze repositórios para dez (ADR 0021)
+
+### A extensão termina em `.go`, e isso foi verificado
+
+O `.blade.php` termina em `.php` porque o PHP é a linguagem hospedeira. O
+`.kyse.go` termina em `.go` pelo mesmo motivo. O arquivo abre com a tag de build
+que o exclui do compilador:
+
+```go
+//go:build kyse
+
+package views
+
+@extends('layouts.app')
+```
+
+Testado com Go 1.26.5 e cache limpo: `go build ./...`, `go vet ./...`,
+`go test ./...` e `go run` passam, com o arquivo gerado no mesmo diretório e o
+pacote importável. O `gofmt` é o único que ignora build tag, e o CI o chama
+filtrando `*.kyse.go`.
+
+A cláusula `package` é obrigatória — sem ela funciona apenas enquanto o
+diretório não tiver nenhum outro `.go`.
+
+### Propagação
+
+Tabela de propagação não fica aqui. Uma lista de "quem ainda não foi
+atualizado" envelhece na primeira correção e passa a mentir sobre o próprio
+repositório. O estado se verifica por comando, com `./plans/checklist.sh`.
 
 ## Decisões abertas
 
-- Nome da camada de view: `porang` confirmado, sem impedimento
+Aguardando decisão sua:
+
+- **A primeira receita, agora sem o `porang`** (doc 21) — a dissolução tirou a
+  âncora do modelo de negócio: não há mais repositório-irmão para pendurar o
+  catálogo pago, e o argumento de vender componente para quem usa templ puro caiu
+  junto com o templ. Vender componente continua possível; o formato é outro, e o
+  doc 21 precisa ser reescrito (ADR 0021)
+- **`Collector` medir orçamento de latência** (doc 22) — recomendado; é o modo de morrer do Livewire
 - Verificação etimológica das palavras marcadas `[C]` e `[?]` em `07-pacotes.md`
-- Redesenhar o `docs` como aplicação Arandu, e só então torná-lo público. Depende
-  do `porang`, ou seja, da Fase 2
-- O esqueleto pesa 23 MB de binário por causa do SQLite puro-Go (`modernc.org`,
-  que carrega um compilador C). Aceito pelo ganho de rodar sem instalar nada;
-  revisitar se o tamanho incomodar em produção — quem usa só Postgres remove o
-  import e o driver sai do binário
+
+- Tração do GoShip não verificada (limite da API) — checar antes de citar em público
 
 ## Estado do código
 
-Fases 1, 2 e 3 entregues, com quatro critérios em aberto que dependem de pessoa
-e não de código. **Onze repositórios** na org, dez públicos — `docs` segue
-privado até ser redesenhado como aplicação Arandu.
+Fases 1 a 4 entregues, verificadas por `./plans/checklist.sh` — que verifica por
+comando, não por afirmação.
 
-Para o estado verificado a cada execução, rode `./plans/checklist.sh`: ele checa
-por comando, e separa o que depende de pessoa.
+**Dez repositórios** na organização. O trio central espelha o Laravel:
 
-| Repositório | O que é |
-|---|---|
-| `framework` | a biblioteca: kernel, security, data, httpx, validation, observability, events, jobs, scheduler, storage, config |
-| `aru` | a CLI, módulo próprio sem dependência: `new`, `dev`, `serve`, `migrate*`, `db:seed`, `make:module`, `make:auth`, `make:policy`, `view:build`, `build`, `schedule:*`, `work`, `trace`, `doctor`, `routes` |
-| `arandu` | o esqueleto: sobe, autentica, migra, agenda, drena fila, e constrói uma imagem distroless |
-| `porang` | a camada de view: templ, HTMX, Tailwind standalone, zero Node |
-| `database` | conexão e pool; um módulo por driver (`pgx`, `sqlite`, `mysql`) |
-| `kv` | cache, sessão, rate limit e lock sobre RESP |
-| `queue` | fila sobre a tabela; submódulo `kv` para volume |
-| `storage` | disco local; submódulo `s3`, com R2 como padrão |
-| `homebrew-tap` | `brew install arandu-io/tap/aru` |
-| `examples` | a aplicação de demonstração |
-| `docs` | estes documentos e os ADRs |
+| Repositório | Espelha | Papel |
+|---|---|---|
+| `framework` | `laravel/framework` | a biblioteca: kernel, security, data, httpx, view |
+| `arandu` | `laravel/laravel` | o esqueleto de projeto que o `aru new` clona |
+| `aru` | `artisan` | a CLI: `new`, `make:*`, `migrate`, `doctor`, `view:build` |
+| `database` | — | `Open` e os compartimentos `pgx`, `mysql`, `sqlite` |
+| `kv` | — | cache, sessão, lock e rate limit sobre RESP |
+| `queue` | — | fila sobre a tabela `jobs`, e sobre RESP no submódulo |
+| `storage` | — | arquivo em disco, e o protocolo S3 no submódulo |
+| `examples` | — | aplicação de exemplo, compilada pelo CI |
+| `homebrew-tap` | — | fórmula do `aru` |
+| `docs` | `laravel/docs` | estas decisões |
 
-Os 27 documentos estão publicados, sem buraco na sequência. Para o estado
-verificado do projeto a qualquer momento: `./plans/checklist.sh`.
+O `porang` era o décimo primeiro e foi **dissolvido**: no Laravel a view mora no
+esqueleto, não no framework. As views foram para `arandu/resources/views/` e o
+runtime de render para `framework/view/` (ADR 0021).
 
-Critérios de saída da Fase 1 (`03-roadmap-fases.md`): 1, 2, 4 e 5 verificados por
-teste automatizado. O critério 3 — um produto real rodando o login em cima do
-`auth` — depende do proprietário e continua aberto.
-
-O caminho completo — `aru migrate`, `aru db:seed`, formulário de login, senha
-errada recusada, senha certa emitindo sessão — foi executado nos **dois** bancos:
-SQLite, sem nada instalado, e PostgreSQL 18, trocando apenas o `.env`.
+A REGRA 3 vale com dez. `queue` e `storage` foram autorizados pelo proprietário
+na Fase 3 (ADR 0016).

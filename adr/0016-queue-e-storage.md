@@ -75,3 +75,16 @@ entrar no grafo.
 - O `aru work` do doc 16 passa a existir de verdade, e o console da Fase 3 passa
   a mostrar job com timeline, que era o que faltava para a linha do roadmap ser
   verdade
+
+## Atualização — agosto/2026
+
+A conta mudou depois desta ADR, e a regra que ela fecha mudou junto.
+
+A ADR 0021 dissolveu o `porang`: as views foram para `arandu/resources/views/` e
+o runtime para `framework/view/`. São **dez** repositórios, e `queue` e `storage`
+passaram a ser o nono e o décimo — não o décimo e o décimo primeiro.
+
+A REGRA 3 vale com dez. O décimo primeiro volta a exigir pedido.
+
+O que esta ADR decidiu — que `queue` e `storage` existem como repositórios
+próprios, com driver pesado em submódulo — não mudou.

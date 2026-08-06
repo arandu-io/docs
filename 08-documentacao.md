@@ -52,7 +52,7 @@ ergonomia do framework aparece aqui antes de aparecer num cliente pagante.
 ### Consequência de cronograma
 
 O site não pode existir antes de o framework servir HTML de verdade. Ou seja: ele
-depende do `porang` (camada de view, Fase 2). Então a fase de documentação vem
+depende da camada de view (Fase 2). Então a fase de documentação vem
 depois da Fase 3, não em paralelo.
 
 ### Divisão

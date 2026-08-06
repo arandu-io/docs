@@ -51,20 +51,25 @@ problema é do PHP
 | **Testing** | `testing` + `httptest` | stdlib |
 | **Translation** | i18n mínimo com `x/text` | deferido — gatilho: primeiro cliente fora do par pt-BR/en. As mensagens do framework nascem em inglês |
 | **Validation** | `validation/` — `Validate() Errors` | core |
-| **View** | `porang` (templ + HTMX) | adapter |
+| **View** | `view/` — motor `kyse`, assets embutidos, HTMX. As views ficam no projeto, em `resources/views/` | core |
 
 ## O placar
 
 | Destino | Componentes |
 |---|---|
-| core | 12 |
-| adapter | 8 |
+| core | 13 |
+| adapter | 7 |
 | stdlib resolve | 9 |
 | não existe (problema do PHP) | 5 |
 | deferido / terceiro / Fase 4 | 4 |
 
 **Nove componentes do Laravel desaparecem porque a stdlib do Go já os tem**, e
 cinco desaparecem porque o problema não existe fora do PHP.
+
+A `View` trocou de coluna: era adapter, quando havia um repositório separado
+para a camada de view. A ADR 0021 dissolveu esse repositório e o motor `kyse`
+(ADR 0020) ficou em `framework/view/`, que é core — um adapter a menos, um core
+a mais.
 
 Isso responde por que o core do Arandu tem duas dependências e o Laravel tem
 dezenas: metade do `Illuminate` é a camada que, em Go, vem com a linguagem.

@@ -38,7 +38,8 @@ dia de uma aquisição ou de uma disputa — quando já não dá para arrumar se
 rastrear cada contribuição.
 
 Vale em **todos** os repositórios da organização, sem exceção: `framework`,
-`aru`, `arandu`, `examples`, `porang`, `kv`, `database`, `homebrew-tap` e
+`aru`, `arandu`, `examples`, `kv`, `database`, `queue`, `storage`,
+`homebrew-tap` e
 `docs`. Um repositório novo nasce com o mesmo arquivo — copiar a licença é parte
 de criar o repositório, não um passo posterior.
 

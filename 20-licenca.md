@@ -39,8 +39,12 @@ BSL faz sentido para banco de dados, onde o hyperscaler é a ameaça real. Aqui 
 ameaça é a irrelevância, não o fork.
 
 O componente pago, se existir, tem **licença comercial própria** e vive em
-repositório separado (`porang-pro`). Nunca sob a mesma licença do core — misturar
-os dois é o erro que faz a comunidade desconfiar do projeto inteiro.
+repositório separado. Nunca sob a mesma licença do core — misturar os dois é o
+erro que faz a comunidade desconfiar do projeto inteiro.
+
+Qual repositório é esse está em aberto: o `porang-pro` era a resposta, e o
+`porang` foi dissolvido (ADR 0021). A regra de licença não depende dessa
+resposta — o que ela exige é que o pago fique fora do core, sob licença própria.
 
 ## A decisão que anda junto: DCO, não CLA
 
@@ -60,7 +64,7 @@ não precisa ser relicenciável. Por isso: DCO.
 1. `LICENSE.md` (MIT) na raiz de todo repositório `arandu-io` — **feito**
 2. `CONTRIBUTING.md` exigindo `git commit -s` — **feito**
 3. Cabeçalho de licença **não** em cada arquivo — o Go não usa essa prática
-4. `THIRD_PARTY.md` no `porang`, com a atribuição de HTMX, Alpine, Tailwind e
-   Basecoat vendorizados
+4. `THIRD_PARTY.md` no `arandu`, com a atribuição de HTMX, Alpine e Bootstrap
+   vendorizados
 
 Tudo isso antes de qualquer repositório ir a público.

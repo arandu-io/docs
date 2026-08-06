@@ -21,7 +21,7 @@ Isto não muda, e é o que preserva a REGRA 9:
 - contrato de módulo `Routes(r *httpx.Router)`
 - validação, CSRF, sessão, rate limit, headers
 - Collector, página de erro, `aru doctor`
-- templ + HTMX na view
+- `kyse` + HTMX na view, com o CSS Bootstrap embutido
 - toda a CLI
 
 **A API pública é a mesma.** Trocar de perfil não muda uma linha do handler,
@@ -58,11 +58,15 @@ expusemos join nem query ad-hoc. O desenho já estava certo.
 ## Módulo declara o perfil que suporta
 
 ```go
-// Tiered e opcional. Sem ele, o modulo suporta apenas o perfil convencional.
+// Tiered is optional. Without it, the module supports the conventional
+// profile only.
 type Tiered interface {
-    Perfis() []Perfil   // PerfilPadrao, PerfilPerformance
+    Profiles() []Profile // ProfileConventional, ProfilePerformance
 }
 ```
+
+Os dois rótulos são `conventional` e `performance`, e são os mesmos que o
+`arandu.mod.toml` já publica no campo `profiles`.
 
 `aru doctor --perfil=performance` falha quando:
 

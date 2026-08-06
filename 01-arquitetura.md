@@ -25,27 +25,27 @@ construtor público além de `security.Authorize`. Como toda assinatura de
 repositório exige um `Grant`, não existe caminho do handler até o banco que não
 passe por uma policy. Não é convenção nem lint: é o sistema de tipos.
 
-## Módulo vertical, não camada horizontal
+## Estrutura: a do Laravel, diretório a diretório
 
-O Laravel organiza por camada (`app/Http/Controllers`, `app/Models`,
-`app/Policies`), o que espalha uma feature por seis diretórios. Aqui um módulo é
-um diretório:
+O esqueleto é o do Laravel, com os mesmos nomes e nos mesmos lugares —
+`app/Http/Controllers`, `app/Models`, `app/Policies`, `app/Providers`,
+`bootstrap/`, `config/`, `database/`, `resources/views`, `routes/`, `storage/`,
+`public/`. Ver `28-estrutura-do-projeto.md`.
+
+O objetivo é único e vale mais que qualquer elegância de organização: **o dev
+que vem do Laravel abre o projeto e reconhece tudo.**
+
+Somam-se três diretórios que o Laravel não tem, e eles são a diferença do
+produto:
 
 ```
-modules/cliente/
-  module.go            registro e rotas
-  cliente.entity.go
-  cliente.policy.go
-  cliente.repo.go
-  cliente.service.go
-  cliente.request.go
-  queries.sql          entrada do sqlc
-  views/*.templ
-  cliente_test.go
+app/Services/       ← regra de negócio, obrigatório
+app/Repositories/   ← acesso a dado, exige Grant
+app/Policies/       ← existe no Laravel, aqui é obrigatório
 ```
 
-Consequência prática: um módulo é publicável. Um diretório é uma unidade de
-distribuição; trinta arquivos espalhados não são.
+No Laravel, Service e Repository são convenção de time organizado. Aqui são
+esqueleto, e o `doctor` cobra. É a frase de onboarding virada em diretório.
 
 ## O que foi deliberadamente deixado de fora
 
@@ -55,7 +55,7 @@ distribuição; trinta arquivos espalhados não são.
 | Facades | não existe | exigiria estado global mutável |
 | Eloquent | sqlc + repository | SQL previsível, injection impossível |
 | `$fillable` | não existe | request struct explícita elimina a classe de bug |
-| Blade | templ | tipagem em tempo de compilação |
+| Blade | kyse | tipagem em tempo de compilação |
 
 As três últimas linhas são o ponto: metade da superfície de segurança do Laravel
 existe para remediar perigos de linguagem dinâmica. Portar a mitigação de um bug

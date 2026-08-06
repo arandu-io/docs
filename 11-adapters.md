@@ -58,7 +58,7 @@ produto que nem é o recomendado.
 
 Nada de nome tupi nos adapters. É o que o usuário digita no import, e clareza
 vence marca ali — `Illuminate\Mail`, não nome de fantasia. O tupi fica nos
-produtos (`marandu`, `porang`, `moitara`), não na infraestrutura.
+produtos (`taba`, `moitara`), não na infraestrutura.
 
 ## Adapter não é modo
 
@@ -140,8 +140,9 @@ Nesse dia, avaliar — e a avaliação começa pelo custo de manter duas camadas
 Fase 2: `database` e `kv` — **feitos**. O contrato de dados fica no core
 (`framework/data`, onde o `Grant` é obrigatório) e o `database` fica com tudo que
 precisa de driver, um módulo por driver. Ver ADR 0014.
-Fase 3: `queue` e `storage` — **feitos**, e são o décimo e o décimo primeiro
-repositórios, autorizados pela ADR 0016.
+Fase 3: `queue` e `storage` — **feitos**, e são o nono e o décimo repositórios,
+autorizados pela ADR 0016. Eram o décimo e o décimo primeiro até a ADR 0021
+dissolver o `porang`.
 
 A fila padrão é a **tabela da própria aplicação**, não o Redis: um job empurrado
 dentro de `data.Transaction` é comitado pela mesma transação da linha que o

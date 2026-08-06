@@ -21,7 +21,7 @@ Repositório separado para isso custa mais em manutenção — release, versiona
 
 - `features.Enabled(ctx, "nome")`, resolvendo por Subject do Grant
 - resolução em memória com override por env, e persistência opcional via adapter
-- integração com o `porang`: componente que não renderiza se a flag está desligada
+- integração com a camada de view: componente que não renderiza se a flag está desligada
 
 ## Gatilho para construir
 

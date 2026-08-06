@@ -15,7 +15,7 @@ Não construir pacote próprio. Se houver demanda, adapter fino sobre `markbates
 
 O goth já cobre os mesmos provedores em Go e é mantido. O valor que sobra para nós é pequeno e específico: traduzir o retorno do provedor para o nosso `security.Subject` e emitir a sessão pelo caminho correto.
 
-Isso são cinquenta linhas dentro do `oka`, não um projeto.
+Isso são cinquenta linhas dentro do starter kit que o `aru make:auth` gera, não um projeto.
 
 ## O que conteria, se existir
 

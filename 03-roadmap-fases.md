@@ -49,7 +49,7 @@ não o erro que prova a tese. Dentro de `testdata/` o go tool ignora o diretóri
 build do módulo e ainda assim compila quando recebe o caminho explícito, o que
 permite exigir a mensagem certa.
 
-O que **não** entra na fase 1: templ, HTMX, geração de código, IA, deploy.
+O que **não** entra na fase 1: view (`kyse`, HTMX), geração de código, IA, deploy.
 
 ---
 
@@ -61,16 +61,23 @@ Entregas — **todas feitas**:
 
 - `aru make:module` — gerador determinístico (templates, zero LLM), com golden
   files e blocos `arandu:begin custom` preservados na regeração
-- `aru doctor` — onze regras de análise estática. A décima primeira confere o
-  `arandu.mod.toml` contra o AST: permissão usada e não declarada é erro
-- `porang` — camada de view em templ + HTMX, com o `hx-headers` do CSRF no
-  layout base (a armadilha nº 1 desse stack)
+- `aru doctor` — análise estática do que o compilador não vê. Uma das regras
+  confere o `arandu.mod.toml` contra o AST: permissão usada e não declarada é
+  erro. Sem número fixo aqui, porque a virada mexeu no conjunto: a ADR 0019
+  registra cinco regras a reescrever para `app/<Categoria>/`, e o doc 14 pede a
+  que reprova `map` como dado de view
+- camada de view com HTMX e o `hx-headers` do CSRF no layout base (a armadilha
+  nº 1 desse stack). Entregue como repositório `porang`, sobre templ. O `porang`
+  foi dissolvido depois: as views e componentes foram para
+  `arandu/resources/views/`, e o runtime de render e os assets embutidos para
+  `framework/view/` — de onze repositórios para dez
 - `aru make:module --tenant` — escopo de tenant no SQL gerado, vindo do Grant
 - `aru make:auth` — o starter kit, publicado no projeto e não importado
   (ADR 0012)
-- `aru view:build` e `aru dev` — toolchain de view gerenciado pela CLI,
-  `templ` e `tailwindcss` standalone, fixados em `arandu.toml`, cacheados em
-  `~/.arandu/bin`. Zero Node
+- `aru view:build` e `aru dev` — toolchain de view gerenciado pela CLI. Entregue
+  com `templ` e `tailwindcss` standalone, baixados e cacheados em
+  `~/.arandu/bin`. Hoje nenhum binário é baixado: o `kyse` é parte da `aru`, e o
+  CSS é Bootstrap vendorizado, embutido por `go:embed`. Zero Node nos dois casos
 - `data.Transaction` e `events.Outbox` — evento gravado na mesma transação da
   escrita, nunca `Publish()` direto (doc 27)
 - `arandu-io/kv` — cache, sessão, rate limit e lock sobre RESP (doc 11)
@@ -95,6 +102,43 @@ Critério de saída:
 O que **não** entra na Fase 2: relay do outbox, fila morta e painel de eventos
 (Fase 3, doc 27); registry de módulos (Fase 4, doc 18); documentação de uso
 (fase própria, doc 08).
+
+### Virada de view e estrutura — agosto/2026
+
+A Fase 2 entregou a view com templ e continua fechada. O que veio depois é
+**substituição de motor**, decidida em agosto de 2026: trabalho novo, sobre uma
+fase que já cumpriu o critério dela. A fase não reabre, e a virada tem critério
+de saída próprio.
+
+O templ caiu. Entra o `kyse`, motor de template próprio, com as diretivas
+nomeadas como as do Blade: `@extends`, `@section`/`@endsection`, `@yield`,
+`@include`, `@if`/`@elseif`/`@else`/`@endif`, `@foreach`/`@endforeach`, `@csrf`,
+`{{ }}` escapado, `{!! !!}` cru e `@go`/`@endgo`. O fonte é `.kyse.go`, abre com
+`//go:build kyse` e cláusula `package`, e o gerado fica ao lado, no mesmo
+diretório e no mesmo pacote: `resources/views/home.kyse.go` gera
+`resources/views/home.go`. O dado chega à view como struct tipada por página,
+nunca `map` — campo errado é erro de compilação, e uma regra do `aru doctor`
+proíbe `map` como dado de view.
+
+Na mesma virada, e pelo mesmo motivo — são um trabalho só:
+
+- o Tailwind caiu, e com ele o binário standalone que a `aru` baixava. O CSS é
+  Bootstrap, vendorizado com a licença e embutido por `go:embed`
+- a estrutura do projeto passa a ser a do Laravel, diretório a diretório:
+  `app/Http/{Controllers,Middleware,Requests}`, `app/Models`, `app/Enums`,
+  `app/Policies`, `app/Services`, `app/Repositories`, `app/Jobs`, `app/Events`,
+  `app/Listeners`, `app/Mail`, `app/Providers`, `bootstrap/`, `config/`,
+  `database/{factories,migrations,seeders}`, `resources/{views,css,js}`,
+  `routes/web.go` e `routes/console.go`, `storage/`, `public/`. O
+  `modules/<nome>/` vertical caiu
+
+Critério de saída da virada:
+
+1. As nove views do starter kit compilam pelo `kyse`: `layouts/app`, `home`,
+   `welcome`, `auth/login`, `auth/register`, `auth/verify` e
+   `auth/passwords/{confirm,email,reset}`
+2. Um erro de sintaxe proposital numa view aponta arquivo e linha do `.kyse.go`
+   que foi escrito, não do arquivo gerado
 
 ---
 
@@ -201,7 +245,7 @@ DSL é um conjunto fechado, e cada coisa que entra nela é mantida para sempre.
 - **relações** — `belongs_to` e `has_many` só fazem sentido dentro do agregado,
   e o `data.Repository` já é por agregado. Uma relação na DSL viraria join
   gerado, e join gerado é o começo de um ORM
-- **telas** — `list`, `form` e `show` gerariam templ, e a forma canônica de uma
+- **telas** — `list`, `form` e `show` gerariam view, e a forma canônica de uma
   tela ainda não existe: `make:auth` publica a primeira, e é dela que se aprende
   o que uma tela gerada deve parecer. Gerar antes disso é adivinhar
 
@@ -225,7 +269,8 @@ Entregas:
 - guias escritos a partir de `docs/01` a `08`
 - `arandu-io/docs` — markdown puro, um branch por versão
 - `arandu-io/website` — **aplicação Arandu**, não Next.js nem gerador estático.
-  Depende do `porang`, e é por isso que esta fase vem depois da 3
+  Depende da camada de view (`kyse` e `framework/view/`), e é por isso que esta
+  fase vem depois da 3
 - toda mensagem de erro do framework revisada contra o tom de voz de `04-marca.md`
 - página de origem do nome revisada por quem estude tupi antigo
 

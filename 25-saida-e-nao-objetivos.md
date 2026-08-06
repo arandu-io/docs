@@ -18,7 +18,7 @@ Dizer isso primeiro é mais forte do que deixar o cliente descobrir depois.
 | **Colaboração em tempo real como núcleo** | Cursor compartilhado, edição simultânea. Times escolheram hipermídia para isso e passaram meses costurando WebSocket e estado no cliente |
 | **App mobile nativo como cliente principal** | Dá para usar em modo API, mas aí você está pagando por metade do framework que não vai usar |
 | **Equipe que não quer arquitetura imposta** | A cultura Go tende a rejeitar isso. Se o time briga com a Policy obrigatória, vai brigar todo dia |
-| **Módulo com JOIN complexo no perfil High Performance** | Não é elegível. O `doctor` reprova, e isso é por desenho (doc 12) |
+| **Módulo com JOIN complexo no perfil de performance** | Não é elegível. O `doctor` reprova, e isso é por desenho (doc 12) |
 
 Nada disso é defeito a corrigir. É fronteira.
 
@@ -27,10 +27,14 @@ Nada disso é defeito a corrigir. É fronteira.
 Se você parar de usar o Arandu amanhã, isto continua sendo seu, e é Go comum:
 
 - handlers, services, policies, entities, requests — código Go no seu repositório
-- templates: o `templ` compila para `.go`, e o Go gerado é seu
+- templates: você escreve `.kyse.go` e o `kyse` gera o `.go` ao lado, no mesmo
+  pacote. O gerado é Go comum, está na árvore e é seu — mas é **gerado**, não
+  escrito. Se você sair, mantém o `.go` como código final e abandona o fonte
+  `.kyse.go`, ou reescreve as views em `html/template`. Estimativa: uma semana
+  num projeto médio
 - SQL: as queries estão em `.sql` e o `sqlc` gera Go a partir delas
 - migrações: SQL versionado
-- CSS: arquivo compilado, sem runtime
+- CSS: Bootstrap vendorizado, arquivo estático. Sem etapa de build e sem runtime
 
 Isto some se você tirar o framework:
 
@@ -38,7 +42,11 @@ Isto some se você tirar o framework:
 - `security.Grant` — a garantia de autorização
 - `observability.Collector` e a página de erro
 - `aru` — CLI, gerador e `doctor`
-- `porang` — componentes de view
+- `framework/view` — runtime de render, assets embutidos e a rota que os serve
+- `kyse` — o motor de template, e ele **não existe fora do Arandu**
+
+As views em si (`resources/views/`) ficam: elas moram no seu projeto, não em
+repositório nosso.
 
 ## Roteiro de saída, honesto
 
@@ -49,9 +57,13 @@ Isto some se você tirar o framework:
    copiar) ou remove o parâmetro de todas as assinaturas. Uma a duas semanas num
    projeto médio, e é mecânico.
 3. **Substituir o `Collector`.** Trocar por OpenTelemetry. Alguns dias.
-4. **Manter o resto.** Módulos, templ, sqlc e migrações não precisam mudar.
+4. **Substituir o `kyse`.** Aqui está o custo novo, e ele é honesto: o `kyse`
+   é nosso e não tem equivalente. Ou você mantém os `.go` gerados como código
+   final e para de editar os `.kyse.go`, ou reescreve as views. Uma a duas
+   semanas.
+5. **Manter o resto.** Pacotes, sqlc e migrações não precisam mudar.
 
-Estimativa honesta para um projeto de porte médio: **duas a três semanas**, e
+Estimativa honesta para um projeto de porte médio: **três a quatro semanas**, e
 nenhuma reescrita de regra de negócio.
 
 ## O que fazemos para a saída ser barata
@@ -71,7 +83,7 @@ Um framework que precisa te prender para sobreviver não deveria sobreviver.
 
 Compromisso escrito, porque é a pergunta que todo comprador sério faz:
 
-- A licença é MIT (doc 20 e ADR 0008). Fork é direito de qualquer um, sem pedir.
+- A licença é MIT (doc 20, ADR 0008). Fork é direito de qualquer um, sem pedir.
 - Se a manutenção parar, publicamos aviso no README e no índice da registry,
   com tag final e estado conhecido dos bugs abertos.
 - Não haverá "morte silenciosa": repositório sem commit e sem aviso por seis

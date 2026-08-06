@@ -29,12 +29,13 @@ Este filtro já reprovou três nomes que passaram por toda a pesquisa etimológi
 Nenhum dos três foi pego pela cosmologia nem pelo dicionário guarani. Só pelo
 ouvido. Por isso este filtro é o primeiro, não o último.
 
-Passaram na leitura em voz alta: `arandu`, `aru`, `marandu`, `porang`,
+Passaram na leitura em voz alta: `arandu`, `aru`, `kyse`, `marandu`, `porang`,
 `moitara`, `igara`, `taba`, `potiron`.
 
 Na fronteira: `oka` — é a casa indígena, que todo brasileiro reconhece, mas
-também é "oco/oca" no sentido de vazio. Decisão aberta, e pesa porque é o
-starter kit, o primeiro contato de quem chega. Não é bloqueio, é escolha.
+também é "oco/oca" no sentido de vazio. A decisão continua aberta e deixou de ser
+urgente: o starter kit não é mais repositório, é `aru make:auth` (ADR 0012),
+então o nome está livre e sem uso previsto.
 
 Ordem correta de checagem:
 
@@ -114,7 +115,7 @@ crepúsculo, flâmula), nunca santos nem cargos religiosos. A regra é a mesma.
 
 | Laravel | Função | Arandu | Significado | St |
 |---|---|---|---|---|
-| Telescope | inspetor de requests (dev) | **marandu** | aviso, informe, advertir | V |
+| Telescope | inspetor de requests (dev) | — | é core: console `/_arandu/debug`, entregue na Fase 3. O nome `marandu` — aviso, informe, advertir [V] — fica livre | — |
 | Pulse | performance da aplicação | — | exportar OpenTelemetry, ver `06-escopo.md` | — |
 | Nightwatch | APM em produção | — | exportar OpenTelemetry, ver `06-escopo.md` | — |
 
@@ -154,11 +155,22 @@ crepúsculo, flâmula), nunca santos nem cargos religiosos. A regra é a mesma.
 | Prompts | prompts interativos de CLI | — | usar bubbletea, ver `06-escopo.md` | — |
 | Folio | roteamento por arquivo | **igarape** | igarapé, caminho de canoa | C |
 
+## View
+
+| Laravel | Função | Arandu | Significado | St |
+|---|---|---|---|---|
+| Blade | motor de template | **kyse** | faca | C |
+| — | camada de view | — | é core: `framework/view/`, com as views do projeto em `resources/views/` | — |
+
+O motor se chama `kyse` desde a ADR 0020, que tirou o templ da stack: a sintaxe
+é a do Blade (`@extends`, `@section`, `@yield`, `{{ }}`), e o arquivo que se
+escreve é `.kyse.go`, com o `.go` gerado ao lado. Não há repositório de view: o
+`porang` foi dissolvido pela ADR 0021, e o nome fica livre.
+
 ## Sem equivalente no Laravel
 
 | Função | Arandu | Significado | St |
 |---|---|---|---|
-| Camada de view (templ + HTMX) | **porang** | belo | V |
 | Registry de módulos (marketplace) | **moitara** | moitará, troca ritual de bens | ? |
 
 ## Detalhe por pacote
@@ -196,7 +208,7 @@ está em `06-escopo.md` — dez repositórios até a Fase 3, não vinte e cinco.
 ## Checagem de nome — o que vale para Go
 
 **Go não tem registry central.** O namespace de um pacote é o próprio caminho do
-repositório (`github.com/arandu-io/porang`), resolvido pelo `proxy.golang.org` e
+repositório (`github.com/arandu-io/kv`), resolvido pelo `proxy.golang.org` e
 indexado no `pkg.go.dev`. Não existe nada para alguém ocupar preventivamente.
 
 Consequência: **npm, PyPI e crates.io são irrelevantes** para nomear pacote Go.
@@ -212,16 +224,19 @@ Onde checar, e só aqui:
 | Domínio `.dev` / `.com` | marca | não bloqueia pacote |
 | INPI classes 9 e 42 | marca | juridicamente sim |
 
-Não há exceção: npm não entra no grafo em nenhum pacote, inclusive `porang`.
-O CSS do Basecoat é vendorizado com a licença. Ver `14-view-e-assets.md`
-e a REGRA 13 — esta linha revoga a exceção que este documento abria antes.
+Não há exceção: npm não entra no grafo, em pacote nenhum. O CSS é **Bootstrap**,
+vendorizado no repositório do `arandu` com a licença e embutido por `go:embed`
+(ADR 0022). O Tailwind e o Basecoat caíram junto — o Basecoat era plugin de
+Tailwind distribuído por npm, e era o único motivo pelo qual a exceção existia.
+Ver `14-view-e-assets.md` e a REGRA 13 — esta linha revoga a exceção que este
+documento abria antes.
 
 ### Estado conhecido
 
 | Nome | Situação |
 |---|---|
 | `arandu` | `.io`, `.app` e `.studio` ocupados; CLI `arandu` já existe (por isso a CLI é `aru`); org `@Arandu` e `Arandusoft` tomadas — daí `arandu-io` |
-| `oka`, `taba`, `porang`, `marandu`, `igara`, `moitara`, `potiron` | sem impedimento conhecido. Confirmar org/repo no GitHub e pkg.go.dev |
+| `kyse`, `oka`, `taba`, `marandu`, `igara`, `moitara`, `potiron` | sem impedimento conhecido. Confirmar org/repo no GitHub e pkg.go.dev |
 
 Correção registrada: uma versão anterior deste documento descartou `oka` e `taba`
 por estarem ocupados em npm e PyPI. Isso estava errado — a checagem não se aplica

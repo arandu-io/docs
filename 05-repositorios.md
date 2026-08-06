@@ -28,6 +28,12 @@ brigar com a estrutura de pastas de projetos antigos.
 
 ## Mapa completo
 
+São **dez repositórios** até a Fase 3, e são estes: `framework`, `arandu`,
+`aru`, `database`, `kv`, `queue`, `storage`, `examples`, `homebrew-tap` e
+`docs`. A conta caiu de onze para dez quando o `porang` foi dissolvido
+(ADR 0021). O `website` vem depois, na Fase D; o `.github` guarda workflow, não
+código.
+
 ### Núcleo
 
 ```
@@ -56,9 +62,9 @@ fornecedor multiplica repositório sem isolar dependência nenhuma. A divisão �
 arandu-io/database    registro, pool e erro; submodulos pgx, sqlite, mysql
 arandu-io/kv          go-redis (RESP): cobre Redis, Dragonfly, Valkey, KeyDB
 arandu-io/queue       fila sobre a tabela; submodulo kv para volume
-arandu-io/storage     disco local; submodulo s3, com R2 como padrao
+arandu-io/storage     interface + disco local; submódulos s3 (R2 como padrão),
+                      gcs, azure
 arandu-io/mail        interface + SMTP; submódulos ses, resend, postmark, mailgun
-arandu-io/storage     interface + disco local; submódulos s3, gcs, azure
 arandu-io/ws          coder/websocket e gobwas/ws
 ```
 
@@ -68,40 +74,49 @@ juntos; `Illuminate\Database` traz MySQL, Postgres e SQLite juntos.
 
 Convenção de nome: **sem prefixo redundante e em inglês funcional**. É
 `arandu-io/kv`, não `arandu-io/arandu-redis` — a org já carrega o nome, e
-o nome tupi fica nos produtos (`porang`, `marandu`), não na infraestrutura.
+o nome tupi fica nos produtos (`taba`, `moitara`), não na infraestrutura.
 
 ### Módulos de primeira parte
 
-O equivalente aos pacotes first-party do Laravel. Cada um implementa
-`kernel.Module` e nada mais.
+O equivalente aos pacotes first-party do Laravel. Cada um implementaria
+`kernel.Module` e nada mais. **Nenhum existe hoje**: a triagem de `06-escopo.md`
+mandou a maior parte para o core, para biblioteca de terceiro ou para "depois,
+com gatilho".
+
+Nomes definidos em `docs/07-pacotes.md`. Os que continuam no mapa:
 
 ```
-Nomes definidos em `docs/07-pacotes.md`. Os principais:
-
-arandu-io/curupira   tokens de API (Sanctum)
-arandu-io/marandu    inspetor de requests em dev (Telescope)
-arandu-io/maraca     performance da aplicação (Pulse)
-arandu-io/boitata    APM em produção (Nightwatch)
-arandu-io/katu       formatador de código (Pint)
-arandu-io/igara      ambiente Docker de dev (Sail)
-arandu-io/uirapuru   servidor websocket (Reverb)
-arandu-io/porang     camada de view em templ
-arandu-io/moitara    registry de módulos
-arandu-io/taba       painel administrativo — pago (Nova)
+arandu-io/moitara    registry de módulos — ver 18-marketplace.md
+arandu-io/uirapuru   servidor websocket (Reverb) — gatilho: SSE não bastar
+arandu-io/potiron    dashboard de filas (Horizon) — depois de fila em produção
+arandu-io/taba       painel administrativo — pago (Nova), Fase 4
 ```
+
+O que saiu da lista, e para onde foi:
+
+- `porang` foi dissolvido (ADR 0021): as views ficam em
+  `arandu/resources/views/` e o runtime de render em `framework/view/`
+- o starter kit não é repositório: é `aru make:auth` (ADR 0012)
+- o inspetor de requests (`marandu`) é core, no console `/_arandu/debug`,
+  desde a Fase 3
+- tokens de API são core, em `security/token.go`
+- `maraca` e `boitata` viraram exportação de OpenTelemetry (ADR 0015)
+- Pint e Sail não têm equivalente: `gofmt` e `go run` resolvem
 
 Nota: as primitivas de autenticação (Grant, Policy, sessão, argon2id) ficam no
 **core**, não aqui. Segurança é a tese do produto; não pode ser um pacote
-opcional que o usuário esquece de instalar. `starter-auth` traz só as telas.
+opcional que o usuário esquece de instalar. O `aru make:auth` gera só as telas.
 
-### UI e distribuição
+### Distribuição
 
 ```
-arandu-io/porang     camada de view em templ, ligada aos contratos do core
-arandu-io/moitara    registry de módulos — ver 18-marketplace.md
 arandu-io/examples   a aplicacao que demonstra o framework, e a forma canonica
                      que o gerador da Fase 2 vai emitir
 ```
+
+A camada de view não aparece aqui porque não é repositório: o desenvolvedor
+edita `resources/views/` no próprio projeto, e o motor `kyse` mais os assets
+embutidos são core, em `framework/view/`.
 
 ## O que é diferente do Laravel, e importa
 
@@ -135,13 +150,15 @@ Fase 1: `framework`, `arandu`, `aru`, `docs` — **feito**, os quatro existem,
 compilam e estão publicados. `examples` entrou junto: escrever à mão o módulo que
 o gerador vai emitir é o passo que transforma "template que pareceu bom" em
 "template já usado"
-Fase 2: `porang`, `kv`, `database`, `homebrew-tap` — **feito**, os quatro
-existem e estão publicados. `oka` saiu da lista: o starter kit é `aru make:auth`,
-não um repositório (ADR 0012). O `database` é um repositório com quatro módulos —
-o contrato fica no core e cada driver tem o seu (ADR 0014)
-Fase 3: `queue` e `storage` — **feito**. São o décimo e o décimo primeiro
-repositórios, autorizados pela ADR 0016; a REGRA 3 passa a valer com onze
-Fase D: `website` (aplicacao Arandu, depende do porang)
+Fase 2: `kv`, `database`, `homebrew-tap` — **feito**, os três existem e estão
+publicados. `oka` saiu da lista: o starter kit é `aru make:auth`, não um
+repositório (ADR 0012). O `porang` chegou a existir e foi dissolvido pela
+ADR 0021 — view no esqueleto, runtime em `framework/view/`. O `database` é um
+repositório com quatro módulos — o contrato fica no core e cada driver tem o
+seu (ADR 0014)
+Fase 3: `queue` e `storage` — **feito**. São o nono e o décimo repositórios,
+autorizados pela ADR 0016; a REGRA 3 passa a valer com dez
+Fase D: `website` (aplicacao Arandu, sobre o `kyse` e o `framework/view`)
 Fase 4+: `taba` (painel administrativo) e a camada de IA, ainda sem nome.
 Ver a triagem em `06-escopo.md`
 

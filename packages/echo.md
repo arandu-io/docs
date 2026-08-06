@@ -1,6 +1,6 @@
 # Echo
 
-**Veredito:** NÃO EXISTE SEPARADO — vive no porang
+**Veredito:** NÃO EXISTE SEPARADO — vive na camada de view
 **Nome Arandu:** —
 
 ## O que o Laravel faz
@@ -9,7 +9,7 @@ Biblioteca JavaScript cliente que assina canais e escuta eventos do broadcasting
 
 ## Decisão
 
-Não é projeto. Se o `uirapuru` existir, o cliente vive no `porang`.
+Não é projeto. Se o `uirapuru` existir, o cliente vive na camada de view.
 
 ## Por quê
 
@@ -21,7 +21,7 @@ Empacotar isso separado criaria uma dependência npm no ecossistema, que é exat
 
 ## O que conteria, se existir
 
-Um componente no `porang` que conecta e re-renderiza o fragmento.
+Um componente em `resources/views/components/` que conecta e re-renderiza o fragmento.
 
 ## Gatilho para construir
 

@@ -91,16 +91,16 @@ A conta:
 | | Módulo `customer` |
 |---|---|
 | Proposta externa | 5 subdiretórios, ~15 arquivos, interface de repositório duplicada (write e read) |
-| Nosso desenho | 1 diretório, 7 arquivos |
+| Nosso desenho | 9 arquivos, cada um no diretório do Laravel que já existe no projeto |
 
 E o custo maior não é o número de arquivos: **o dev Laravel não reconhece nada
 ali.** Aggregate, Use Case, Value Object e Command Bus não existem no vocabulário
 dele. A frase de onboarding — "se você conhece Laravel, você já sabe 80% do
 Arandu" — morre no primeiro `ls`. REGRA 10 e doc 10 seguem valendo: vocabulário
-Laravel, layout modular.
+Laravel, e a estrutura de diretórios do Laravel (ADR 0019).
 
 **Onde há razão:** Value Object para dinheiro, CPF/CNPJ e e-mail é bom e evita
-classe inteira de bug. Cabe como tipo dentro de `<entidade>.entity.go`, sem
+classe inteira de bug. Cabe como tipo em `app/Models/`, junto da entidade, sem
 virar camada nem diretório.
 
 ---
@@ -120,13 +120,14 @@ log da camada de service já resolve auditoria.
 
 ## 6. CORREÇÃO ao documento do ChatGPT — a promessa de migração
 
-O texto afirma que se migra de Standard para High Performance "sem alterar a
-estrutura da aplicação ou a forma de desenvolvimento, substituindo apenas os
-componentes responsáveis pela persistência e comunicação".
+O texto afirma que se migra de um perfil para o outro — ele chama os dois de
+"Standard" e "High Performance" — "sem alterar a estrutura da aplicação ou a
+forma de desenvolvimento, substituindo apenas os componentes responsáveis pela
+persistência e comunicação".
 
 Isso não é verdade, e o doc 12 já explica: Scylla é CQL, sem join, sem transação
 cruzando partição, o tenant vira chave de partição, e o módulo precisa declarar
-`Perfis()`. O `doctor --perfil=performance` reprova módulo que usa JOIN,
+`Profiles()`. O `doctor --perfil=performance` reprova módulo que usa JOIN,
 transação cruzando agregado ou entidade sem chave de partição.
 
 Prometer troca indolor é exatamente o erro que está custando caro ao Next.js:
@@ -137,12 +138,20 @@ continuam idênticos. O modelo de dados muda, e **nem todo módulo é elegível*
 
 ---
 
-## 7. ACEITO — o rótulo dos perfis
+## 7. RECUSADO — renomear os perfis
 
-"Standard" e "High Performance" comunica melhor que "convencional" e
-"performance". O Postgres não é o perfil lento; o Scylla é o perfil distribuído.
-Renomear no doc 12 e no `Perfis()`. Mudança de rótulo, custo zero, feita antes
-da Fase 2.
+A proposta era trocar "convencional" e "performance" por "Standard" e "High
+Performance", com o argumento de que o Postgres não é o perfil lento e o Scylla é
+o perfil distribuído. Foi aceita aqui e depois recusada, por dois motivos.
+
+O rótulo não é custo zero: `conventional` e `performance` estão no campo
+`profiles` do `arandu.mod.toml`, que já foi publicado. Manifesto de módulo é
+contrato — renomear quebra todo módulo que declarou o valor antigo, e um período
+de aceitar os dois nomes seria duas formas de dizer a mesma coisa (REGRA 9).
+
+E o preço de ter tentado ficou visível: por um tempo o corpus carregou três
+rótulos para dois perfis. **Valem `conventional` e `performance`**, no manifesto,
+na CLI e no doc 12.
 
 ---
 
@@ -163,15 +172,17 @@ de novo.
 - Tabela outbox e `Store()` sobem para a **Fase 2**.
 - **REGRA 17** no `CLAUDE.md`: o `Grant` vale também na leitura. Não existe
   caminho de consulta sem policy, em nenhum desenho.
-- Renomear os perfis para **Standard** e **High Performance**.
+- Os rótulos dos perfis **não mudam**: `conventional` e `performance`.
 - Value Objects entram como tipo, não como camada.
 - Event Sourcing fica documentado com gatilho, não construído.
 
 ## Nota sobre o método
 
 As três consultas convergiram em quase tudo: não há incumbente, arquitetura
-opinativa é o diferencial, IA produz spec e não código, Templ é protagonista.
+opinativa é o diferencial, IA produz spec e não código, o templ é protagonista.
 Convergência entre modelos diferentes é sinal fraco de acerto — todos leem as
-mesmas fontes. O que vale mais são as **divergências**, e elas foram três:
+mesmas fontes. O último item envelheceu: o templ caiu em agosto de 2026 e o motor
+de view passou a ser o `kyse` (ADR 0020), o que é um exemplo do que a
+convergência vale. O que vale mais são as **divergências**, e elas foram três:
 Policy opcional na leitura, cinco camadas e Event Sourcing opt-in. As três
 seriam decisões ruins, e as três teriam entrado sem ninguém notar.

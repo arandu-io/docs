@@ -45,7 +45,8 @@ de escrever a primeira linha.
 
 | Dimensão | A única forma | Nunca |
 |---|---|---|
-| View | templ + HTMX | segundo motor de template; opção React/Vue; Alpine só onde HTMX não alcança |
+| View | kyse + HTMX | segundo motor de template; opção React/Vue; Alpine só onde HTMX não alcança |
+| CSS | Bootstrap vendorizado | segundo framework de CSS; binário de build baixado pela `aru`; pacote npm |
 | Runtime | o binário Go | variantes de servidor, modo "turbo", modo alternativo |
 | Autorização | `security.Grant` | atalho, bypass, "modo simples" |
 | Dados | sqlc + `Repository` | ORM, query builder fluente, segunda camada |
@@ -56,6 +57,21 @@ O teste antes de aceitar qualquer coisa nova: **isso cria uma segunda maneira de
 fazer algo que já tem uma?** Se sim, não entra — nem como opcional, nem como
 experimental, nem "só para quem precisa". Opcional vira obrigatório assim que o
 primeiro tutorial popular usa.
+
+## O gerado mora em um lugar só
+
+A regra também decidiu onde o `kyse` escreve. `resources/views/home.kyse.go` é o
+que se escreve; `resources/views/home.go` é o que o gerador emite — ao lado, no
+mesmo diretório e no mesmo pacote. **Não existe `storage/framework/views/`.**
+
+No Laravel o mesmo template tem duas moradas: o fonte em `resources/` e o
+compilado em `storage/framework/views/`, com nome derivado de hash. São duas
+respostas para "onde está o código que rodou", e a segunda ninguém lê porque não
+foi feita para ser lida.
+
+Manter as duas aqui seria uma segunda forma de responder à mesma pergunta. O
+gerado ao lado é código Go de verdade, checado pelo compilador, aberto no editor
+e diferenciável no git. Um artefato, um lugar.
 
 ## A página de erro é o caso-teste
 

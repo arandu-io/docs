@@ -243,7 +243,7 @@ Por frequência, somando todos os ecossistemas:
 
 | Dor | Nosso risco |
 |---|---|
-| **Arquitetura híbrida** | A dor central do AdonisJS. Quando o requisito não couber no padrão, metade do código do cliente sai da convenção. Nosso antídoto é o bloco `// arandu:inicio custom`, que hoje está enterrado no doc 19 como detalhe da Fase 4 |
+| **Arquitetura híbrida** | A dor central do AdonisJS. Quando o requisito não couber no padrão, metade do código do cliente sai da convenção. Nosso antídoto é o bloco `// arandu:begin custom`, que hoje está enterrado no doc 19 como detalhe da Fase 4 |
 | **Boilerplate e cerimônia** | Policy por entidade, Grant em toda assinatura, wiring explícito, `arandu.mod.toml`. Sem gerador cobrindo tudo, viramos o Spring |
 | **Sobrefragmentação de HTMX** | Se o gerador emitir tela com muitos fragmentos, todo app do cliente nasce com "pop-in" |
 | **Latência invisível em dev** | O modo de morrer do Livewire. O Collector conta query, não mede orçamento de latência |

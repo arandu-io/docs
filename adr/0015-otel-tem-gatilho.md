@@ -74,3 +74,14 @@ Nada disso precisa mudar para o exportador existir. É o que torna adiar barato.
   intacta.
 - Se o gatilho não disparar até a Fase 4 fechar, vale reavaliar se ele existe: um
   exportador que ninguém pediu em duas fases provavelmente não é o que falta.
+
+## Atualização — agosto/2026
+
+A contagem citada aqui envelheceu duas vezes, e o gatilho do OTel não.
+
+A vaga de "décimo repositório" foi ocupada por `queue` e `storage` (ADR 0016), e
+depois a ADR 0021 dissolveu o `porang`, o que devolveu a conta a dez. O `otel`
+seria hoje o **décimo primeiro**, e continua precisando de pedido.
+
+A decisão desta ADR — o exportador só existe quando alguém pedir, e enquanto
+isso o OpenTelemetry entra pela API padrão — segue valendo sem alteração.

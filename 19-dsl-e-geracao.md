@@ -22,27 +22,42 @@ contexto e é verificável antes de virar código.
 | HCL | rejeitado — menos treino, e a expressividade extra é exatamente o que não queremos |
 | CUE | rejeitado — validação superior, público minúsculo, LLM erra |
 
-O schema publicado em `arandu-io/schema` é o produto real dessa camada: é ele que
-faz um modelo sem fine-tuning nenhum acertar a spec.
+O schema é o produto real dessa camada: é ele que faz um modelo sem fine-tuning
+nenhum acertar a spec. Ele não é repositório novo — sai do comando `aru schema`,
+gerado das mesmas constantes que o validador usa, com exemplo que passa na
+própria validação.
 
 ## O que a DSL expressa
 
 Conjunto **fechado**, por decisão:
 
-- módulo e entidades
+- módulo e a entidade dele
 - campos com tipos fechados: `string` `text` `int` `decimal` `money` `bool` `date`
-  `timestamp` `uuid` `enum` `ref`
-- relações `belongs_to` e `has_many` — sempre dentro do agregado
-- permissões por ação e papel, que geram a `Policy`
-- validações declarativas (obrigatório, faixa, tamanho, formato)
-- telas `list`, `form`, `show` com colunas e campos
-- jobs e tarefas agendadas
+  `timestamp` `uuid` `email`
+- por campo, `required` e `unique` — de onde saem as validações geradas
+- escopo de tenant, que vem do `Grant` e entra em toda query
+- permissões por ação e papel, que abrem a `Policy`
+
+## Considerado e não entrou
+
+Duas coisas estavam na lista original e ficaram de fora, pela REGRA 15 — cada
+item que entra na DSL é mantido para sempre:
+
+- **relações `belongs_to` e `has_many`** — só fazem sentido dentro do agregado, e
+  o `data.Repository` já é por agregado. Relação na DSL viraria join gerado, e
+  join gerado é o começo de um ORM
+- **telas `list`, `form` e `show`** — gerariam view, e a forma canônica de uma
+  tela ainda não existe. O `make:auth` publica a primeira, e é dela que se
+  aprende o que uma tela gerada deve parecer. Gerar antes disso é adivinhar
+
+Ambas voltam à mesa quando houver um módulo real pedindo. Ver `03-roadmap-fases.md`.
 
 ## O que a DSL não expressa, e por quê
 
 - lógica de negócio condicional
 - SQL customizado
-- template livre
+- template livre — toda tela se escreve à mão em `.kyse.go`, com as diretivas do
+  `kyse`
 
 Este é o ponto que decide se o produto vive. DSL expressiva demais vira uma
 linguagem que você mantém para sempre; restrita demais e o cliente esbarra no
@@ -52,13 +67,40 @@ A saída não é ampliar a DSL, é a **saída de emergência tipada**: o código
 tem blocos protegidos por marcador, e regeneração preserva o que está dentro.
 
 ```go
-// arandu:inicio custom — preservado na regeração
-func (s *Service) aplicarDescontoProgressivo(...) { ... }
-// arandu:fim custom
+// arandu:begin custom
+func (s *Service) applyProgressiveDiscount(...) { ... }
+// arandu:end custom
 ```
+
+O que está entre os dois marcadores é preservado na regeração.
 
 Fora do padrão se escreve em Go, com o framework inteiro disponível, e sem perder
 a capacidade de regenerar o resto.
+
+## Onde o gerador escreve
+
+Nos diretórios do Laravel, os mesmos que `aru new` já criou. Não existe
+`modules/<nome>/`.
+
+| Item da spec | Arquivo emitido |
+|---|---|
+| entidade | `app/Models/Pedido.go` |
+| permissões por ação e papel | `app/Policies/PedidoPolicy.go` |
+| acesso a dado | `app/Repositories/PedidoRepository.go` |
+| regra de negócio | `app/Services/PedidoService.go`, com os blocos custom |
+| validações | `app/Http/Requests/StorePedido.go` |
+| ações HTTP | `app/Http/Controllers/PedidoController.go` |
+| rotas | linhas em `routes/web.go` |
+| campos e tipos | migração em `database/migrations/` e as queries do sqlc |
+| o que o módulo declara sobre si | `arandu.mod.toml`, conferido pelo `doctor` |
+| teste | o teste do módulo, verde sem edição manual |
+
+**O gerador não escreve view.** Telas ficaram fora da DSL, e o `.kyse.go` se
+escreve à mão. O `.go` ao lado dele sai do `aru view:build`, nunca daqui.
+
+O dado que chega a uma view é struct tipada por página, nunca `map` — campo
+errado é erro de compilação, e uma regra do `aru doctor` proíbe `map` como dado
+de view.
 
 ## O pipeline
 
@@ -72,8 +114,8 @@ usuário (português)
 ```
 
 Erro de spec nunca vira código quebrado, porque a validação acontece antes da
-geração. E o humano aprova a spec, não o código — spec cabe na cabeça, diff de
-sete arquivos não.
+geração. E o humano aprova a spec, não o código — spec cabe na cabeça, diff
+espalhado por `app/`, `database/` e `routes/` não.
 
 ## Round-trip
 

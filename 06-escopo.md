@@ -45,7 +45,8 @@ paga. `maraca` e `boitata` saem do mapa.
 
 | Laravel | Onde vive no Arandu |
 |---|---|
-| Telescope (parte dev) | `observability/` — Collector e página de erro, já implementados |
+| Telescope (parte dev) | `observability/` — Collector, página de erro e o console `/_arandu/debug`, já implementados |
+| Blade | `view/` — o motor `kyse` e os assets embutidos. As views ficam no projeto, em `resources/views/`. Ver ADR 0020 e 0021 |
 | Fortify | `security/` — Grant, Policy, sessão, argon2id. Segurança é a tese; não pode ser pacote opcional |
 | Sanctum | tokens de API são um adapter de sessão. `security/token.go` |
 | Pennant | feature flags são um mapa e um middleware. ~200 linhas |
@@ -55,42 +56,56 @@ Sem nome indígena para essa camada: é o pacote `security` do core. O nome `sum
 
 ## CONSTRUIR — Fase 1
 
-Quatro repositórios. Nada mais.
+Cinco repositórios. Nada mais.
 
 ```
 arandu-io/framework    a biblioteca
 arandu-io/arandu       esqueleto de projeto
 arandu-io/aru          CLI
 arandu-io/docs         markdown do guia
+arandu-io/examples     a aplicação que demonstra o framework
 ```
 
-Critério: sem esses quatro não existe produto.
+Critério: sem os quatro primeiros não existe produto. O `examples` entrou junto
+porque escrever à mão o módulo que o gerador vai emitir é o que transforma
+"template que pareceu bom" em "template já usado".
 
 ## CONSTRUIR — Fase 2
 
 ```
-arandu-io/database     adapter de SQL — sem ele o framework não roda
-arandu-io/kv           adapter de chave-valor — sessão e rate limit distribuídos
-arandu-io/porang       camada de view (templ + HTMX + Basecoat)
-arandu-io/oka          starter kit: telas de auth
+arandu-io/database      adapter de SQL — sem ele o framework não roda
+arandu-io/kv            adapter de chave-valor — sessão e rate limit distribuídos
+arandu-io/homebrew-tap  fórmula do `aru`
 ```
 
 Os nomes seguem `11-adapters.md`: um pacote por **domínio**, não por fornecedor.
 `database` cobre Postgres, MySQL e SQLite; `kv` cobre Redis, Dragonfly, Valkey e
 KeyDB, porque falam o mesmo protocolo.
 
-`porang` é o único com valor competitivo real da lista — é a camada que liga
-componente a Grant, validação e CSRF, e nenhuma biblioteca genérica pode fazer.
+A camada de view estava nesta lista, como `arandu-io/porang`. Não é mais
+repositório: a ADR 0021 dissolveu o `porang` — as views ficam em
+`arandu/resources/views/`, no projeto que o desenvolvedor edita, e o motor
+`kyse` mais os assets embutidos ficam em `framework/view/`, que é core. O valor
+competitivo continua sendo o mesmo — é a camada que liga componente a Grant,
+validação e CSRF, e nenhuma biblioteca genérica faz isso — e é justamente por
+isso que ela é core, não dependência opcional.
+
+O starter kit também saiu: `oka` não é repositório, é o comando `aru make:auth`
+(ADR 0012).
 
 ## CONSTRUIR — Fase 3
 
 ```
-arandu-io/marandu      console histórico de requests
-arandu-io/moitara      registry de módulos
+arandu-io/queue        fila sobre a tabela do projeto; driver RESP para volume
+arandu-io/storage      disco local e protocolo S3, com R2 como padrão
 ```
 
-`moitara` só faz sentido depois de existir módulo para distribuir. Antes disso é
-infraestrutura sem conteúdo.
+Os dois foram autorizados pela ADR 0016.
+
+O console histórico de requests não virou repositório: é core, em
+`/_arandu/debug`, entregue na Fase 3. O nome `marandu` fica livre. O `moitara`
+segue sem data — registry só faz sentido depois de existir módulo para
+distribuir; antes disso é infraestrutura sem conteúdo.
 
 ## DEPOIS — só com pedido concreto
 
@@ -101,7 +116,7 @@ infraestrutura sem conteúdo.
 | `potiron` | dashboard de filas | depois de existir fila em produção |
 | `taba` | painel administrativo | Fase 4. É o único dos "pagos" que faz sentido |
 | *a definir* | camada de IA | Fase 4, depende de tudo acima. Nomear no gatilho |
-| `igarape` | roteamento por arquivo | provavelmente nunca — conflita com módulos verticais |
+| `igarape` | roteamento por arquivo | provavelmente nunca — `routes/web.go` já é o caminho único de rota, e roteamento por arquivo seria o segundo (REGRA 9). Rota descoberta por convenção também some do arquivo onde se lê o que a aplicação expõe, e com ela a Policy que a protege |
 | — | servidor OAuth2 | nicho pequeno, esforço enorme. Recomendar biblioteca existente |
 
 ## NÃO — fora do escopo
@@ -120,10 +135,10 @@ Laravel LLC virou empresa de infraestrutura depois de o framework dominar.
 
 | Categoria | Itens |
 |---|---|
-| Construir na Fase 1 | **4** |
-| Construir na Fase 2 | **4** |
-| Construir na Fase 3 | **2** |
-| Core (sem repo) | 5 |
+| Construir na Fase 1 | **5** — framework, arandu, aru, docs, examples |
+| Construir na Fase 2 | **3** — database, kv, homebrew-tap |
+| Construir na Fase 3 | **2** — queue, storage |
+| Core (sem repo) | 6 |
 | Não existe em Go | 5 |
 | Biblioteca de terceiro | 4 |
 | Depois, com gatilho | 7 |

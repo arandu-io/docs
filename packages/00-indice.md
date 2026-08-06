@@ -29,7 +29,7 @@ pessoa saber o que fazer.
 | [Socialite](socialite.md) | usar goth, adapter fino | — | com demanda |
 | [Sanctum](sanctum.md) | core | — | Fase 1–2 |
 | [Pennant](pennant.md) | core | — | quando houver a 1ª flag |
-| [Echo](echo.md) | vive no `porang` | — | com o `uirapuru` |
+| [Echo](echo.md) | vive na camada de view | — | com o `uirapuru` |
 | [Scout](scout.md) | deferido | a definir | Postgres não bastar |
 | [Horizon](horizon.md) | deferido | `potiron` | fila em produção |
 | [Reverb](reverb.md) | deferido | `uirapuru` | SSE não bastar |

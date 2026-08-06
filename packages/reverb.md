@@ -31,4 +31,4 @@ Cliente com requisito bidirecional real que SSE não atende.
 
 ## Alternativa enquanto não existe
 
-SSE via extensão do HTMX, com o `porang` fornecendo o componente.
+SSE via extensão do HTMX, com a camada de view fornecendo o componente.
