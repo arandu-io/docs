@@ -23,10 +23,18 @@ golden files e blocos `arandu:begin custom` preservados na regeração.
 
 O starter kit é `aru make:auth`. Não existe `arandu-io/oka`.
 
-Os templates vivem em `aru/internal/gen/auth.go` e produzem quatro arquivos em
-`modules/authui/` do projeto: `module.go`, `handlers.go`, `views.templ` e
-`arandu.mod.toml`. Nada disso é dependência de runtime, e cada arquivo é do
-projeto a partir do momento em que aparece.
+Os templates vivem em `aru/internal/gen/auth.go` e publicam no projeto o
+controller, as rotas e as telas de autenticação, nos diretórios do Laravel
+(ADR 0019): `app/Http/Controllers/`, `routes/web.go` e as views em
+`resources/views/auth/*.kyse.go`. Nada disso é dependência de runtime, e cada
+arquivo é do projeto a partir do momento em que aparece.
+
+O que se publica é o `.kyse.go` — o fonte que o humano lê e edita. O `.go` ao
+lado sai do `aru view:build` (ADR 0020).
+
+O comando é anterior à virada de estrutura e ainda emite o layout antigo
+(`modules/authui/`, com a view em `views.templ`). Portar `aru/internal/gen/auth.go`
+para os caminhos acima é pendência da ADR 0019, não uma decisão em aberto.
 
 ## Por quê
 
@@ -40,19 +48,19 @@ com telas embutidas não é o Breeze: é o oposto dele. Quem quisesse mudar uma
 palavra da tela teria que forkar.
 
 **O gerador já paga o custo.** Golden files, preservação de bloco custom,
-verificação de sintaxe e teste de compilação contra `framework` e `porang` já
-existem para o `make:module`. O starter kit herda os quatro.
+verificação de sintaxe e teste de compilação contra o `framework` já existem para
+o `make:module`. O starter kit herda os quatro.
 
 ## Consequências
 
 - **Fecha:** não haverá repositório de starter kit, nem um segundo binário. Um
   segundo tema de autenticação, se um dia existir, é uma flag do comando
   (`--style=...`), nunca um repositório novo.
-- **A Fase 2 passa a ter nove repositórios**, não dez: `framework`, `aru`,
-  `arandu`, `docs`, `examples`, `porang`, `kv`, `homebrew-tap` e o que a
-  ADR 0013 decide sobre `database`.
+- **Um repositório a menos.** À época isso levava a Fase 2 de dez para nove;
+  depois o `database` entrou (ADR 0014) e o `porang` foi dissolvido (ADR 0021).
+  A lista atual está em `05-repositorios.md`.
 - **O nome `oka` fica livre.** Continua aprovado pelos cinco filtros da REGRA 4 e
   disponível para outro uso, se aparecer um.
-- `make:auth` depende do `porang`, e portanto da Fase 2 estar de pé. Isso é
+- `make:auth` depende da camada de view, e portanto da Fase 2 estar de pé. Isso é
   ordem, não acoplamento: o esqueleto continua autenticando sem ele, com a tela
   mínima do módulo `auth` do core.

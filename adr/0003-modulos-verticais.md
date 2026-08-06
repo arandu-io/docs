@@ -1,6 +1,8 @@
 # ADR 0003-modulos-verticais — Módulos verticais em vez de camadas
 
-**Status:** Aceita.
+**Status:** Superseded pela ADR 0019. O `modules/<nome>/` vertical caiu em
+agosto/2026: a arvore passou a ser a do Laravel, diretorio a diretorio.
+Mantida como registro do porque a decisao original fazia sentido.
 
 ## Contexto
 

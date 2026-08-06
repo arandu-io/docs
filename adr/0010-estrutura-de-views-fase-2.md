@@ -1,6 +1,8 @@
 # ADR 0010-estrutura-de-views-fase-2 — Estrutura de views no formato do Inertia, com HTMX
 
-**Status:** Aceita como direção. Implementa na Fase 2, com o `porang`.
+**Status:** Superseded pelas ADRs 0020 (kyse no lugar do templ), 0021
+(porang dissolvido) e 0022 (Bootstrap no lugar do Tailwind). Mantida como
+registro.
 
 ## Contexto
 
