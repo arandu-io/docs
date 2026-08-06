@@ -34,7 +34,7 @@ Se você parar de usar o Arandu amanhã, isto continua sendo seu, e é Go comum:
   num projeto médio
 - SQL: as queries estão em `.sql` e o `sqlc` gera Go a partir delas
 - migrações: SQL versionado
-- CSS: Bootstrap vendorizado, arquivo estático. Sem etapa de build e sem runtime
+- CSS: Tailwind v4 compilado por binário standalone. Sem npm e sem runtime
 
 Isto some se você tirar o framework:
 

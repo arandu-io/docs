@@ -21,7 +21,7 @@ Isto não muda, e é o que preserva a REGRA 9:
 - contrato de módulo `Routes(r *httpx.Router)`
 - validação, CSRF, sessão, rate limit, headers
 - Collector, página de erro, `aru doctor`
-- `kyse` + HTMX na view, com o CSS Bootstrap embutido
+- `kyse` + HTMX + Alpine na view, com o CSS Tailwind compilado e embutido
 - toda a CLI
 
 **A API pública é a mesma.** Trocar de perfil não muda uma linha do handler,

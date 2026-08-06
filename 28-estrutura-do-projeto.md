@@ -125,9 +125,9 @@ que o Laravel só recomendava.*
 | `database/` | `database/` | **igual** — `factories/`, `migrations/`, `seeders/` |
 | `public/` | **quase não existe** | asset entra por `go:embed` (doc 14). Sem `storage:link`, sem asset servido de disco |
 | `resources/views/` | `resources/views/` | **igual** — layouts, componentes e páginas. É onde as views do dissolvido `porang` foram parar; o runtime de render ficou em `framework/view/` |
-| `resources/css/app.css` | `resources/css/app.css` | **igual** — entrada do Bootstrap, vendorizado com a licença e embutido |
+| `resources/css/app.css` | `resources/css/app.css` | **igual** — a entrada do Tailwind; `aru view:build` compila para `assets/app.css`, embutido por `go:embed` |
 | `resources/js/app.js` | `resources/js/app.js` | **igual** — JS à mão, sem npm e sem bundler |
-| `public/build/` (saída do Vite) | **não existe** | o CSS do Bootstrap é vendorizado com a licença e embutido por `go:embed`. Sem bundler, sem diretório de saída |
+| `public/build/` (saída do Vite) | **não existe** | o CSS compilado entra no binário por `go:embed`. Sem bundler, sem diretório de saída servido do disco |
 | `routes/web.php` | `routes/web.go` | **igual** |
 | `routes/api.php` | o mesmo `routes.go` | o handler decide JSON ou fragmento |
 | `routes/console.php` | `routes/console.go` | **igual** |
@@ -185,7 +185,7 @@ document root para onde o servidor aponta. Misturar os dois é o erro.
 
 E aqui `public/` praticamente não existe: asset é embutido (REGRA 13), não
 servido de disco. O que o Laravel joga em `public/build/` — a saída do Vite — em
-nós não tem equivalente: o CSS do Bootstrap é vendorizado com a licença dentro
+nós não tem equivalente: o CSS compilado é embutido no binário dentro
 de `resources/css/` e entra no binário por `go:embed`.
 
 Se sobrar alguma coisa que precise ser servida de disco em dev, ela vai em

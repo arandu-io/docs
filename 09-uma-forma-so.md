@@ -46,7 +46,7 @@ de escrever a primeira linha.
 | Dimensão | A única forma | Nunca |
 |---|---|---|
 | View | kyse + HTMX | segundo motor de template; opção React/Vue; Alpine só onde HTMX não alcança |
-| CSS | Bootstrap vendorizado | segundo framework de CSS; binário de build baixado pela `aru`; pacote npm |
+| CSS | Tailwind v4, binário standalone | segundo framework de CSS; pacote npm |
 | Runtime | o binário Go | variantes de servidor, modo "turbo", modo alternativo |
 | Autorização | `security.Grant` | atalho, bypass, "modo simples" |
 | Dados | sqlc + `Repository` | ORM, query builder fluente, segunda camada |

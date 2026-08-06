@@ -224,7 +224,7 @@ Onde checar, e só aqui:
 | Domínio `.dev` / `.com` | marca | não bloqueia pacote |
 | INPI classes 9 e 42 | marca | juridicamente sim |
 
-Não há exceção: npm não entra no grafo, em pacote nenhum. O CSS é **Bootstrap**,
+Não há exceção: npm não entra no grafo, em pacote nenhum. O CSS é **Tailwind v4**,
 vendorizado no repositório do `arandu` com a licença e embutido por `go:embed`
 (ADR 0022). O Tailwind e o Basecoat caíram junto — o Basecoat era plugin de
 Tailwind distribuído por npm, e era o único motivo pelo qual a exceção existia.

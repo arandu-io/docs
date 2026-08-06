@@ -74,8 +74,9 @@ deles deixaram de ser opcionais.
   `@go`/`@endgo` no lugar do `@php`. Bloco de código é `@go` ... `@endgo`,
   nunca `{{ go }}`.
 
-- **CSS é Bootstrap**, como o `laravel/ui`. O Tailwind cai, e com ele o binário
-  standalone que a `aru` baixava. Bootstrap é vendorizado com a licença e
+- **O scaffolding de auth espelha o do `laravel/ui`** — as mesmas nove views. A
+  stack de CSS não muda: Tailwind v4 com o binário standalone, vendorizado com a
+  licença e
   embutido por `go:embed`.
 
 - **O `porang` foi dissolvido.** De onze repositórios para dez. Views e

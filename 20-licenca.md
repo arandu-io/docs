@@ -64,7 +64,7 @@ não precisa ser relicenciável. Por isso: DCO.
 1. `LICENSE.md` (MIT) na raiz de todo repositório `arandu-io` — **feito**
 2. `CONTRIBUTING.md` exigindo `git commit -s` — **feito**
 3. Cabeçalho de licença **não** em cada arquivo — o Go não usa essa prática
-4. `THIRD_PARTY.md` no `arandu`, com a atribuição de HTMX, Alpine e Bootstrap
+4. `THIRD_PARTY.md` no `arandu`, com a atribuição de HTMX, Alpine e Tailwind
    vendorizados
 
 Tudo isso antes de qualquer repositório ir a público.

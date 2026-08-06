@@ -77,7 +77,7 @@ Entregas — **todas feitas**:
 - `aru view:build` e `aru dev` — toolchain de view gerenciado pela CLI. Entregue
   com `templ` e `tailwindcss` standalone, baixados e cacheados em
   `~/.arandu/bin`. Hoje nenhum binário é baixado: o `kyse` é parte da `aru`, e o
-  CSS é Bootstrap vendorizado, embutido por `go:embed`. Zero Node nos dois casos
+  CSS continua Tailwind v4, com o binário standalone. Zero Node nos dois casos
 - `data.Transaction` e `events.Outbox` — evento gravado na mesma transação da
   escrita, nunca `Publish()` direto (doc 27)
 - `arandu-io/kv` — cache, sessão, rate limit e lock sobre RESP (doc 11)
@@ -123,7 +123,7 @@ proíbe `map` como dado de view.
 Na mesma virada, e pelo mesmo motivo — são um trabalho só:
 
 - o Tailwind caiu, e com ele o binário standalone que a `aru` baixava. O CSS é
-  Bootstrap, vendorizado com a licença e embutido por `go:embed`
+  Tailwind v4, com o binário standalone que a `aru` baixa e cacheia
 - a estrutura do projeto passa a ser a do Laravel, diretório a diretório:
   `app/Http/{Controllers,Middleware,Requests}`, `app/Models`, `app/Enums`,
   `app/Policies`, `app/Services`, `app/Repositories`, `app/Jobs`, `app/Events`,

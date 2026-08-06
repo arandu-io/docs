@@ -65,9 +65,9 @@ Escopo vem antes de nomes de propósito: só se nomeia o que vai existir.
 - Dos 14 pacotes principais do Laravel, **um** vira repositório novo. Ver `packages/`
 - Documentação de uso é **fase própria, depois da Fase 3**. Comentário de doc em
   Go e ADR continuam obrigatórios durante o desenvolvimento
-- View: `kyse` + Bootstrap vendorizado, como o `laravel/ui`. Nenhum binário de
-  CSS baixado pela `aru`. Assets por `go:embed`, sem CDN e sem npm.
-  Ver `14-view-e-assets.md` e ADR 0022
+- View: `kyse` + HTMX + Alpine + Tailwind v4, com o binário standalone. O
+  scaffolding de auth espelha o do `laravel/ui`. Assets por `go:embed`, sem CDN
+  e sem npm. Ver `14-view-e-assets.md` e ADR 0022
 - `arandu-io/website` é uma **aplicação Arandu** — dogfood, e primeiro cliente real
 - **Uma forma só de fazer cada coisa.** Um frontend (kyse + HTMX), um runtime,
   um caminho de autorização, um caminho de dados, zero Node no core
@@ -94,8 +94,8 @@ que está abaixo, o documento está velho.
    Arandu. O **templ caiu**. `resources/views/home.kyse.go` é o que se escreve,
    `resources/views/home.go` é o que o `aru view:build` gera ao lado, e
    `@go`/`@endgo` é o `@php` com Go de verdade dentro (doc 14, ADR 0020)
-3. **CSS é Bootstrap**, como o `laravel/ui`. O Tailwind **caiu**, e com ele o
-   binário standalone que a `aru` baixava (ADR 0022)
+3. **O scaffolding de auth espelha o do `laravel/ui`**: as mesmas nove views,
+   nos mesmos caminhos. A stack não muda — HTMX, Alpine e Tailwind v4 (ADR 0022)
 4. **O `porang` foi dissolvido.** No Laravel a view mora no esqueleto: as views
    foram para `arandu/resources/views/`, o runtime para `framework/view/`.
    De onze repositórios para dez (ADR 0021)

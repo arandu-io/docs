@@ -4,7 +4,7 @@ Este é o documento da camada de view. Ele fecha três coisas: qual é o motor d
 template, de onde vem o CSS, e onde a view mora agora que o `porang` deixou de
 existir.
 
-O templ caiu (ADR 0020). O Tailwind caiu (ADR 0022). O `porang` foi dissolvido
+O templ caiu (ADR 0020). O `porang` foi dissolvido
 (ADR 0021). O que não mudou é a restrição que decide tudo — e é por ela que se
 começa.
 
@@ -35,8 +35,8 @@ pelo qual o Node entrou no Laravel — a página de erro com `package.json` e
 `vite.config.js` dentro do framework não nasceu de uma decisão de arquitetura,
 nasceu de uma exceção pontual como essa.
 
-**A exceção cai. A regra fica.** Com o Tailwind fora e o Bootstrap vendorizado,
-ela deixa de ter até motivo de existir.
+**A exceção cai. A regra fica.** O Tailwind entra pelo binário standalone, que
+não é npm — e é o que fecha a porta que a exceção tinha aberto.
 
 ## O motor: `kyse`
 
@@ -141,28 +141,30 @@ binários — `templ` e o `tailwindcss` standalone. Ambos saíram:
 | Saiu | Entrou |
 |---|---|
 | `templ` (binário baixado) | `aru view:build`, dentro da CLI |
-| `tailwindcss` standalone (binário baixado) | Bootstrap vendorizado, sem etapa de compilação de CSS |
+| `tailwindcss` standalone | **continua** — é binário único, não npm |
 
 `aru dev` roda o watch do `kyse` mais o servidor. Um comando, um terminal.
 
-## CSS: Bootstrap, vendorizado
+## CSS: Tailwind v4, pelo binário standalone
 
-O CSS é **Bootstrap**, como no `laravel/ui`. O Tailwind caiu, e com ele o binário
-standalone e a necessidade de compilar CSS no build.
+O CSS é **Tailwind v4**. O `aru view:build` baixa o binário standalone,
+verifica o SHA-256 contra o `checksums.txt` da release e cacheia em
+`~/.arandu/bin`. Binário único não é npm: não há `package.json`, não há
+`node_modules`, não há lockfile de JavaScript.
 
-O Bootstrap entra vendorizado no repositório do `arandu`, com o arquivo de
-licença e a atribuição, e é embutido por `go:embed`. npm não entra no grafo de
-dependências em nenhuma hipótese.
+`resources/css/app.css` é a entrada, e `assets/app.css` a saída compilada, que
+entra no binário por `go:embed`.
 
-Com o Tailwind fora, o Basecoat sai junto — ele é um plugin de Tailwind, e era o
-único motivo pelo qual a exceção de npm tinha sido aberta.
+O que o `laravel/ui` empresta é a **estrutura**, não o CSS: as nove views de
+`resources/views/`, com a mesma função e nos mesmos caminhos, escritas em
+utilitário Tailwind no lugar das classes do Bootstrap. Ver ADR 0022.
 
-Se manter o vendor ficar caro, a alternativa é escrever o CSS — não é
-reintroduzir npm.
+Se manter o vendor de um componente ficar caro, a alternativa é escrever o CSS
+— não é reintroduzir npm.
 
 ## Assets: `go:embed`, sem CDN
 
-`htmx.min.js`, `alpine.min.js` e o CSS do Bootstrap entram no binário via
+`htmx.min.js`, `alpine.min.js` e o `app.css` compilado entram no binário via
 `go:embed` e são servidos por `framework/view` em `/_arandu/assets/<hash>/…` com
 cache imutável.
 

@@ -70,7 +70,7 @@ Vulnerabilidade em módulo da registry é responsabilidade do autor. Nossa parte
 - `govulncheck` na CI de todo repositório, bloqueando merge
 - Dependabot com revisão humana obrigatória; nunca merge automático
 - `go.sum` verificado; nenhum `replace` apontando para fora em release
-- Assets vendorizados (HTMX, Alpine, Bootstrap) com hash conferido no PR de
+- Assets vendorizados (HTMX, Alpine) e o binário do Tailwind com hash conferido no PR de
   atualização
 
 ## O `doctor` faz parte da resposta a incidente
