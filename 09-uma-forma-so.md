@@ -49,7 +49,7 @@ de escrever a primeira linha.
 | CSS | Tailwind v4, binário standalone | segundo framework de CSS; pacote npm |
 | Runtime | o binário Go | variantes de servidor, modo "turbo", modo alternativo |
 | Autorização | `security.Grant` | atalho, bypass, "modo simples" |
-| Dados | sqlc + `Repository` | ORM, query builder fluente, segunda camada |
+| Dados | SQL parametrizado + `Repository` | ORM, query builder fluente, segunda camada |
 | Build | `go build` | npm, Vite, bundler, Node em qualquer lugar do core |
 | Config | struct tipada | mapa, config dinâmica, arquivo por ambiente |
 
@@ -86,7 +86,7 @@ resposta é essa seção. Foi exatamente assim que o Node entrou no Laravel.
 Modo é a mesma doença com outro nome. Performance no Arandu vem de **remover
 camada**, não de adicionar modo:
 
-- sem ORM: sqlc gera prepared statement, plano previsível
+- sem ORM: o gerador emite a query e a struct juntas, plano previsível
 - sem reflection: wiring explícito, resolvido em compilação
 - sem boot por request: o binário sobe uma vez (é o que torna Octane desnecessário)
 - sem hidratação: fragmento de HTML, não JSON + render no cliente

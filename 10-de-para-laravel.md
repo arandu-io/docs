@@ -81,7 +81,7 @@ propósito — não há vocabulário novo a aprender aqui.
 |---|---|---|
 | Service container | wiring explícito, gerado | reflection move erro para runtime |
 | Facades | passagem por parâmetro ou context | exigiria estado global mutável |
-| Eloquent / Active Record | entity + repository + sqlc | SQL previsível, injection impossível |
+| Eloquent / Active Record | entity + repository + SQL parametrizado | SQL previsível, injection impossível |
 | `$fillable` | struct de request explícita | a classe de bug não existe |
 | `compact()` / `with([...])` na view | struct tipada por página | campo errado vira erro de compilação; `map` é reprovado pelo `doctor` |
 | Model com regra dentro | service | entidade é dado, não comportamento |

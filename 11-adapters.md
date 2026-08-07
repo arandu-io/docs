@@ -66,7 +66,7 @@ produtos (`taba`, `moitara`), não na infraestrutura.
 
 > **Adapter atrás de uma interface não é um modo. Segundo modelo de dados é.**
 
-Postgres, MySQL e SQLite falam SQL: um `Repository`, um sqlc, um conjunto de
+Postgres, MySQL e SQLite falam SQL: um `Repository`, um conjunto de
 queries, um caminho de autorização. Trocar o driver não duplica nada.
 
 ## Alta performance — o que entra e o que não
@@ -128,7 +128,7 @@ ninguém no roadmap tem.
 
 **E o ganho não está aí.** Num SaaS o gargalo quase nunca é throughput do engine:
 é N+1, índice faltando, serialização e custo de boot. Go sem ORM, sem reflection,
-sem boot por request e com sqlc já removeu os três maiores. Postgres em hardware
+sem boot por request e sem ORM já removeu os três maiores. Postgres em hardware
 decente faz dezenas de milhares de transações por segundo.
 
 **Gatilho:** cliente real com carga **medida**, não estimada, batendo no limite do

@@ -231,7 +231,7 @@ Por frequência, somando todos os ecossistemas:
 |---|---|
 | Magia que não se rastreia | Sem container, sem facades, sem reflection; wiring explícito e commitado (ADR 0001, 0002) |
 | Mass assignment | Request struct explícita; a classe de bug não existe (doc 13) |
-| N+1 | sqlc elimina lazy loading implícito e o `Collector` detecta e nomeia repetição, com arquivo:linha (doc 02) |
+| N+1 | não há lazy loading implícito para eliminar — a query é explícita — e o `Collector` detecta e nomeia repetição, com arquivo:linha (doc 02) |
 | Duas formas de tudo / fadiga de decisão | REGRA 9, escrita antes desta pesquisa |
 | Memória e startup | Binário único, sem boot por request |
 | Fasthttp quebrando ecossistema | Recusado; ficamos em `net/http` |

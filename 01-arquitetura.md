@@ -53,7 +53,7 @@ esqueleto, e o `doctor` cobra. É a frase de onboarding virada em diretório.
 |---|---|---|
 | Service container | wiring explícito gerado | reflection em Go custa e esconde |
 | Facades | não existe | exigiria estado global mutável |
-| Eloquent | sqlc + repository | SQL previsível, injection impossível |
+| Eloquent | SQL parametrizado + repository | SQL previsível, injection impossível |
 | `$fillable` | não existe | request struct explícita elimina a classe de bug |
 | Blade | kyse | tipagem em tempo de compilação |
 

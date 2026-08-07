@@ -19,7 +19,7 @@ esqueleto **não é biblioteca** — ninguém o importa, você o clona uma vez. 
 segue com stdlib e `golang.org/x/crypto`.
 
 O adapter `arandu-io/postgres` da Fase 2 continua fazendo sentido: pool com
-tunning, health, `LISTEN/NOTIFY` e os tipos que o `sqlc` gerar.
+tunning, health, `LISTEN/NOTIFY` e os tipos que o gerador emitir.
 
 **2. O migrador mínimo é core, em `data.Migrate`.** Usa apenas `database/sql`:
 tabela `arandu_migrations`, cada migração numa transação junto com o registro, e

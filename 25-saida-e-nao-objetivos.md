@@ -32,7 +32,7 @@ Se você parar de usar o Arandu amanhã, isto continua sendo seu, e é Go comum:
   escrito. Se você sair, mantém o `.go` como código final e abandona o fonte
   `.kyse.go`, ou reescreve as views em `html/template`. Estimativa: uma semana
   num projeto médio
-- SQL: as queries estão em `.sql` e o `sqlc` gera Go a partir delas
+- SQL: as queries são `database/sql` com placeholder, legíveis no repositório
 - migrações: SQL versionado
 - CSS: Tailwind v4 compilado por binário standalone. Sem npm e sem runtime
 
@@ -61,7 +61,7 @@ repositório nosso.
    é nosso e não tem equivalente. Ou você mantém os `.go` gerados como código
    final e para de editar os `.kyse.go`, ou reescreve as views. Uma a duas
    semanas.
-5. **Manter o resto.** Pacotes, sqlc e migrações não precisam mudar.
+5. **Manter o resto.** Pacotes, queries e migrações não precisam mudar.
 
 Estimativa honesta para um projeto de porte médio: **três a quatro semanas**, e
 nenhuma reescrita de regra de negócio.
