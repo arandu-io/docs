@@ -36,14 +36,24 @@ Matriz de drivers é o caso em que multi-módulo paga o próprio custo.
 
 ## Os seis domínios
 
-| Pacote | Núcleo (sem dep pesada) | Submódulos |
-|---|---|---|
-| `database` | registro, pool e erro; zero driver | `pgx`, `sqlite`, `mysql` |
-| `kv` | go-redis (RESP) | nenhum |
-| `mail` | interface + SMTP (`net/smtp`) | `ses`, `resend`, `postmark`, `mailgun` |
-| `storage` | interface + disco local | `s3`, `gcs`, `azure` |
-| `queue` | interface + driver sobre `kv` e sobre `database` | `nats`, `sqs`, `rabbitmq` |
-| `ws` | `coder/websocket` e `gobwas/ws` | nenhum |
+| Pacote | Núcleo (sem dep pesada) | Submódulos | Existe? |
+|---|---|---|---|
+| `database` | registro, pool e erro; zero driver | `pgx`, `sqlite`, `mysql` | sim, os três |
+| `kv` | go-redis (RESP) | nenhum | sim |
+| `storage` | interface + disco local, zero dependência | `s3` | sim; `gcs` e `azure` não existem |
+| `queue` | fila sobre a tabela da própria aplicação; nenhum client | `kv` (driver RESP) | sim; `nats`, `sqs` e `rabbitmq` não existem |
+| `mail` | interface + SMTP (`net/smtp`) | `ses`, `resend`, `postmark`, `mailgun` | **não** — decidido e sem gatilho |
+| `ws` | `coder/websocket` e `gobwas/ws` | nenhum | **não** — decidido e sem gatilho |
+
+*Corrigido em 07/08/2026:* a linha do `queue` dizia núcleo "interface + driver
+sobre `kv` e sobre `database`", com `nats`, `sqs` e `rabbitmq` como submódulos.
+O núcleo publicado não conhece RESP: `queue/go.mod` requer o `framework` e mais
+nada em tempo de execução — o `modernc.org/sqlite` que aparece ali é importado
+só por `queue_test.go`. O driver RESP é `github.com/arandu-io/queue/kv`, módulo
+próprio, pela mesma regra de dependência opcional que separou `storage/s3`. Os
+três submódulos listados não existem, e a coluna nova diz o que está no disco em
+vez de deixar o desenho passar por entrega. `mail` e `ws` continuam decididos e
+sem gatilho — ADR 0016, "com demanda".
 
 Dois padrões que aparecem sozinhos e mantêm a conta baixa:
 

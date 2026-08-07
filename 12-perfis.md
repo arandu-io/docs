@@ -1,17 +1,35 @@
 # Perfis — convencional e performance
 
-O Arandu entrega **dois conjuntos de recursos**: perfil convencional e perfil de
+O Arandu prevê **dois conjuntos de recursos**: perfil convencional e perfil de
 performance. Não são dois frameworks e não são dois caminhos de código escritos
 à mão. São duas fiações da mesma arquitetura.
 
+Este documento é **desenho**. O perfil convencional está construído; o de
+performance **não tem uma linha de código**. As seções que descrevem o que muda
+entre os dois marcam onde a promessa para; as duas que descrevem o que é
+*idêntico* nos dois não marcam — e vale ler com isso em mente, porque não há
+segundo perfil para trocar. *Corrigido em 07/08/2026:* a abertura dizia que o Arandu "entrega" os dois
+conjuntos, no presente, o que fazia a página inteira ler como descrição do que
+existe.
+
 ## Por que é viável aqui
 
-Porque existe gerador determinístico. `aru make:module` emite `queries.sql` e
-`queries.cql` a partir da mesma especificação. A duplicação fica **dentro do
-gerador**, não espalhada no código do cliente.
+Porque existe gerador determinístico. `aru make:module` emite o Repository com o
+**SQL parametrizado escrito à mão nos templates do gerador**, a partir da mesma
+especificação que emitiria o CQL. A duplicação fica **dentro do gerador**, não
+espalhada no código do cliente.
 
 Um framework onde o dev escreve a query à mão não consegue fazer isso sem dobrar
 o trabalho de todo mundo. Aqui a conta fica com a engine.
+
+*Corrigido em 07/08/2026:* esta seção dizia que o `aru make:module` emite
+`queries.sql` e `queries.cql`. Nenhum `.sql` é emitido, e nunca foi: o gerador
+produz doze arquivos — oito `.go` (controller, model, policy, repository,
+service, request, teste e migration) e quatro `.kyse.go` (index, show, create,
+edit) —, com o SQL em literal Go dentro do Repository. O `sqlc`, que era o
+mecanismo por trás da promessa de `.sql`, nunca entrou (ADR 0024) e virou
+gatilho: ele passa a valer no dia em que o perfil de performance exigir a
+segunda emissão de queries, que é exatamente o assunto deste documento.
 
 ## O que é idêntico nos dois perfis
 
@@ -31,13 +49,26 @@ do service ou da policy.
 
 | Camada | Convencional | Performance |
 |---|---|---|
-| Banco | PostgreSQL + `database/sql` | ScyllaDB + gocql |
+| Banco | PostgreSQL, MySQL ou SQLite + `database/sql` | ScyllaDB + gocql |
 | KV / cache / sessão | Dragonfly (RESP) | Dragonfly (RESP) |
-| Filas | `kv` ou Postgres | NATS |
+| Filas | tabela `jobs` da aplicação, ou `queue/kv` (RESP) | NATS |
 | Tempo real | SSE (`net/http`) | WebSocket (`gobwas/ws`) |
 | Escopo de tenant | coluna `tenant_id` | chave de partição |
 
 Dragonfly é o mesmo nos dois: protocolo RESP, mesmo driver, custo zero.
+
+**A coluna da direita é inteiramente desenho.** Não há uma linha de código do
+perfil de performance em lugar nenhum do projeto: `grep -rni
+"gocql\|scylla\|cassandra\|nats\|gobwas"` sobre `framework`, `aru`, `arandu`,
+`database`, `kv`, `queue`, `storage` e `examples` devolve duas ocorrências, e
+nenhuma é código: um comentário em `framework/events/relay.go`, dizendo que o
+framework **não** escolhe o transporte, e uma linha de prosa do
+`framework/README.md` afirmando que Postgres, Redis e NATS chegam por módulos
+adapter separados — o adapter NATS não existe, e essa linha é uma promessa em
+aberto no README daquele repositório, fora deste diretório. Os dialetos que
+`framework/data` aceita são `sqlite`, `pgsql` e `mysql`, e não há um quarto. A
+coluna da esquerda também não está completa: SSE não existe — ver
+`13-estrutura-illuminate.md`.
 
 ## A restrição que o perfil de performance impõe
 
@@ -57,35 +88,41 @@ expusemos join nem query ad-hoc. O desenho já estava certo.
 
 ## Módulo declara o perfil que suporta
 
-```go
-// Tiered is optional. Without it, the module supports the conventional
-// profile only.
-type Tiered interface {
-    Profiles() []Profile // ProfileConventional, ProfilePerformance
-}
-```
+O que existe hoje é **declarativo, não uma interface Go**: o campo `profiles` do
+`arandu.mod.toml`, lido por `aru/internal/manifest`. Os quatro adapters
+publicados declaram `profiles = ["conventional", "performance"]`; os módulos de
+exemplo declaram `["conventional"]`. Os dois rótulos são esses, e não há um
+terceiro.
 
-Os dois rótulos são `conventional` e `performance`, e são os mesmos que o
-`arandu.mod.toml` já publica no campo `profiles`.
+*Corrigido em 07/08/2026:* aqui havia um bloco Go declarando uma interface
+`Tiered` com `Profiles() []Profile`, apresentada como se fosse código do
+framework. Ela nunca foi escrita: `grep -rn "Tiered" framework aru arandu` não
+devolve nada, e sai com status 1. Nem `Tiered`, nem `Profile`, nem
+`ProfileConventional`, nem `ProfilePerformance` existem. Manter o bloco fazia a
+página parecer referência de API, e o que ela descreve é desenho.
 
-`aru doctor --perfil=performance` falha quando:
+O critério de recusa do `aru doctor` para o perfil de performance seria: módulo
+sem suporte declarado, query com `JOIN`, subquery correlacionada ou
+`BEGIN`/`COMMIT` cruzando agregados, entidade sem chave de partição, e tenant que
+não vem do `Grant` para compor a partição. **Três dos quatro não existem**, e o
+subcomando não aceita a flag — ver a seção seguinte.
 
-1. um módulo do projeto não declara suporte ao perfil
-2. um `queries.sql` usa `JOIN`, subquery correlacionada ou `BEGIN`/`COMMIT`
-   cruzando agregados
-3. uma entidade não tem chave de partição definida
-4. o tenant não vem do `Grant` para compor a partição
+O quarto já existe na forma geral, e é das regras mais fortes do `doctor` hoje:
+`tenant-from-request` e `tenant-from-header` reprovam tenant vindo de path,
+corpo, query ou header em vez do `Grant` — é a REGRA 14 sendo cobrada. O que
+falta é a metade da chave de partição, porque não existe partição.
 
 Regra do ecossistema: **módulo de primeira parte suporta os dois perfis.** Módulo
-de comunidade declara o que suporta, e a registry mostra isso na listagem.
+de comunidade declara o que suporta, e a registry mostra isso na listagem — a
+registry é a `moitara` do `18-marketplace.md`, Fase 4, e também não existe ainda.
 
 ## Como se escolhe
 
 ```bash
 aru new crm                          # convencional, o padrão
-aru new crm --perfil=performance
-aru make:module cliente              # emite queries.sql
-aru make:module cliente --perfil=ambos   # emite queries.sql e queries.cql
+aru new crm --profile=performance
+aru make:module client               # SQL parametrizado no Repository
+aru make:module client --profile=both    # o mesmo, mais o CQL do agregado
 ```
 
 **Nenhuma flag de perfil existe ainda** — nem aqui, nem no `aru doctor` da seção

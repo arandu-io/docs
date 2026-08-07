@@ -14,7 +14,7 @@ Ordem de leitura. Cada documento decide algo que o seguinte assume como dado.
 | 08 | `08-documentacao.md` | quando documentar, e por que o site é feito no próprio Arandu |
 | 09 | `09-uma-forma-so.md` | **a regra anti-complexidade** |
 | 10 | `10-de-para-laravel.md` | a curva de aprendizado: Laravel → Arandu |
-| 11 | `11-adapters.md` | os seis pacotes de adapter, e o que conta como modo |
+| 11 | `11-adapters.md` | os pacotes de adapter por domínio — quatro existem —, e o que conta como modo |
 | 12 | `12-perfis.md` | perfil **convencional** e perfil de **performance** |
 | 13 | `13-estrutura-illuminate.md` | mapa componente a componente do `Illuminate/*` |
 | 14 | `14-view-e-assets.md` | camada de view, toolchain sem Node, limite do Alpine |
@@ -58,11 +58,23 @@ Escopo vem antes de nomes de propósito: só se nomeia o que vai existir.
 - Sem equivalentes de Octane, Sail, Herd, Valet, Volt e Tinker — resolvem
   problemas do PHP
 - APM em produção via OpenTelemetry, não produto próprio
-- Seis pacotes de adapter por domínio, driver pesado em submódulo
+- Adapter por **domínio**, nunca por fornecedor, com driver pesado em submódulo.
+  Existem **quatro**: `database`, `kv`, `queue` e `storage`. O `11-adapters.md`
+  desenha seis — `mail` e `ws` continuam sem gatilho ("com demanda") e sem
+  repositório
 - **Dois perfis**: convencional (Postgres) e performance (Scylla). Mesma API,
   mesma Policy, mesmo contrato de módulo — muda a fiação gerada. Ver `12-perfis.md`
 - Dragonfly como padrão de KV nos dois perfis
-- Dos 14 pacotes principais do Laravel, **um** vira repositório novo. Ver `packages/`
+- Dos 14 pacotes principais do Laravel, **nenhum** virou repositório novo. Ver
+  `packages/`
+
+  *Corrigido em 07/08/2026:* esta linha dizia que **um** viraria. O candidato
+  único era o `marandu`, a UI do Telescope, e ele não existe: o console
+  histórico de requests ficou core, em `framework/observability/console.go`,
+  servido em `/_arandu/debug` desde a Fase 3 — ver `06-escopo.md`. Os outros
+  treze vereditos se dividem em cinco categorias, não três — "não existe em Go"
+  (3), "não construir" (2), "core" (2), "não é projeto" (1) e "deferido com
+  gatilho" (5) —, e nenhum gatilho disparou. O placar em `packages/00-indice.md` ainda conta um
 - Documentação de uso é **fase própria, depois da Fase 3**. Comentário de doc em
   Go e ADR continuam obrigatórios durante o desenvolvimento
 - View: `kyse` + HTMX + Alpine + Tailwind v4, com o binário standalone. O
@@ -144,8 +156,47 @@ Aguardando decisão sua:
 
 ## Estado do código
 
-Fases 1 a 4 entregues, verificadas por `./plans/checklist.sh` — que verifica por
-comando, não por afirmação.
+O que o `./plans/checklist.sh` respondeu em 07/08/2026, por critério de saída do
+`03-roadmap-fases.md`:
+
+| Fase | Estado |
+|---|---|
+| 1 | espera pessoa — 30 de 31; o critério que falta não é de código |
+| 2 | fechada — 13 de 13 |
+| 3 | espera pessoa — 3 de 5; os dois que faltam não são de código |
+| 4 | fechada — 5 de 5 |
+
+Os três critérios que faltam dependem de pessoa, não de commit: um produto real
+rodando o login sobre o auth (Fase 1), um bug real diagnosticado só pelo console
+e um dev externo que instala, quebra e entende o erro sem documentação (Fase 3).
+
+Nenhuma verificação falhou na rodada, e duas do instrumento foram consertadas
+no mesmo dia para que isso fosse verdade.
+
+A primeira: a seção *O que os documentos afirmam, e o que existe* procura
+`aru <nome>` nos documentos e cobra que o nome esteja no `help`, com uma lista
+de exceções que era **escrita à mão**. Ela não distinguia documento que
+**promete** um comando de documento que o cita **para dizer que não existe** —
+então cada correção honesta feita aqui aumentava a falha. A lista saiu: hoje o
+comando ou existe no `help`, ou o documento diz na mesma linha que ele não
+existe. O atrito continua, só que no documento, que é onde alguém lê.
+
+A segunda: a guarda que cobra que todo nome de regra citado exista no `doctor`
+pegava qualquer palavra com dois hifens entre crases — e pegou dois nomes de
+servidor DNS no doc 04, o que deixou a Fase 2 reportando **aberta**. Agora ela
+só olha linhas que falam de regra ou do doctor.
+
+As duas eram do mesmo feitio: instrumento que reprova o documento por dizer a
+verdade empurra o documento a calar sobre a lacuna.
+
+Duas verificações ficam de fora enquanto não houver banco de pé — conformidade
+em Postgres e em MySQL, por `./plans/testar-com-bancos-reais.sh`.
+
+*Corrigido em 07/08/2026:* esta linha dizia "Fases 1 a 4 entregues, verificadas
+por `./plans/checklist.sh`". O checklist não diz isso: ele fecha as Fases 2 e 4
+e marca as Fases 1 e 3 como "espera pessoa". Citar o instrumento e afirmar o
+contrário do que ele responde é pior do que não citá-lo. O estado se lê rodando
+o comando; a tabela acima é uma fotografia, e envelhece.
 
 **Dez repositórios** na organização. O trio central espelha o Laravel:
 

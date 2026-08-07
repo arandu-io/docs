@@ -64,7 +64,38 @@ não precisa ser relicenciável. Por isso: DCO.
 1. `LICENSE.md` (MIT) na raiz de todo repositório `arandu-io` — **feito**
 2. `CONTRIBUTING.md` exigindo `git commit -s` — **feito**
 3. Cabeçalho de licença **não** em cada arquivo — o Go não usa essa prática
-4. `THIRD_PARTY.md` no `arandu`, com a atribuição de HTMX, Alpine e Tailwind
-   vendorizados
+4. `THIRD_PARTY.md` no `framework`, com a atribuição de HTMX, Alpine e Tailwind
+   embutidos em `framework/view/assets/` — **feito**. E não fica a cargo da
+   memória: `TestEveryEmbeddedAssetIsCredited` e
+   `TestTheCreditedVersionsAreTheEmbeddedOnes`, em
+   `framework/view/third_party_test.go`, reprovam arquivo que aparece em
+   `view/assets/` sem entrada no aviso e versão registrada que deixou de bater
+   com a que está dentro do arquivo.
 
-Tudo isso antes de qualquer repositório ir a público.
+   *Corrigido em 07/08/2026:* este item mandava o `THIRD_PARTY.md` para o
+   `arandu`. O arquivo está no `framework`, que é onde os assets embutidos moram
+   desde a ADR 0021 — procurando o arquivo nos dez repositórios, existe um só, o
+   `framework/THIRD_PARTY.md`.
+
+5. `THIRD_PARTY.md` no `arandu` — **não feito, e é furo aberto.** O
+   `arandu/assets/app.css` é saída compilada do Tailwind: a primeira linha do
+   arquivo é `/*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */`,
+   e ele entra no binário por `go:embed` em `arandu/assets/assets.go`. O
+   esqueleto não tem `THIRD_PARTY.md`, e o teste de crédito do `framework` não
+   alcança isso — ele lê o diretório `framework/view/assets/` contra o
+   `framework/THIRD_PARTY.md`, e nada olha para `arandu/assets/`. O único teste
+   que existe ao lado do arquivo, `TestTheBrowserGetsThisProjectsStylesheet`,
+   compara md5 de bytes servidos; não é sobre crédito.
+
+   A consequência é que o furo se propaga: o `aru new` clona o esqueleto inteiro
+   e só apaga o `.git`, então todo projeto gerado nasce redistribuindo Tailwind
+   sem o aviso de copyright que a licença MIT dele exige — o mesmo raciocínio que
+   o `framework/THIRD_PARTY.md` escreve para justificar a própria existência
+   ("`go:embed` puts these bytes in the executable, so every user of Arandu
+   becomes a redistributor"). Registrado aqui porque é o lugar onde a decisão de
+   licença mora, e não resolvido: fechar exige mexer em código, que este
+   documento não faz.
+
+Isso deveria ter acontecido antes de qualquer repositório ir a público, e não
+aconteceu: `gh repo view` mostra `arandu` e `framework` como `PUBLIC`, com o item
+5 em aberto. O prazo não vale mais como prazo — vale como dívida datada.

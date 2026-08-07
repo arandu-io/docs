@@ -29,7 +29,7 @@ rejeitou a alternativa.
 
 Um ADR novo a cada decisão que fecha uma porta. Ver `adr/`.
 
-### 3. Este conjunto de documentos (`docs/01` a `08`)
+### 3. Este conjunto de documentos (`docs/01` a `28`)
 
 Não são documentação de produto, são **decisões**. Continuam vivos durante todo o
 desenvolvimento. Quando a fase de documentação começar, eles são a fonte da qual
@@ -72,7 +72,7 @@ Entra no roadmap depois da Fase 3, como fase própria com critério de saída.
 Escopo:
 
 1. Congelar a API pública do core. Nenhuma mudança de assinatura durante a fase
-2. Escrever os guias a partir de `docs/01` a `08`
+2. Escrever os guias a partir de `docs/01` a `28`
 3. Construir `arandu-io/website` sobre o Arandu
 4. Revisar a página de origem do nome com quem estude tupi antigo
    (ver `04-marca.md`)

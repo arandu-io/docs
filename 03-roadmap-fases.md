@@ -63,9 +63,20 @@ Entregas — **todas feitas**:
   files e blocos `arandu:begin custom` preservados na regeração
 - `aru doctor` — análise estática do que o compilador não vê. Uma das regras
   confere o `arandu.mod.toml` contra o AST: permissão usada e não declarada é
-  erro. Sem número fixo aqui, porque a virada mexeu no conjunto: a ADR 0019
-  registra cinco regras a reescrever para `app/<Categoria>/`, e o doc 14 pede a
-  que reprova `map` como dado de view
+  erro.
+
+  *Corrigido em 07/08/2026:* estas linhas descreviam como pendente a reescrita
+  que a ADR 0019 pedia — as regras a reapontar para `app/<Categoria>/` e a que
+  o doc 14 exige contra `map` como dado de view. Está feita, e a própria ADR
+  0019 registra o custo como pago. A detecção deriva categoria e entidade do
+  caminho (`classify`, em `aru/internal/doctor/doctor.go`);
+  `moduleMustNotImportModule` foi substituída por
+  `controllerMustNotReachTheRepository` e não existe mais no código; as duas
+  regras de view — `view-data-is-a-map` e `view-does-not-exist` — estão lá. São
+  dezesseis funções de regra emitindo vinte e duas identificações de achado. O
+  que impede a lista de apodrecer de novo não é o número escrito aqui, é
+  `TestEveryRuleFiresOnAFixture`: regra que não dispara em fixture nenhum
+  reprova, porque é indistinguível de regra apagada
 - camada de view com HTMX e o `hx-headers` do CSRF no layout base (a armadilha
   nº 1 desse stack). Entregue como repositório `porang`, sobre templ. O `porang`
   foi dissolvido depois: as views e componentes foram para
@@ -97,16 +108,30 @@ Critério de saída:
    `--fields`, em inglês como toda a saída da CLI (REGRA 6); `--campos` não
    existe e o comando para com `flag provided but not defined`
 2. `doctor` roda em CI e falha em pelo menos 3 violações plantadas de propósito —
-   **verificado**: oito violações plantadas em `aru/internal/doctor/testdata`,
-   e o esqueleto passa no próprio `doctor --strict`
+   **verificado**, e com folga. Rodando o `doctor` sobre os fixtures de
+   `aru/internal/doctor/testdata` em 07/08/2026: `violations` devolve 24
+   achados de 19 regras distintas, `gaps` devolve 13 de 8, `broken` devolve 1, e
+   `clean` devolve zero. O esqueleto passa no próprio `doctor --strict`
+
+   *Corrigido em 07/08/2026:* esta linha dizia oito violações plantadas. O
+   número é de antes de a ADR 0019 reescrever as regras por entidade e de o doc
+   14 pedir as duas de view, e um número escrito à mão num documento é a coisa
+   que primeiro deixa de acompanhar o fixture. O que sustenta o critério é
+   `TestEveryRuleFiresOnAFixture`, que reprova qualquer regra do `doctor` que
+   não dispare em nenhum fixture, e `TestCleanCodeProducesNothing`, que reprova
+   achado em código correto
 3. Um CRUD real de um dos seus produtos foi substituído por módulo gerado —
    **aberto**, depende do proprietário
 
-   > **Este critério não aparece em nenhum instrumento de acompanhamento, e
-   > isto aqui é o único registro dele.** O `plans/checklist.sh` cobre os
-   > critérios 1 e 2 da Fase 2 e para; o `plans/O-QUE-FALTA.md` lista quatro
-   > pendências de pessoa e esta não é uma delas. Quem olhar só os dois lê a
-   > Fase 2 como fechada.
+   > **Este critério não é verificável por comando**, e por isso nenhum
+   > instrumento que executa o cobra: o `plans/checklist.sh` cobre os critérios
+   > 1 e 2 da Fase 2 e para. Quem olhar só o checklist lê a Fase 2 como fechada.
+   >
+   > *Corrigido em 07/08/2026:* este parágrafo dizia que o doc 03 era o único
+   > registro do critério e citava o `plans/O-QUE-FALTA.md` como o outro
+   > instrumento. Esse arquivo foi apagado — o `checklist.sh` reprova a volta
+   > dele — e o `plans/ESTADO.md` o substituiu, registrando este critério como
+   > aberto e apontando para cá.
    >
    > Ele importa mais que os outros três porque é o **único** que testa o
    > gerador contra um domínio que não foi desenhado junto com ele. Os critérios
@@ -149,9 +174,15 @@ Na mesma virada, e pelo mesmo motivo — são um trabalho só:
   `app/Http/{Controllers,Middleware,Requests}`, `app/Models`, `app/Enums`,
   `app/Policies`, `app/Services`, `app/Repositories`, `app/Jobs`, `app/Events`,
   `app/Listeners`, `app/Mail`, `app/Providers`, `bootstrap/`, `config/`,
-  `database/{factories,migrations,seeders}`, `resources/{views,css,js}`,
+  `database/{factories,migrations,seeders}`, `resources/{views,css}`,
   `routes/web.go` e `routes/console.go`, `storage/`, `public/`. O
-  `modules/<nome>/` vertical caiu
+  `modules/<nome>/` vertical caiu.
+
+  O `resources/js/` do Laravel **não** tem correspondente, e esta linha o
+  listava. Nem o esqueleto nem o `aru new` criam esse diretório: HTMX e Alpine
+  entram por `go:embed` — estão em `framework/view/assets/` — e sem bundler não
+  há o que morar ali (REGRA 13). Um projeto recém-criado não tem nenhum arquivo
+  `.js` nem `package.json`
 
 Critério de saída da virada:
 
@@ -199,9 +230,25 @@ Critério de saída:
 1. Um bug real de um dos seus produtos foi diagnosticado exclusivamente pelo
    console, sem `fmt.Println` — **aberto**, depende do proprietário
 2. O overhead do Collector em produção **desligado** é mensurável e zero —
-   **verificado**, e como teste em vez de benchmark: código instrumentado e
-   código sem instrumentação alocam exatamente igual, e 22 chamadas de `Record`
-   com o Collector ausente custam 0 alocações e 0 bytes
+   **verificado**, e como teste em vez de benchmark, que é o que ninguém lembra
+   de rodar. São quatro testes em `framework/observability/`, que chamam
+   `testing.AllocsPerRun(200, …)` quatro vezes ao todo:
+   `TestRecordingCostsNothingWithTracingOff` (os quatro pontos de entrada do
+   Collector — `RecordEvent`, `RecordQuery`, `RecordExternal` e `RecordRender`,
+   que vêm de camadas do framework, não do código gerado — com o Collector nil),
+   `TestReadingCostsNothingWithTracingOff` (três métodos de leitura, dos quais o
+   middleware chama dois mais o `SuspectedNPlusOne`, e sempre dentro de
+   `if col != nil`) e `TestAnUnguardedEventCostsOneAllocation`, que é o único
+   cuja tese é que a alocação **existe** — ele exige que a forma desguardada
+   aloque, e só cobra zero na forma guardada. Os outros dois exigem zero;
+   que registra por que a guarda `if col != nil` existe: converter o valor da
+   entidade para `any` aloca no ponto da chamada, antes de o receptor nil ser
+   olhado. O quarto, `TestRecordingAnOutboundCallCostsNothingInProduction`,
+   exercita o transporte sem Collector no contexto
+
+   *Corrigido em 07/08/2026:* esta linha citava "22 chamadas de `Record`" e "0
+   bytes". Não há teste com esse número — a medição é de quatro chamadas por
+   execução — e o que se mede é contagem de alocação, não bytes.
 3. Um dev externo consegue instalar, quebrar de propósito e entender o erro
    sem ler documentação — **aberto**, depende de pessoa
 
@@ -213,8 +260,10 @@ para compilar contra.
 
 Entregas:
 
-- DSL declarativa em YAML (`module.arandu.yaml`) descrevendo módulo, campos e
-  permissões — **feito**. Sem relações e sem telas: ver "o que ficou de fora"
+- DSL declarativa em YAML descrevendo módulo, campos e permissões — **feito**. A
+  spec é `database/specs/<nome>.yaml`, commitada junto com o código que produziu,
+  e o comando é `aru generate <spec.yaml>`. Sem relações e sem telas **na spec**:
+  ver "o que ficou de fora"
 - `aru generate` — DSL → código, determinístico, **a mesma engine** do
   `make:module`, com os mesmos golden files — **feito**
 - `aru schema` — o JSON Schema da DSL, gerado das mesmas constantes que o
@@ -223,9 +272,11 @@ Entregas:
   vez, e sem escrever arquivo nenhum quando reprova — **feito**
 - round-trip: código gerado → DSL → código idêntico byte a byte, verificado por
   teste — **feito**
-- `arandu ai` — **não construído**. O que ele faria é pedir a DSL a um modelo, e
-  isso é o que qualquer assistente já faz melhor com o schema na mão. O produto
-  desta camada é o schema, não um wrapper de chamada
+- um subcomando `ai` — **não construído**, e não existe na CLI. O que ele faria
+  é pedir a DSL a um modelo, e isso é o que qualquer assistente já faz melhor
+  com o schema na mão. O produto desta camada é o schema, não um wrapper de
+  chamada. A linha dizia `arandu ai`, com dois erros num nome só: o binário se
+  chama `aru`, e nem com o nome certo o comando existe
 
 Critério de saída:
 
@@ -266,12 +317,22 @@ DSL é um conjunto fechado, e cada coisa que entra nela é mantida para sempre.
 - **relações** — `belongs_to` e `has_many` só fazem sentido dentro do agregado,
   e o `data.Repository` já é por agregado. Uma relação na DSL viraria join
   gerado, e join gerado é o começo de um ORM
-- **telas** — `list`, `form` e `show` gerariam view, e a forma canônica de uma
-  tela ainda não existe: `make:auth` publica a primeira, e é dela que se aprende
-  o que uma tela gerada deve parecer. Gerar antes disso é adivinhar
+- **telas** — não existe chave `screens:` na spec, e não vai existir. As telas
+  saem dos campos que a spec já declara, sem que a DSL tenha crescido para
+  acomodá-las
 
-Ambas voltam à mesa quando houver um módulo real pedindo, que é o mesmo gatilho
-de todo o resto.
+  *Corrigido em 07/08/2026:* este item justificava a ausência dizendo que a
+  forma canônica de uma tela ainda não existia e que gerar antes disso seria
+  adivinhar. A ADR 0023 revogou o motivo: o `make:auth` publicou as nove telas
+  do `laravel/ui`, o `layouts.app` fixou o contrato de layout, e o
+  `aru make:module` passou a emitir quatro telas — `index`, `show`, `create` e
+  `edit`, em `resources/views/<plural>/`, com golden file cada uma. A conclusão
+  não muda, e é o que interessa: gerar tela não exigiu chave nova na DSL, que é
+  exatamente o que a REGRA 15 pede
+
+**Relações** voltam à mesa quando houver um módulo real pedindo, que é o mesmo
+gatilho de todo o resto. **Telas** não voltam: a tela já é gerada, e foi gerada
+sem chave nova — que era a única coisa que a REGRA 15 protegia aqui.
 
 ---
 

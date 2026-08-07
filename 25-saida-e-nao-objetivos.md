@@ -18,9 +18,20 @@ Dizer isso primeiro é mais forte do que deixar o cliente descobrir depois.
 | **Colaboração em tempo real como núcleo** | Cursor compartilhado, edição simultânea. Times escolheram hipermídia para isso e passaram meses costurando WebSocket e estado no cliente |
 | **App mobile nativo como cliente principal** | Dá para usar em modo API, mas aí você está pagando por metade do framework que não vai usar |
 | **Equipe que não quer arquitetura imposta** | A cultura Go tende a rejeitar isso. Se o time briga com a Policy obrigatória, vai brigar todo dia |
-| **Módulo com JOIN complexo no perfil de performance** | Não é elegível. O `doctor` reprova, e isso é por desenho (doc 12) |
+| **Módulo com JOIN complexo no perfil de performance** | Não é elegível, e isso é por desenho (doc 12) |
 
 Nada disso é defeito a corrigir. É fronteira.
+
+*Corrigido em 07/08/2026:* a última linha dizia "O `doctor` reprova", no
+presente. **Nenhuma checagem de perfil existe no `doctor`.** Ele registra uma
+flag só, `-strict` (`aru/doctor.go`), e nenhuma das 22 regras de
+`internal/doctor/rules.go` menciona `JOIN` — são 16 funções na lista `rules`,
+que emitem 22 identificadores de finding, e nenhum deles é de perfil. A
+inelegibilidade é decisão de desenho hoje, não regra que reprova build.
+
+E a flag que apareceu no corpus para essa checagem era `--perfil`, em português.
+Quando ela entrar, entra em inglês como toda a CLI (REGRA 6): `--profile`. O doc
+12 e o doc 26 já registram isso.
 
 ## O que é seu e o que é nosso
 

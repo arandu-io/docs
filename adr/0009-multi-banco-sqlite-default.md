@@ -47,14 +47,33 @@ Migrações também no modelo do Laravel: número de lote por execução,
 que **se recusa a rodar fora de `APP_ENV=dev`** — prompt de confirmação não é
 proteção às três da manhã.
 
-Driver SQLite: `modernc.org/sqlite`, que é Go puro e não exige cgo. Vive no
-esqueleto, junto do `pgx` — o core continua com stdlib e `x/crypto`.
+Driver SQLite: `modernc.org/sqlite`, que é Go puro e não exige cgo. O core
+continua com stdlib e `x/crypto`.
+
+*Corrigido em 07/08/2026:* esta linha dizia que o driver "vive no esqueleto,
+junto do `pgx`". A **ADR 0014** o moveu para compartimento — `arandu-io/database`
+com um `go.mod` por driver. O esqueleto só faz o import em branco
+(`arandu/main.go:37-38`), que é o que liga o driver no binário sem que ele
+apareça no grafo de quem não o usa.
 
 ## Consequência
 
-**MySQL está declarado, não suportado.** A conexão funciona; os repositórios não,
-porque usam `RETURNING`. Suportar exige um segundo caminho de escrita, e isso só
-se paga com pedido concreto.
+**MySQL é suportado, e não é a recomendação.** — *corrigido em 07/08/2026.*
+
+Esta consequência dizia o contrário: *"MySQL está declarado, não suportado. A
+conexão funciona; os repositórios não, porque usam `RETURNING`."* Ela contradizia
+a própria tabela quatro linhas acima, que lista `RETURNING` entre o que **não** se
+usa justamente porque o MySQL não tem. Nenhum repositório usa `RETURNING` — a
+busca devolve zero ocorrências fora de comentário.
+
+O erro se propagou para dois lugares publicados: o comentário de `DialectMySQL`
+em `framework/data/dialect.go`, que mandava o leitor a esta ADR para confirmar, e
+o `database/mysql`, que dizia o oposto e estava certo. A suíte de conformidade da
+ADR 0018 roda as queries geradas contra servidor de verdade nos três engines, o
+MySQL entre eles, e passa.
+
+O que continua verdade é a recomendação: Postgres é onde a história de migração,
+o DDL transacional e o relay do outbox surpreendem menos.
 
 **MongoDB não entra.** Não é SQL, não tem transação com a mesma semântica, e nem
 o Laravel o suporta sem pacote de terceiro. Um adapter próprio seria outro

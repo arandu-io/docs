@@ -17,15 +17,27 @@ Laravel + Inertia            Arandu
 routes/web.php           →   routes/web.go
 Route::get(...)          →   r.Get(...)
 Controller               →   Controller em app/Http/Controllers
-Inertia::render(         →   views.ClientesIndex(
-  'Clientes/Index',            views.ClientesIndexData{Clientes: c},
-  ['clientes' => $c]         ).Render(ctx, w)
-)
+Inertia::render(         →   ctx.View(
+  'Clientes/Index',            "clientes.index",
+  ['clientes' => $c]           views.ClientesIndexData{Clientes: c},
+)                            )
 props (array)            →   struct tipada da página, nunca map
-partial reload           →   hx-get + fragmento
+partial reload           →   ctx.Fragment(status, nome, dados) + hx-get
 useForm().errors         →   validation.Errors no fragmento do form
 shared data              →   valores no context
 ```
+
+O controller renderiza pelo **nome** da view — `"clientes.index"`, o mesmo ponto
+que o Laravel usa —, e o `httpx.Context` resolve contra o registro. Não existe
+função exportada por página que o controller chame direto.
+
+*Corrigido em 07/08/2026:* este bloco dizia
+`views.ClientesIndex(...).Render(ctx, w)`. Essa era a forma do `templ`, que a ADR
+0020 descartou junto com o motor. O que existe em `framework/httpx/context.go` é
+`func (c *Context) View(name string, data any) error` e o par
+`func (c *Context) Fragment(status int, name string, data any) error`; o
+esqueleto chama `ctx.View("home", views.HomeData{...})` e o `aru make:module`
+gera `ctx.View("purchase-orders.index", ...)`.
 
 A diferença que importa: **não existe build de JavaScript.** Sem Vite, sem npm,
 sem hidratação, sem estado no cliente. O HTMX é atributo em HTML — quem sabe HTML
@@ -105,7 +117,7 @@ propósito — não há vocabulário novo a aprender aqui.
 
 | Laravel | Arandu | Muda algo? |
 |---|---|---|
-| `resources/views/home.blade.php` | `resources/views/home.kyse.go` | o gerado fica ao lado, em `home.go` |
+| `resources/views/home.blade.php` | `resources/views/home.kyse.go` | o gerado é `home.go`, em `resources/views/`; view aninhada achata o nome — `auth/login.kyse.go` gera `auth_login.go` |
 | `@extends('layouts.app')` | `@extends('layouts.app')` | idêntico |
 | `@section` / `@endsection` | `@section` / `@endsection` | idêntico |
 | `@yield('content')` | `@yield('content')` | idêntico |
@@ -117,17 +129,37 @@ propósito — não há vocabulário novo a aprender aqui.
 | `@while` / `@endwhile` | iguais | Go tem um laço só, e é `for` |
 | `@continue` / `@break` | iguais | idêntico |
 | `@csrf` | `@csrf` | idêntico |
-| `{{ $var }}` | `{{ var }}` | escapado nos dois |
-| `{!! $html !!}` | `{!! html !!}` | cru nos dois |
+| `{{ $var }}` | `{{ .Var }}` | escapado nos dois; o **ponto** é o que faz virar campo do dado |
+| `{!! $html !!}` | `{!! .Html !!}` | cru nos dois; mesma regra do ponto |
 | `{{-- comentário --}}` | `{{-- comentário --}}` | não chega ao navegador, nos dois |
 | `@php` / `@endphp` | `@go` / `@endgo` | só troca o nome da linguagem hospedeira |
-| `storage/framework/views/` (cache) | **não existe** | o gerado é o `.go` ao lado, legível e versionável |
+| `storage/framework/views/` (cache) | **não existe** | o gerado é `.go` versionável, não cache descartável |
+
+A tabela acima é o conjunto **inteiro** de diretivas: sete de bloco (`section`,
+`if`, `foreach`, `forelse`, `for`, `while`, `go`, cada uma com seu `end`) e nove
+inline (`extends`, `yield`, `include`, `csrf`, `elseif`, `else`, `continue`,
+`break`, `empty`). Não há décima sétima, e é isso que a REGRA 15 quer dizer: o
+que não couber se escreve em Go, dentro de `@go`. As duas listas estão em
+`aru/internal/kyse/kyse.go`, e `TestEveryDirectiveEmitsSomething` percorre
+`Directives()` para garantir que cada membro está exercitado **ou**
+explicitamente pulado. Onze são exercitados ali; doze — as diretivas de
+fechamento, mais `@go`, `@section`, `@extends`, `@else` e `@elseif` — têm testes
+próprios e entram no mapa `skip`.
+
+**A regra do ponto.** Só expressão iniciada por ponto vira campo do dado da
+página: `{{ .Name }}` gera `view.Text(d.Name)`, onde `d` é o dado já convertido
+para o tipo da página. O resto passa direto para o Go — é o que faz
+`{{ len(d.Items) }}`, `{{ view.URL("app.css") }}` e `{{ item }}` (a variável
+ligada por um `@foreach`) funcionarem. A consequência é que `{{ name }}`, sem
+ponto, gera `view.Text(name)` e o build para em `undefined: name`. É a diferença
+com o `$` do Blade. Não é a única do capítulo — a tabela acima lista as
+outras, e a coluna "Muda algo?" é onde elas estão.
 
 ## O que o dev Laravel precisa desaprender
 
 | Laravel | Aqui | Por quê |
 |---|---|---|
-| Service container | wiring explícito, gerado | reflection move erro para runtime |
+| Service container | fiação explícita em `bootstrap/app.go`, escrita à mão | reflection move erro para runtime |
 | Facades | passagem por parâmetro ou context | exigiria estado global mutável |
 | Eloquent / Active Record | entity + repository + SQL parametrizado | SQL previsível, injection impossível |
 | `$fillable` | struct de request explícita | a classe de bug não existe |

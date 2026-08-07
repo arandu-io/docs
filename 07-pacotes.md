@@ -89,7 +89,7 @@ crepúsculo, flâmula), nunca santos nem cargos religiosos. A regra é a mesma.
 |---|---|---|---|---|
 | Breeze | starter kit | — | não é repositório: é `aru make:auth`, ver ADR 0012. O nome `oka` fica livre | — |
 | Fortify | auth headless, sem telas | — | é core: pacote `security/` | — |
-| Sanctum | tokens de API | — | é core: `security/token.go` | — |
+| Sanctum | tokens de API | — | decidido core e **não construído**: não existe `security/token.go`. Ver `06-escopo.md` | — |
 | Passport | servidor OAuth2 | — | deferido, ver `06-escopo.md` | — |
 | Socialite | login por provedor externo | **jopara** | mistura | C |
 
@@ -101,7 +101,7 @@ crepúsculo, flâmula), nunca santos nem cargos religiosos. A regra é a mesma.
 | Laravel | Função | Arandu | Significado | St |
 |---|---|---|---|---|
 | Scout | busca full-text | *a definir* | `heka` vetado no filtro zero. Deferido, ver `06-escopo.md` | — |
-| Ranger | introspecção da aplicação | **epiaka** | ver, enxergar | C |
+| Ranger | introspecção da aplicação | **epiaka** | ver, enxergar. Nome sem uso previsto: é core, no `aru doctor` (`06-escopo.md`) | C |
 
 ## Filas e tempo real
 
@@ -125,7 +125,7 @@ crepúsculo, flâmula), nunca santos nem cargos religiosos. A regra é a mesma.
 |---|---|---|---|---|
 | Pint | formatador de código | — | não existe em Go: `gofmt` + `aru doctor`. Ver `packages/pint.md` | — |
 | Dusk | testes de navegador | **pytuna** | noite, escuridão | C |
-| Pennant | feature flags | **kanitar** | canitar, cocar — insígnia que se veste | C |
+| Pennant | feature flags | **kanitar** | canitar, cocar — insígnia que se veste. Nome sem uso previsto: o veredito é core, sem repositório (`packages/pennant.md`), e o código não existe | C |
 
 > **Octane não tem equivalente.** Ele existe porque PHP reinicializa a aplicação
 > a cada request; um binário Go já boota uma vez e fica em memória. Ver
@@ -135,10 +135,20 @@ crepúsculo, flâmula), nunca santos nem cargos religiosos. A regra é a mesma.
 
 | Laravel | Função | Arandu | Significado | St |
 |---|---|---|---|---|
-| Forge | provisionar servidor (pago) | **taba** | aldeia (o terreno onde se constrói) | C |
+| Forge | provisionar servidor (pago) | — | fora de escopo, e sem nome. Ver a nota abaixo | — |
 | Vapor | deploy serverless (pago) | **ybytu** | vento | ? |
 | Cloud | plataforma gerenciada (pago) | **amana** | chuva, nuvem | C |
 | Envoyer | deploy sem downtime (pago) | **piracema** | subida dos peixes rio acima | C |
+
+*Corrigido em 07/08/2026:* o `taba` estava nomeando duas coisas nesta página —
+o Forge aqui e o Nova em "Negócio e administração". Um nome, um pacote: `taba` é
+o **painel administrativo** (Nova), Fase 4, e é assim que aparece em
+`05-repositorios.md` e em `06-escopo.md`. O Forge fica sem nome porque está em
+"NÃO — fora do escopo" do `06`: provisionar servidor é negócio de
+infraestrutura, não pacote. Nomear o que não vai existir foi exatamente o que
+produziu a colisão. As três linhas restantes desta tabela também estão fora de
+escopo e mantêm o nome só como reserva documentada — a `06` reserva na org
+apenas os dez repositórios e o `taba`.
 
 ## Negócio e administração
 
@@ -152,20 +162,40 @@ crepúsculo, flâmula), nunca santos nem cargos religiosos. A regra é a mesma.
 | Laravel | Função | Arandu | Significado | St |
 |---|---|---|---|---|
 | Boost | camada de IA / MCP | *a definir* | Fase 4 — nomear no gatilho, não agora | — |
-| Prompts | prompts interativos de CLI | — | usar bubbletea, ver `06-escopo.md` | — |
+| Prompts | prompts interativos de CLI | — | não existe: a `aru` é só flag e argumento, e o `aru/go.mod` tem um único `require`. Ver `06-escopo.md` | — |
 | Folio | roteamento por arquivo | **igarape** | igarapé, caminho de canoa | C |
 
 ## View
 
 | Laravel | Função | Arandu | Significado | St |
 |---|---|---|---|---|
-| Blade | motor de template | **kyse** | faca | C |
+| Blade | motor de template | **kyse** | faca. O `[C]` é da etimologia, não do nome — ver abaixo | C |
 | — | camada de view | — | é core: `framework/view/`, com as views do projeto em `resources/views/` | — |
 
 O motor se chama `kyse` desde a ADR 0020, que tirou o templ da stack: a sintaxe
 é a do Blade (`@extends`, `@section`, `@yield`, `{{ }}`), e o arquivo que se
 escreve é `.kyse.go`, com o `.go` gerado ao lado. Não há repositório de view: o
 `porang` foi dissolvido pela ADR 0021, e o nome fica livre.
+
+*Corrigido em 07/08/2026:* o `kyse` estava marcado `[C]` e listado na tabela de
+"Estado conhecido" como nome a confirmar, e continua entre as pendências do
+filtro 4 — como se o nome ainda pudesse mudar. Não pode. Ele está no código
+publicado, e mudá-lo quebraria arquivo-fonte de projeto de cliente:
+
+- a extensão do fonte é `.kyse.go` — `arandu/resources/views/home.kyse.go`,
+  `arandu/resources/views/layouts/app.kyse.go` e os `testdata/` do `aru doctor`
+- a tag de build é `//go:build kyse`, e o gerador a emite em
+  `aru/internal/gen/authviews.go`
+- o motor mora em dois lugares: o compilador é `aru/internal/kyse/` (parser e
+  gerador) e o runtime que a view gerada chama é `framework/view/`
+- a decisão é a ADR 0020, e o `arandu.toml` registra por escrito que não há
+  binário a fixar porque o `kyse` é parte da `aru`
+
+O `[C]` que sobra mede a **etimologia**, que é o que a coluna sempre mediu:
+*kysê*, faca, ainda não foi conferida no Navarro. **Encerrar ou não o filtro 4
+para este nome é decisão do proprietário, e está aberta** — a diferença é que
+ela não decide mais o nome, só o que este documento pode afirmar sobre a origem
+dele.
 
 ## Sem equivalente no Laravel
 
@@ -176,7 +206,19 @@ escreve é `.kyse.go`, com o `.go` gerado ao lado. Não há repositório de view
 ## Detalhe por pacote
 
 Cada um dos 14 pacotes principais do Laravel tem documento próprio em
-`packages/`, com veredito, justificativa e gatilho. Um só vira repositório novo.
+`packages/`, com veredito, justificativa e gatilho. **Nenhum deles vira
+repositório novo hoje.**
+
+*Corrigido em 07/08/2026:* esta linha terminava com "Um só vira repositório
+novo". O "um" era a UI do Telescope, o `marandu`, e ela não virou repositório: o
+console histórico é core, em `framework/observability/` — `ConsolePath =
+"/_arandu/debug"` em `console.go`, e o ring buffer de 200 requests em
+`recorder.go` (`DefaultRecorderSize`) — e foi entregue na Fase 3. É o que a
+tabela de Observabilidade desta mesma página já diz, e o `06-escopo.md` também. Os
+deferidos de `06-escopo.md` só viram repositório quando o gatilho acontecer, e
+cada um passa pela REGRA 3 antes. Os arquivos `packages/00-indice.md` e
+`packages/telescope.md` ainda carregam a contagem antiga e o `marandu` como
+pacote da Fase 3.
 
 ## Triagem de escopo
 
@@ -224,19 +266,42 @@ Onde checar, e só aqui:
 | Domínio `.dev` / `.com` | marca | não bloqueia pacote |
 | INPI classes 9 e 42 | marca | juridicamente sim |
 
-Não há exceção: npm não entra no grafo, em pacote nenhum. O CSS é **Tailwind v4**,
-vendorizado no repositório do `arandu` com a licença e embutido por `go:embed`
-(ADR 0022). O Tailwind e o Basecoat caíram junto — o Basecoat era plugin de
-Tailwind distribuído por npm, e era o único motivo pelo qual a exceção existia.
-Ver `14-view-e-assets.md` e a REGRA 13 — esta linha revoga a exceção que este
+Não há exceção: npm não entra no grafo, em pacote nenhum. O que caiu foi o
+**npm**, não o Tailwind. O CSS é **Tailwind v4** e continua sendo (ADR 0022); o
+que saiu foi o Basecoat, que era plugin de Tailwind distribuído por npm e o
+único motivo pelo qual a exceção existia.
+
+O Tailwind não é vendorizado. É o **binário standalone**, que a `aru` baixa,
+verifica contra o `sha256sums.txt` da release e cacheia em `~/.arandu/bin`, com
+a versão presa em `arandu.toml` (`tailwindcss = "v4.3.3"`). O código está em
+`aru/internal/toolchain/`. Binário único não é npm: não há `package.json`, não
+há `node_modules`, não há lockfile de JavaScript.
+
+O que é vendorizado, com licença e `THIRD_PARTY.md`, são os assets que entram no
+binário por `go:embed`: `htmx.min.js` (0BSD) e `alpine.min.js` (MIT). O
+`app.css` **não é vendorizado** — é saída do binário do Tailwind sobre fonte
+nossa, e o `THIRD_PARTY.md` diz isso com todas as letras; o crédito existe
+porque a saída carrega o preflight do Tailwind, que é outra coisa. O CSS-fonte fica em dois lugares — `framework/view/assets/app.src.css`
+para a página de erro e o console, e `arandu/resources/css/app.css` para as
+views do projeto. Os dois abrem com `@import "tailwindcss" source(none)`
+(ADR 0025).
+
+Ver `14-view-e-assets.md` e a REGRA 13 — este trecho revoga a exceção que este
 documento abria antes.
+
+*Corrigido em 07/08/2026:* o parágrafo dizia que "o Tailwind e o Basecoat caíram
+junto" e que o Tailwind era "vendorizado no repositório do `arandu` com a
+licença". As duas afirmações estão erradas e se contradiziam entre si — CSS
+vendorizado não teria por que ter binário fixado no `arandu.toml`. O Tailwind
+ficou, e chega por download verificado por SHA-256.
 
 ### Estado conhecido
 
 | Nome | Situação |
 |---|---|
 | `arandu` | `.io`, `.app` e `.studio` ocupados; CLI `arandu` já existe (por isso a CLI é `aru`); org `@Arandu` e `Arandusoft` tomadas — daí `arandu-io` |
-| `kyse`, `oka`, `taba`, `marandu`, `igara`, `moitara`, `potiron` | sem impedimento conhecido. Confirmar org/repo no GitHub e pkg.go.dev |
+| `kyse` | não é repositório: é o compilador em `aru/internal/kyse/` mais o runtime em `framework/view/`. O nome já está no código publicado — extensão `.kyse.go` e tag `//go:build kyse` |
+| `oka`, `taba`, `marandu`, `igara`, `moitara`, `potiron` | sem impedimento conhecido. Confirmar org/repo no GitHub e pkg.go.dev |
 
 Correção registrada: uma versão anterior deste documento descartou `oka` e `taba`
 por estarem ocupados em npm e PyPI. Isso estava errado — a checagem não se aplica
@@ -244,7 +309,9 @@ a Go. Os dois seguem disponíveis.
 
 ## A fazer antes de registrar
 
-1. Checar cada `[?]` e `[C]` no *Dicionário de tupi antigo* (Navarro, 2013)
+1. Checar cada `[?]` e `[C]` no *Dicionário de tupi antigo* (Navarro, 2013). O
+   `kyse` está nessa lista pela **etimologia**, não pelo nome: o nome é
+   já em código publicado — ver a seção View
 2. Confirmar org e nome de repo no GitHub, e buscar no `pkg.go.dev`
 3. Reservar na org `arandu-io` só os nomes que existirão até a Fase 3
 

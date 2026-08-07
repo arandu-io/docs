@@ -31,10 +31,23 @@ brigar com a estrutura de pastas de projetos antigos.
 São **dez repositórios** até a Fase 3, e são estes: `framework`, `arandu`,
 `aru`, `database`, `kv`, `queue`, `storage`, `examples`, `homebrew-tap` e
 `docs`. A conta caiu de onze para dez quando o `porang` foi dissolvido
-(ADR 0021). O `website` vem depois, na Fase D; o `.github` guarda workflow, não
-código.
+(ADR 0021). São exatamente os dez que a org tem hoje: `gh repo list arandu-io`
+não devolve mais nada. O `website` vem depois, na Fase D.
+
+*Corrigido em 07/08/2026:* esta frase terminava com "o `.github` guarda
+workflow, não código", e a lista do Núcleo trazia `arandu-io/.github` entre os
+repositórios. Ele não existe — `gh api repos/arandu-io/.github` responde 404.
+Os nove repositórios de código carregam o próprio `.github/workflows`; o `docs`,
+que é só markdown, não tem `.github/` nenhum. Criar o repositório de
+perfil da org é decisão em aberto — e, pela letra da REGRA 3, é criar o décimo
+primeiro repositório da org, o que exige pedido ao proprietário. A regra lista os
+dez nominalmente e inclui o `docs`, que é só markdown, então ela não é sobre
+"repositório de código". É o mesmo raciocínio que este documento aplica adiante
+ao `mail` e ao `ws`.
 
 ### Núcleo
+
+Publicados:
 
 ```
 arandu-io/framework     a biblioteca. Módulo: github.com/arandu-io/framework
@@ -43,10 +56,14 @@ arandu-io/arandu        esqueleto de projeto. O que `aru new` clona.
                         Ninguem depende dele como biblioteca.
 arandu-io/aru           CLI. Módulo próprio, binário `aru`.
 arandu-io/docs          markdown do guia. Branch por versão (1.x, 2.x).
-arandu-io/website       site que renderiza o docs.
-                        E uma APLICACAO ARANDU — dogfood. Ver 08-documentacao.md
-arandu-io/.github       workflows e templates compartilhados da org.
 arandu-io/homebrew-tap  fórmula do `aru` (nome da fórmula: aru, não arandu).
+```
+
+Decidido e não criado:
+
+```
+arandu-io/website       site que renderiza o docs. Fase D.
+                        E uma APLICACAO ARANDU — dogfood. Ver 08-documentacao.md
 ```
 
 ### Adapters (drivers de infraestrutura)
@@ -56,21 +73,37 @@ Existem para manter o core sem dependência de terceiros (ADR 0004).
 **Esta seção foi substituída por `11-adapters.md`**, que resolveu um problema que
 não estava visto aqui: em Go não existe dependência opcional, então um pacote por
 fornecedor multiplica repositório sem isolar dependência nenhuma. A divisão é por
-**domínio**, com driver pesado em submódulo:
+**domínio**, com driver pesado em submódulo.
+
+No ar, quatro repositórios, com os submódulos que de fato existem:
 
 ```
-arandu-io/database    registro, pool e erro; submodulos pgx, sqlite, mysql
+arandu-io/database    registro, pool e erro; submódulos pgx, sqlite, mysql
 arandu-io/kv          go-redis (RESP): cobre Redis, Dragonfly, Valkey, KeyDB
-arandu-io/queue       fila sobre a tabela; submodulo kv para volume
-arandu-io/storage     interface + disco local; submódulos s3 (R2 como padrão),
-                      gcs, azure
+arandu-io/queue       fila sobre a tabela; submódulo kv para volume
+arandu-io/storage     interface + disco local; submódulo s3 (R2 como padrão)
+```
+
+Desenho, sem repositório e sem data. O `11-adapters.md` os põe em "com demanda":
+
+```
 arandu-io/mail        interface + SMTP; submódulos ses, resend, postmark, mailgun
 arandu-io/ws          coder/websocket e gobwas/ws
 ```
 
-Seis pacotes no lugar dos quinze que a lista por fornecedor produziria. É o mesmo
-que o Laravel faz — `Illuminate\Mail` traz SMTP, Mailgun, Postmark, SES e Resend
-juntos; `Illuminate\Database` traz MySQL, Postgres e SQLite juntos.
+Criar qualquer um dos dois é passar de dez para onze repositórios, e a REGRA 3
+exige autorização do proprietário antes — como a ADR 0016 registrou para `queue`
+e `storage`.
+
+*Corrigido em 07/08/2026:* este bloco listava os seis num só lugar, como se os
+seis existissem, e dava `gcs` e `azure` como submódulos do `storage`. A árvore
+publicada tem só `s3` (`gh api repos/arandu-io/storage/git/trees/HEAD`), e
+`mail` e `ws` não aparecem em `gh repo list arandu-io`. A divisão por domínio
+continua sendo a decisão; o que mudou aqui é separar o publicado da planta.
+
+Seis domínios no lugar dos quinze pacotes que a lista por fornecedor produziria.
+É o mesmo que o Laravel faz — `Illuminate\Mail` traz SMTP, Mailgun, Postmark,
+SES e Resend juntos; `Illuminate\Database` traz MySQL, Postgres e SQLite juntos.
 
 Convenção de nome: **sem prefixo redundante e em inglês funcional**. É
 `arandu-io/kv`, não `arandu-io/arandu-redis` — a org já carrega o nome, e
@@ -99,12 +132,22 @@ O que saiu da lista, e para onde foi:
 - o starter kit não é repositório: é `aru make:auth` (ADR 0012)
 - o inspetor de requests (`marandu`) é core, no console `/_arandu/debug`,
   desde a Fase 3
-- tokens de API são core, em `security/token.go`
+- tokens de API estão decididos como core, e **não existem**. Ver a nota abaixo
 - `maraca` e `boitata` viraram exportação de OpenTelemetry (ADR 0015)
 - Pint e Sail não têm equivalente: `gofmt` e `go run` resolvem
 
+*Corrigido em 07/08/2026:* esta lista dizia "tokens de API são core, em
+`security/token.go`". Não há esse arquivo: `ls framework/security/` devolve
+`csrf.go`, `password.go`, `policy.go` e `session.go`, mais os testes de cada um,
+e nada além. O que vale é o veredito de `docs/packages/sanctum.md` — token de
+API é core, sem repositório próprio, e seria uma variação de sessão sobre o
+`SessionStore` e o `Grant`, que existem. **Construir ou rebaixar para "depois,
+com gatilho" é decisão do proprietário, e está aberta.** Enquanto ela não for
+tomada, nenhum documento pode citar `security/token.go` como coisa entregue.
+
 Nota: as primitivas de autenticação (Grant, Policy, sessão, argon2id) ficam no
-**core**, não aqui. Segurança é a tese do produto; não pode ser um pacote
+**core**, não aqui — e essas quatro existem: `security.Grant` em `policy.go`,
+argon2id em `password.go`. Segurança é a tese do produto; não pode ser um pacote
 opcional que o usuário esquece de instalar. O `aru make:auth` gera só as telas.
 
 ### Distribuição
@@ -114,9 +157,12 @@ arandu-io/examples   a aplicacao que demonstra o framework, e a forma canonica
                      que o gerador da Fase 2 vai emitir
 ```
 
-A camada de view não aparece aqui porque não é repositório: o desenvolvedor
-edita `resources/views/` no próprio projeto, e o motor `kyse` mais os assets
-embutidos são core, em `framework/view/`.
+A camada de view não aparece aqui porque não é repositório, e ela vive em dois
+lugares: o desenvolvedor edita `resources/views/` no próprio projeto; o
+**runtime de render** do `kyse` e os assets embutidos são core, em
+`framework/view/` (`render.go`, `runtime.go` e o `go:embed` de `assets.go`); e o
+**compilador** do `kyse` é parte da `aru`, em `aru/internal/kyse/`, chamado pelo
+`aru view:build`.
 
 ## O que é diferente do Laravel, e importa
 
@@ -142,7 +188,16 @@ fragmentam o ecossistema em silêncio. O `aru doctor` deve conferir isso.
 
 **5. `aru` em repositório separado do core.** Se a CLI viver dentro do módulo do
 framework, todo projeto que importa o framework arrasta as dependências da CLI.
-Separado, o core continua com duas dependências.
+Separado, o core continua com **uma** dependência direta, `golang.org/x/crypto`,
+mais o `golang.org/x/sys` indireto que vem com ela — é o `framework/go.mod`
+inteiro.
+
+*Corrigido em 07/08/2026:* esta linha dizia "duas dependências", e o número não
+era engano solto: vem da **ADR 0017**, que escolheu contar a indireta. Os dois
+jeitos de contar descrevem o mesmo `go.mod`; o que não pode é cada documento usar
+um sem dizer. Aqui e no `CLAUDE.md` a contagem é a de `require` direto — **uma**
+—, e a ADR 0017 continua válida no que decide, que é a CLI poder ter dependência
+e o core não.
 
 ## Ordem de criação
 

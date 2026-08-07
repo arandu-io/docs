@@ -32,10 +32,19 @@ para o pool.
 
 | Laravel | Biblioteca Go | Decisão |
 |---|---|---|
-| Prompts | bubbletea, survey | a CLI usa uma delas |
+| Prompts | bubbletea, survey | **nenhuma das duas hoje.** A `aru` não tem prompt interativo. Ver a nota abaixo |
 | Dusk | chromedp, rod | documentar, não empacotar |
 | Socialite | goth | adapter fino no core, se alguém pedir |
 | Pulse / Nightwatch | OpenTelemetry | **exportar OTel.** Construir APM próprio é competir com Grafana e Datadog |
+
+*Corrigido em 07/08/2026:* a linha do Prompts dizia "a CLI usa uma delas". Não
+usa. O `aru/go.mod` tem um único `require`, `gopkg.in/yaml.v3`, e ele está lá
+pelo parser da DSL, não por prompt; `grep -rn "bubbletea\|survey" aru/` não
+devolve nada, e os únicos `os.Stdin` da CLI (`delegate.go`, `dev.go`) são
+repasse para subprocesso, não leitura de resposta. Ter só essa dependência é
+compromisso declarado, e a ADR 0017 fixou o preço de entrar na lista: um ADR por
+dependência, não um `go get`. As duas bibliotecas continuam sendo a recomendação
+**se** o prompt interativo for construído. Hoje ele não existe.
 
 O caso do Pulse/Nightwatch é o mais importante: nosso Collector já captura tudo
 em dev. Em produção, exportar OTel e deixar o cliente usar o Grafana que ele já
@@ -46,11 +55,32 @@ paga. `maraca` e `boitata` saem do mapa.
 | Laravel | Onde vive no Arandu |
 |---|---|
 | Telescope (parte dev) | `observability/` — Collector, página de erro e o console `/_arandu/debug`, já implementados |
-| Blade | `view/` — o motor `kyse` e os assets embutidos. As views ficam no projeto, em `resources/views/`. Ver ADR 0020 e 0021 |
+| Blade | `view/` — o **runtime de render** do `kyse` e os assets embutidos; o **compilador** é parte da `aru`, em `aru/internal/kyse/`. As views ficam no projeto, em `resources/views/`. Ver ADR 0020 e 0021 |
 | Fortify | `security/` — Grant, Policy, sessão, argon2id. Segurança é a tese; não pode ser pacote opcional |
-| Sanctum | tokens de API são um adapter de sessão. `security/token.go` |
-| Pennant | feature flags são um mapa e um middleware. ~200 linhas |
+| Sanctum | tokens de API são um adapter de sessão. **Decidido, não construído**: não existe `security/token.go` |
+| Pennant | feature flags são um mapa e um middleware, ~200 linhas. **Decidido, não construído**: não existe `features/` no framework |
 | Ranger | `aru doctor` já faz introspecção |
+
+*Corrigido em 07/08/2026:* duas destas seis linhas descreviam código que não
+existe, e a seção "Classificação" define CORE como "existe, mas dentro do
+framework" — Sanctum e Pennant não passam nesse teste:
+
+- `ls framework/security/` devolve `csrf.go`, `password.go`, `policy.go` e
+  `session.go`. Não há `token.go`
+- `ls framework/` não tem `features/`, e `grep -ril "feature.flag\|pennant"` em
+  `framework/`, `aru/` e `arandu/` não devolve nada
+
+O veredito de cada um continua sendo o de `docs/packages/`, e é ele que vale:
+`pennant.md` diz "entra no core quando alguém precisar da primeira flag" — o
+gatilho é a primeira flag, e ela não apareceu. `sanctum.md` diz core e traz o campo
+"Gatilho para construir" com "Não se aplica." — sem completar a frase, ao
+contrário do `pennant.md`, que diz de que depende. **Construir os dois, ou reclassificá-los para "depois, com
+gatilho", é decisão do proprietário, e está aberta.**
+
+As outras quatro linhas foram conferidas e estão certas: `framework/observability/`
+tem `collector.go`, `console.go` e `errorpage/`, e o console responde em
+`/_arandu/debug`; `framework/view/` tem o runtime e `assets/`; `security.Grant`
+está em `policy.go` e o argon2id em `password.go`; `aru/internal/doctor/` existe.
 
 Sem nome indígena para essa camada: é o pacote `security` do core. O nome `sume` foi vetado (divindade) — ver a regra de admissibilidade em `07-pacotes.md`.
 
@@ -84,8 +114,9 @@ KeyDB, porque falam o mesmo protocolo.
 
 A camada de view estava nesta lista, como `arandu-io/porang`. Não é mais
 repositório: a ADR 0021 dissolveu o `porang` — as views ficam em
-`arandu/resources/views/`, no projeto que o desenvolvedor edita, e o motor
-`kyse` mais os assets embutidos ficam em `framework/view/`, que é core. O valor
+`arandu/resources/views/`, no projeto que o desenvolvedor edita, o runtime de
+render do `kyse` mais os assets embutidos ficam em `framework/view/`, que é
+core, e o compilador do `kyse` é parte da `aru` (`aru/internal/kyse/`). O valor
 competitivo continua sendo o mesmo — é a camada que liga componente a Grant,
 validação e CSRF, e nenhuma biblioteca genérica faz isso — e é justamente por
 isso que ela é core, não dependência opcional.
@@ -138,7 +169,7 @@ Laravel LLC virou empresa de infraestrutura depois de o framework dominar.
 | Construir na Fase 1 | **5** — framework, arandu, aru, docs, examples |
 | Construir na Fase 2 | **3** — database, kv, homebrew-tap |
 | Construir na Fase 3 | **2** — queue, storage |
-| Core (sem repo) | 6 |
+| Core (sem repo) | 6 — quatro construídos, dois decididos e não construídos |
 | Não existe em Go | 5 |
 | Biblioteca de terceiro | 4 |
 | Depois, com gatilho | 7 |

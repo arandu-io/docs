@@ -7,12 +7,35 @@ de terceiro é a única porta por onde essa garantia pode vazar — e ela precis
 estar fechada **antes** de existir o primeiro módulo de terceiro, não depois.
 
 Um módulo hostil não consegue fabricar um `security.Grant`: os campos são não
-exportados e não há construtor público além de `Authorize`. Mas `SystemGrant` **é**
-público, porque jobs e migrations precisam dele. Esse é o bypass real.
+exportados e não há construtor público além de `Authorize`. Mas `SystemGrant`
+**é** público, porque trabalho sem request atrás precisa dele — job, tarefa do
+scheduler, seeder, comando — e o caminho de login também, onde ainda não existe
+sujeito. Esse é o bypass real.
 
-Fechamento: `aru doctor --strict` reprova `SystemGrant` fora de job, migration e
-teste. A auditoria da registry roda o doctor em modo strict contra o módulo
-publicado, e o selo é o resultado assinado dessa execução.
+*Corrigido em 07/08/2026:* esta linha dizia "porque jobs e migrations precisam
+dele". Migration não precisa: uma migration é DDL, roda pelo `data.Migration` e
+não passa por `Repository` nenhum — nenhuma das migrations do esqueleto ou dos
+templates do gerador chama `SystemGrant`. O comentário de doc de
+`security.SystemGrant` diz para que ele existe: "jobs that run outside a request,
+and for the login path, where there is no subject yet".
+
+Fechamento: `aru doctor --strict` reprova `SystemGrant` fora dos diretórios em
+que o esqueleto põe trabalho sem request atrás. A regra é
+`system-grant-outside-scope`, em `aru/internal/doctor/rules.go`, e o escopo que
+ela perdoa é este, por segmento de caminho: `seeders`, `jobs`, `commands`,
+`console`, `cmd`, mais os arquivos `main.go` e `routes/console.go`. Fora deles,
+só passa a chamada que carrega `//arandu:system-grant <motivo>` na própria linha
+ou na de cima — o marcador sem motivo escrito não perdoa nada. Arquivo de teste a
+regra nem lê.
+
+*Corrigido em 07/08/2026:* esta linha dizia "fora de job, migration e teste".
+Migration não está na lista: `database/migrations` não é escopo de sistema, e um
+`SystemGrant` ali é reportado como qualquer outro. A severidade é aviso, não
+erro — é o `--strict` que transforma o aviso em reprovação, e por isso a frase só
+vale com a flag.
+
+A auditoria da registry roda o doctor em modo strict contra o módulo publicado, e
+o selo é o resultado assinado dessa execução.
 
 ## `moitara` não hospeda pacote
 
@@ -85,8 +108,23 @@ aru add github.com/fulano/crm
 ```
 
 Resolve pelo proxy do Go, checa o índice, exibe nível e permissões para
-confirmação, roda `doctor` localmente e regenera o wiring explícito. Nada é
-resolvido em runtime — continua tudo em código commitável.
+confirmação, roda `doctor` localmente e **imprime** as linhas de fiação, para
+serem coladas à mão. Nada é resolvido em runtime — continua tudo em código
+commitável.
+
+*Corrigido em 07/08/2026:* esta linha dizia que o `aru add` "regenera o wiring
+explícito", e listava isso como trabalho pendente. A decisão está revogada, não
+pendente: a ADR 0001, com a nota que a ADR 0023 acrescentou, proíbe o gerador
+editar fiação — "não crie `internal/wire/`; fiação gerada ao lado da fiação
+escrita à mão seriam duas fiações". O `aru make:module` já é assim: a função
+`wiring` em `aru/makemodule.go` imprime as três linhas de `routes/web.go`,
+`bootstrap/app.go` e `database/migrations/migrations.go`, e o comando não toca em
+nenhum dos três arquivos. Um `aru add` que regenerasse fiação abriria de novo a
+porta que a ADR 0001 fechou.
+
+O comando `aru add` ainda não existe — `aru/commands.go` não o registra —, e isso
+é coerente com a seção seguinte, que o coloca na Fase 4. O que este documento
+descreve aqui é desenho, não entrega.
 
 ## Quando construir
 

@@ -29,7 +29,12 @@ sem major.
 ## v0 até a Fase 3
 
 Nada de `v1.0.0` antes de existir cliente real em produção. Em `v0.x` o contrato
-é explícito: pode quebrar, e quebra vem com nota de migração.
+é explícito: pode quebrar.
+
+*Corrigido em 07/08/2026:* esta linha terminava em "e quebra vem com nota de
+migração". Não veio: as 23 tags publicadas do `framework` não têm nota de
+migração no repositório — não há `UPGRADE.md` nem CHANGELOG em lugar nenhum. A
+parte que se cumpre é "pode quebrar"; ver "Depreciação" e "O que falta decidir".
 
 O import path segue a regra do Go: `v2` em diante muda o caminho
 (`github.com/arandu-io/framework/v2`). Isso é do módulo, não nosso — e é mais um
@@ -45,7 +50,7 @@ motivo para major ser raro.
 
 ## Depreciação
 
-Nada é removido sem passar por depreciação:
+A política pretendida, e nada nela roda hoje:
 
 1. Comentário `// Deprecated:` no símbolo, com a alternativa nomeada.
 2. Aviso no `aru doctor` — não erro, aviso.
@@ -54,10 +59,34 @@ Nada é removido sem passar por depreciação:
 
 Nunca remover e avisar na mesma versão.
 
+*Corrigido em 07/08/2026:* esta seção dizia "nada é removido sem passar por
+depreciação", no presente, como se o ciclo estivesse em vigor. O que vale é que
+o ciclo **nunca foi aplicado uma única vez**. `git grep "// Deprecated:"` em
+todas as 23 tags publicadas do `framework` devolve zero ocorrências, e o `aru
+doctor` não tem regra de depreciação — as severidades `Warning` e `Error`
+existem em `internal/doctor`, o que falta é uma regra que as use para isso.
+
+E houve o que depreciar. O levantamento de 07/08/2026 rodou `apidiff` par a par
+nas tags do `framework` e contou **seis mudanças incompatíveis já publicadas sem
+aviso nenhum** — entre elas `auth.New`, `config.Config.DatabaseURL`,
+`data.Wrap`, `middleware.Observe` e os cinco verbos do `httpx.Router`. Uma delas
+se confere sem ferramenta alguma: `data.InTransaction(ctx)` na `v0.5.0` virou
+`data.InTransaction(ctx, db)` na `v0.13.2`, parâmetro novo, sem depreciação e
+sem nota.
+
+Isso não é um defeito de código a consertar: é uma escolha entre adotar o
+mecanismo e reescrever a política. Ver "O que falta decidir", abaixo.
+
 ## Migração é código, não texto
 
-Migração que não pode ser automática vira item explícito no `UPGRADE.md`, com
-exemplo antes e depois.
+Migração que não pode ser automática viraria item explícito num `UPGRADE.md`,
+com exemplo antes e depois.
+
+*Corrigido em 07/08/2026:* esta linha citava o `UPGRADE.md` no presente, como
+arquivo existente. **Não existe `UPGRADE.md` em nenhum dos dez repositórios** —
+`find` por `UPGRADE*` na árvore inteira não devolve nada, e também não há
+CHANGELOG. As seis quebras da seção anterior saíram sem nota de migração de
+espécie alguma.
 
 **`aru upgrade` — ainda não existe, e tem gatilho.** Ele rodaria as migrações
 mecânicas (renomear símbolo, mover pacote, ajustar assinatura) como um codemod.
@@ -74,13 +103,47 @@ tomar mais que dez minutos** num projeto médio.
 
 ## Como isso é verificado
 
-Na CI, contra cada release:
+Três verificações foram desenhadas para rodar na CI contra cada release. Uma
+existe:
 
-- `go build` da aplicação de exemplo da versão anterior contra a nova
-- golden files do gerador — saída idêntica byte a byte, salvo mudança declarada
-- `apidiff` entre tags, com o diff aparecendo na revisão do PR
+| Verificação | Estado |
+|---|---|
+| golden files do gerador — saída idêntica byte a byte, salvo mudança declarada | **existe** — `aru/internal/gen/golden_test.go`, com os fixtures em `internal/gen/testdata` e `-update` para regravar |
+| `go build` da aplicação de exemplo da versão anterior contra a nova | **não existe** — a CI do `examples` constrói a versão corrente contra a corrente, nada mais |
+| `apidiff` entre tags, com o diff aparecendo na revisão do PR | **não existe** — `grep -rn apidiff` nos nove `ci.yml` não devolve nada |
 
-Sem essas três, a política é declaração de intenção.
+*Corrigido em 07/08/2026:* esta seção afirmava as três como fatos da CI. Só a
+primeira é verdade. Dos nove `.github/workflows/ci.yml` do projeto, oito são de
+repositório Go e rodam `gofmt`, `go vet`, `go test -race` e `govulncheck`. O
+`go build` está só em três deles (`aru`, `arandu` e `examples`), e cada um
+carrega ainda a sua própria guarda: orçamento de dependência no `framework` e no
+`aru`, isolamento de driver no `database` e no `queue`, ausência de Node no `kv`,
+no `queue` e no `storage`, `doctor` e build da imagem no `arandu`. O nono é o do
+`homebrew-tap`, que não roda Go nenhum: `brew style`, `brew audit` e
+`brew install`. Nenhum dos nove roda `apidiff`, e nenhum constrói a versão
+anterior contra a nova.
+
+A frase que fechava a seção estava certa, e agora se lê com o resultado na mão:
+
+> Sem essas três, a política é declaração de intenção.
+
+## O que falta decidir
+
+Esta é a única parte deste documento que não é decisão tomada, e ela é do
+proprietário. A política acima está escrita por inteiro; o mecanismo que a
+cumpre não foi construído, e seis quebras já saíram publicadas por baixo dela.
+
+São dois caminhos, e não dá para ficar entre os dois:
+
+1. **Adotar o mecanismo.** `apidiff` na CI do `framework`, `UPGRADE.md` por
+   versão e `// Deprecated:` em uso a partir da próxima remoção. É o que este
+   documento já decidiu e ninguém implementou.
+2. **Reescrever a política.** Declarar o pré-v1 explicitamente sem garantia de
+   compatibilidade e reduzir esta página ao que se cumpre hoje, deixando o ciclo
+   de depreciação para quando a v1 se aproximar.
+
+O que não se sustenta é a terceira opção em vigor: a política escrita como se
+valesse, sem nada que a verifique.
 
 ## O que autoriza um breaking change
 

@@ -45,13 +45,39 @@ lock distribuído no `kv` (`SET NX PX`), chave
 `sched:<tenant>:<id>:<janela>` e TTL igual ao timeout da tarefa. `Singleton: false`
 desliga o lock para tarefas idempotentes.
 
-Isso é possível porque `kv` já é dependência do core. Não entra nada novo.
+Nada novo entra no core por causa disso, e o motivo não é o que este documento
+dizia. *Corrigido em 07/08/2026:* esta linha afirmava que o `kv` já é dependência
+do core. Não é: `framework/go.mod` tem um `require` só, `golang.org/x/crypto`
+(ADR 0004). O contrato é a interface `kernel.Locker` — um método `Run(ctx, name,
+ttl, fn)` —, quem a implementa é o adaptador, em `kv/lock.go`, com `SetNX`, e a
+aplicação injeta a implementação em `scheduler.Options.Locker`. É justamente por
+não importar o `kv` que o scheduler reconhece "outra réplica está com o lock"
+pela mensagem do erro, na função `isLocked` de `framework/scheduler/scheduler.go`,
+e não por um tipo sentinela.
 
 ## Falha
 
-Log estruturado com `task_id`, `tenant_id` e duração, evento emitido, e o
-`Collector` instrumenta a execução como se fosse um request — a timeline de uma
-tarefa aparece no console de debug igual à de um request.
+Log estruturado. O logger da tarefa carrega `component` e `task`, e no laço por
+tenant também `tenant`; a linha de falha acrescenta `duration_ms`, `queries` e
+**`error`**. A que traz `sql_ms` é a de sucesso — `task done` —, não a de falha.
+
+O `Collector` instrumenta a execução como se fosse um request — a
+timeline de uma tarefa aparece no console de debug igual à de um request. A
+instrumentação é condicional: só acontece quando `scheduler.Options.Recorder`
+foi passado em `Options`. `Recorder` nil é o padrão de produção — nenhum `Collector` é
+construído, e é assim de propósito.
+
+*Corrigido em 07/08/2026:* esta linha dizia "evento emitido" e nomeava as chaves
+de log como `task_id` e `tenant_id`. Nenhuma das duas coisas é verdade. O
+scheduler não emite evento: `framework/scheduler/` não importa
+`framework/events`, e não há chamada a `Recorder.Record` de `events` em lugar
+nenhum do pacote — o `Record` que o `execute` chama é o de `observability`, que
+alimenta o console de debug, não um barramento. As chaves são `task` e `tenant`,
+sem sufixo. O que existe além do log é o `kernel.Diagnostic` do
+`scheduler.Module`, que reporta tarefa atrasada e tarefa que falhou na página de
+erro, e é o que a seção "O que o scheduler não faz" já descrevia. Emitir evento
+de tarefa continua possível dentro do `Run` da própria tarefa, como qualquer
+serviço faz; o scheduler não faz por ela.
 
 Retentativa **não** é do scheduler: a tarefa enfileira um job e a fila cuida do
 retry. Scheduler dispara, fila persiste.
@@ -92,5 +118,17 @@ precisa acontecer a cada poucos segundos é worker, não agendamento.
 ## O que não construímos
 
 Equivalente do Horizon (dashboard de filas) não entra até a Fase 3 — o console
-`/_arandu/debug` já mostra job enfileirado e executado. **Gatilho:** cliente real
-operando mais de três filas com prioridade distinta.
+`/_arandu/debug` já lista cada job **executado** como entrada própria, ao lado
+dos requests: `framework/jobs/worker.go` grava no `Recorder` um `Recorded` com
+`Method: "job"` e o nome do job no `Path`. O **enfileiramento** não tem entrada
+própria; ele aparece como o `INSERT INTO jobs` entre as queries do request que o
+produziu — **e isso vale só para o driver de tabela.** O `queue/queue.go` grava
+por `data.DB.ExecContext`, que passa pelo `RecordQuery`; o `queue/kv` enfileira
+com `HSet` + `ZAdd` num pipeline RESP e **não importa `observability`**, então
+com ele o enfileiramento não deixa rastro nenhum no console — nem entrada
+própria, nem query. É a diferença mais visível entre os dois drivers, e ela não
+está no contrato: é consequência de um passar pelo `data` e o outro não.
+
+Os dois dependem de o `Recorder` existir, o que só acontece em dev ou
+com `TracingSecret` configurado (`framework/kernel/kernel.go`). **Gatilho:**
+cliente real operando mais de três filas com prioridade distinta.

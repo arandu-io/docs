@@ -105,8 +105,9 @@ Nos diretórios do Laravel, os mesmos que `aru new` já criou. Não existe
 próxima compilação.
 
 **O gerador não escreve fiação.** Três linhas ficam por conta de quem gerou — o
-campo em `routes.Deps` e o `Resource` em `routes/web.go`, o construtor em
-`bootstrap/app.go`, e a migração em `All()`. O comando imprime as três. Um
+campo do `Deps` e o `Resource` em `routes/web.go`, o construtor dentro do literal
+`routes.Deps` de `bootstrap/app.go`, e a migração no `All()` de
+`database/migrations/migrations.go`. O comando imprime as três. Um
 gerador que editasse esses arquivos sozinho tiraria deles a única propriedade
 que justificam ter: dizer, por escrito, do que a aplicação é feita.
 
@@ -129,11 +130,31 @@ Erro de spec nunca vira código quebrado, porque a validação acontece antes da
 geração. E o humano aprova a spec, não o código — spec cabe na cabeça, diff
 espalhado por `app/`, `database/` e `routes/` não.
 
-## Round-trip
+## Round-trip: pela spec, não pelo código
 
-Código gerado → DSL → código idêntico byte a byte, verificado por golden files na
-CI. Sem isso não há como garantir que regenerar não destrói trabalho, e sem essa
-garantia ninguém regenera — o gerador vira ferramenta de uso único.
+Spec → Go, e de novo Spec → Go, byte a byte igual. O ciclo fecha pela spec, não
+pelo código: o `aru generate` grava a spec normalizada em
+`database/specs/<módulo>.yaml` junto com o código que ela produziu, e regenerar
+lê esse arquivo de volta. É o que `TestTheRoundTripIsByteForByte`, em
+`aru/generate_test.go`, verifica — gera, regenera a partir da spec que a primeira
+execução salvou, e compara os bytes de `app/`. Os golden files de
+`aru/internal/gen/` prendem a outra ponta, e a CI roda os dois no
+`go test -race ./...`.
+
+Sem isso não há como garantir que regenerar não destrói trabalho, e sem essa
+garantia ninguém regenera — o gerador vira ferramenta de uso único. O que protege
+o trabalho escrito à mão é outra coisa: os blocos `arandu:begin custom`.
+
+*Corrigido em 07/08/2026:* esta seção dizia "código gerado → DSL → código
+idêntico byte a byte", que promete um caminho de volta, de Go para spec. Ele não
+existe. Em `aru/internal/spec/` há `Read`, `Parse`, `Write` e `Marshal` — YAML
+para struct e struct para YAML, e nada mais; nenhuma função lê Go gerado e
+devolve spec. O `go/parser` aparece na `aru` em `makerequest.go`,
+`makemigration.go`, `internal/gen/factory.go` e no `doctor`, sempre para ler um
+modelo que já existe ou auditar código, nunca para reconstruir a spec. A ida é
+determinística e verificada; a volta nunca foi construída, e não está prometida
+aqui. O comentário de doc de `TestTheRoundTripIsByteForByte` ainda repete a
+formulação antiga; o corpo do teste faz o que esta seção descreve.
 
 ## Por que isso não é o Spec Kit
 

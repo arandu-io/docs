@@ -77,7 +77,13 @@ CREATE INDEX idx_outbox_unfinished ON outbox (failed_at, published_at, occurred_
 
 ## O relay
 
-Faz parte do runtime, no mesmo binário (mesma lógica do scheduler, doc 16):
+Faz parte do runtime, no mesmo binário (mesma lógica do scheduler, doc 16). São
+dois construtores, e a diferença entre eles não é modo: `events.NewModule()` dá
+a tabela e o `Store()` sem publicar nada — que é o estado correto de quem ainda
+não tem para onde publicar — e `events.WithRelay(r)` roda o laço neste processo.
+O esqueleto sai com o primeiro, em `bootstrap/app.go`.
+
+O laço:
 
 - **polling**, com intervalo de 1s por padrão (`RelayOptions.Interval`). O
   `LISTEN/NOTIFY` foi considerado e **recusado**: é específico do Postgres,
@@ -104,9 +110,14 @@ com ele.
 E é preciso ser explícito sobre o que **não** existe, porque já esteve escrito
 aqui que existia:
 
-- **não há handler gerado.** O `aru make:module` não emite listener nenhum;
-  `app/Events/` e `app/Listeners/` saem vazios do `aru new`. Não há checagem de
-  idempotência "que já nasce" em lugar algum
+- **não há checagem de idempotência gerada.** *Corrigido em 07/08/2026:* esta
+  linha dizia "não há handler gerado", e isso ficou falso: o `aru make:listener`
+  gera `app/Listeners/<Nome>.go`, implementando `events.Publisher`, e o
+  comentário de doc dele avisa que a entrega é at-least-once e que nada verifica
+  isso por você. O que não existe é a verificação. O `aru make:module` continua
+  não emitindo listener nenhum — as doze saídas dele são sete arquivos em `app/`,
+  uma migração e quatro views — e `app/Events/` e `app/Listeners/` saem do
+  `aru new` com um `.gitkeep` e nada mais
 - **não há regra de `doctor` que reprove handler sem idempotência.** O contrato
   do lado de fora é `events.Publisher` — uma interface de **saída**. Quem
   consome está noutro processo, muitas vezes noutra linguagem, e o `doctor` lê o
@@ -151,11 +162,35 @@ de fazer a mesma coisa, e a segunda forma sempre vaza para produção.
 
 ## Fases
 
-| O quê | Fase |
-|---|---|
-| Tabela `outbox` e `outbox.Store()`, driver sobre `database` | **2** |
-| Relay, fila morta, `kv` para lock, NATS | 3 |
-| Painel de eventos no console `/_arandu/debug` | 3 |
+| O quê | Fase | Estado |
+|---|---|---|
+| Tabela `outbox` e `outbox.Store()`, driver sobre `database` | **2** | feito |
+| Relay | 3 | feito — `framework/events/relay.go` |
+| Fila morta | 3 | feito — `Outbox.Park`, `Parked`, `Retry`, coluna `failed_at` |
+| `kv` para lock | 3 | feito — `kv.Locker`, com `var _ events.Locker = (*Locker)(nil)` provando o encaixe em tempo de compilação |
+| NATS | 3 | **não entra, e é por desenho** |
+| Painel de eventos no console `/_arandu/debug` | 3 | **falta** |
 
-O `Store()` sobe para a Fase 2 pelo mesmo motivo do `arandu.mod.toml`: evento
+O `Store()` subiu para a Fase 2 pelo mesmo motivo do `arandu.mod.toml`: evento
 que não foi gravado não se recupera depois. O relay pode esperar; a gravação não.
+
+*Corrigido em 07/08/2026:* esta tabela dizia que o relay, a fila morta, o lock em
+`kv` e o NATS eram trabalho de Fase 3 ainda por fazer. Virou retrato
+desatualizado: os três primeiros existem e são testados contra banco real —
+`framework/events/relay_module_test.go` e `arandu/relay_test.go`, este último
+provando entrega at-least-once, estacionamento após falhas repetidas e o `Lag`
+que separa relay parado de relay ocioso.
+
+O NATS deixou de figurar como item a construir porque não é item a construir. O
+contrato é `events.Publisher`, uma interface de uma função: NATS, webhook, fila
+ou handler in-process têm a mesma forma daqui, e a escolha é da aplicação. Pôr um
+driver NATS no core seria pôr uma dependência pesada no `framework` para atender
+uma escolha que não é nossa (ADR 0004, REGRA 11).
+
+**O que falta é uma linha da tabela: o painel.** O console `/_arandu/debug` já
+mostra os eventos gravados no request corrente — a seção `Events` de
+`observability/console_page.go`, alimentada por `Collector.Events()`. O que não
+existe é a visão do outbox em si: pendentes, estacionados e atraso do relay numa
+tela. Os três números já são calculáveis hoje (`Outbox.Pending`, `Outbox.Parked`,
+`Outbox.Lag`) e já saem pelo `Diagnose` e pelo `Health` — falta a tela que os
+junta.

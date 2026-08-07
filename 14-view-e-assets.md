@@ -75,16 +75,35 @@ Dois detalhes que a verificação expôs, e que valem estar escritos:
 - a cláusula `package` é obrigatória quando existe outro `.go` no diretório. Sem
   ela funciona apenas enquanto o diretório estiver sozinho, e quebra depois
 
-### O par fonte/gerado fica lado a lado
+### O par fonte/gerado fica no mesmo pacote — lado a lado só na raiz
 
 ```
-resources/views/home.kyse.go   ← escreve-se
-resources/views/home.go        ← o aru view:build gera, mesmo pacote
+resources/views/home.kyse.go         ← escreve-se
+resources/views/home.go              ← o aru view:build gera, ao lado
+
+resources/views/auth/login.kyse.go   ← escreve-se
+resources/views/auth_login.go        ← o gerado, achatado um diretório acima
 ```
+
+*Corrigido em 07/08/2026:* esta seção dizia "lado a lado", sem ressalva. Vale
+para a view na raiz de `resources/views/` e não vale para a aninhada. **Go tem
+um pacote por diretório**: com o gerado dentro de `resources/views/auth/`, esse
+diretório seria outro pacote, e a struct que o layout declara não estaria
+visível para a página que o estende — que é exatamente o que faz uma página
+herdar o dado do layout. Então o fonte mantém a árvore do Laravel e o gerado vai
+para a raiz de `resources/views/`, com o caminho no nome e `/` virando `_`. Quem
+faz isso é `OutputPath`, em `aru/internal/kyse/kyse.go`. Ver ADR 0020, seção
+"o gerado é flat".
+
+Achatar o fonte também seria a outra saída, e custaria o que a árvore existe
+para dar: o desenvolvedor Laravel abre `resources/views/auth/` e encontra
+`login`, `register` e `passwords/` onde espera. O nome de render não muda com o
+achatamento — `auth/login.kyse.go` continua sendo `ctx.View("auth.login", …)`,
+que é como o Laravel a chama.
 
 O par existe também no Laravel. Lá o gerado fica escondido em
-`storage/framework/views/`; aqui ele fica visível, no mesmo pacote e
-no mesmo pacote — e é código Go de verdade, checado pelo compilador.
+`storage/framework/views/`; aqui ele fica visível, no mesmo pacote — e é código
+Go de verdade, checado pelo compilador.
 
 **Não existe `storage/framework/views/`.** Cache de template compilado é
 necessidade de linguagem interpretada. Nós compilamos uma vez, e o resultado é
@@ -104,11 +123,30 @@ binário.
 @while · @endwhile
 @continue · @break
 @csrf
-{{ variavel }}       escapado
-{!! html !!}         cru
+{{ .Campo }}         escapado
+{!! .Html !!}        cru
 {{-- nota --}}       não chega ao navegador
 @go … @endgo         o @php, com Go de verdade dentro
 ```
+
+São vinte e três nomes, e são exatamente estes: o conjunto vive em dois mapas de
+`aru/internal/kyse/kyse.go` — `blockDirectives`, com os sete que abrem região
+(`section`, `if`, `foreach`, `forelse`, `for`, `while`, `go`) mais os sete
+`@end…` correspondentes, e `inlineDirectives`, com os nove que emitem no lugar
+(`extends`, `yield`, `include`, `csrf`, `elseif`, `else`, `continue`, `break`,
+`empty`). A função `Directives()` devolve os vinte e três, e
+`TestEveryDirectiveEmitsSomething` percorre a lista inteira: onze ele exercita
+com uma view mínima e confere o traço no Go gerado (`if`, `foreach`, `for`,
+`while`, `yield`, `include`, `csrf`, `forelse`, `continue`, `break`, `empty`), e
+doze ele pula por nome — `section`, `extends`, `else`, `elseif`, `go` e os sete
+`@end…` —, que têm teste próprio. Uma diretiva que entre no conjunto sem estar
+em nenhuma das duas listas reprova o teste. Três vezes uma diretiva foi
+declarada sem caso no gerador e o nó sumiu em silêncio, com build verde.
+
+**A interpolação começa com ponto.** `{{ .Campo }}` vira `d.Campo`, onde `d` é o
+struct daquela página; expressão sem ponto é passada adiante como Go, então
+`{{ variavel }}` não é o campo `Variavel` — é um identificador solto, e o build
+quebra. Chamada de método vale igual: `{{ .PageTitle() }}`.
 
 A sintaxe do bloco de código é **`@go` … `@endgo`**, nunca `{{ go }}`. Mesmos
 nomes do Blade no resto, mesma sintaxe. A única adição é o `@go`, que é o `@php`
@@ -133,6 +171,55 @@ Uma regra de `aru doctor` reprova `map` como dado de view.
 
 > Não é o desenvolvedor que garante a arquitetura. É o compilador. Numa view
 > `map`, o compilador não garante nada.
+
+### `Layout` e `Page`: como uma página tipada cabe num layout só
+
+Se cada página tem o próprio struct, o layout não pode ser tipado pelo struct de
+nenhuma delas. É por isso que existe um par de nomes que este documento não
+mencionava e sem o qual a camada não se explica:
+
+- **`Layout`** é a interface, declarada no `@go` de
+  `arandu/resources/views/layouts/app.kyse.go`. Ela pede exatamente o que o
+  layout desenha, e nada além: `PageTitle`, `BrandName`, `CSRFToken`,
+  `SignedIn`, `SignedInName`, `HomeLink`, `LoginLink`, `LogoutLink` e
+  `RegisterLink`.
+- **`Page`** é o struct embutível, em `arandu/resources/views/page.go` — Go
+  comum, sem tag de build, porque não renderiza nada. Ele carrega o título, a
+  marca, o token de CSRF e a navegação, e implementa `Layout`.
+
+A página embute `Page` e ganha o contrato de graça:
+
+```go
+type InvoicesIndexData struct {
+	Page                     // a moldura
+	Invoices   []InvoiceRow  // o que só esta página tem
+	NextCursor string
+}
+
+var _ Layout = InvoicesIndexData{}
+```
+
+É o que faz **toda** tela que o `aru make:module` gera — index, show, create e
+edit — renderizar pelo layout que o `aru make:auth` instala, sem que os dois
+comandos saibam um do outro: os templates em `aru/internal/gen/viewtemplates.go`
+embutem `Page` e afirmam `var _ Layout` em tempo de compilação, e o
+`aru/internal/gen/authviews.go` reescreve `page.go` e redeclara a mesma
+interface junto do layout novo — porque o `make:auth` roda em projeto gerado por
+qualquer versão do `aru new`, inclusive uma anterior a esse contrato.
+
+O `kyse` fecha o circuito na hora de escolher o tipo de render: `RenderType`, em
+`aru/internal/kyse/kyse.go`, devolve **a interface** para um layout — o arquivo
+que contém `@yield` — e **o struct** para uma página. Ler o primeiro tipo do
+`@go` para os dois casos foi um defeito real: o layout do `make:auth` ficou
+tipado pela struct da tela de login, e toda página do `make:module` passou a
+responder
+
+```
+view "layouts.app" takes AuthPage and got views.InvoicesIndexData
+```
+
+com `go build` verde, porque a discordância é uma asserção de tipo em tempo de
+execução.
 
 ## Toolchain: um binário baixado, não dois
 
@@ -202,8 +289,12 @@ coisa derivada de dado que o servidor já tem.
 O teste em uma frase: **se você está escrevendo regra de negócio em Alpine, o
 componente devia ser um fragmento HTMX.**
 
-Verificação no `aru doctor`: reprova `x-data` que contenha `fetch`, `axios`,
-`$store` global, ou `$watch` com efeito de rede.
+Verificação no `aru doctor`, regra `alpine-reaches-the-server`: ela varre
+`x-data`, `x-init`, `x-effect`, `x-on:*` e `@*` — aspas simples ou duplas — e
+reprova o que contenha `fetch(`, `axios`, `XMLHttpRequest`, `$store`,
+`navigator.sendBeacon`, `EventSource(` ou `new WebSocket`. A varredura é só
+dentro dos `*.kyse.go` de `resources/views/`; o `doctor` não abre arquivo `.js`
+(doc 28, anexo 3).
 
 ## Bug conhecido: o Alpine embutido não roda sob a nossa CSP
 
@@ -232,9 +323,7 @@ A build CSP é vendorizada com licença, como o resto — não vem por npm.
 
 Não existe `<nx-modal />`, `<x-card>` nem web component registrado em runtime.
 
-Componente é uma view em `resources/views/components/`, incluída por `@include`,
-que o `kyse` resolve em tempo de build para uma chamada da função Go gerada, com
-o struct tipado daquela view:
+Componente é uma view em `resources/views/components/`, incluída por `@include`:
 
 ```go
 //go:build kyse
@@ -244,9 +333,37 @@ package views
 @include('components.alert')
 ```
 
-Tag customizada seria um segundo sistema de componentes ao lado do `kyse`, com
-resolução em runtime e erro só na tela. O `kyse` já dá composição, tipagem e erro
-em tempo de compilação.
+O diretório é convenção, e nada no código o trata: o `aru new` não o cria, e a
+palavra `components` não aparece em `.go` nenhum da `aru`. No `framework/view`
+ela aparece — na camada `components` do Tailwind, dentro do CSS —, o que não é
+tratamento de diretório. Ele passa a existir quando alguém escreve o primeiro
+componente.
+
+*Corrigido em 07/08/2026:* esta seção dizia que o `kyse` resolve o `@include`
+**em tempo de build**, numa chamada da função Go gerada com o struct daquela
+view, e que o componente dá "erro em tempo de compilação". Não é o que o gerador
+faz. `@include('components.alert')` emite
+`view.Include(w, "components.alert", data)` (`aru/internal/kyse/generate.go`), e
+`view.Include` procura o nome no registro de **páginas**, que cada página gerada
+preenche no `init()` — `view.Register("home", renderHome)` —, repassando o dado
+da página que incluiu (`framework/view/runtime.go`). São dois registros, e essa
+distinção tem consequência: um layout gerado chama `view.RegisterLayout`, que
+grava noutro mapa, lido só por `RenderInto`. Logo,
+`@include('layouts.app')` devolve `unknownView` — layout não se inclui, se
+estende. **Nome errado é erro de render**, não de
+compilação: a função devolve `unknownView(name)`. O layout é resolvido do mesmo
+jeito, por `RenderInto`, e o tipo é afirmado dentro da função gerada
+(`data.(HomeData)`, com `view.WrongData` na discordância) — é o mesmo mecanismo
+de runtime que a seção do `Layout` já descreve.
+
+O que o compilador garante é o **campo**: a view renderiza com o struct que ela
+declara, então `d.Title` inexistente não compila, e é essa metade que sustenta
+a tese aqui.
+
+Tag customizada continua fora, e o motivo é a REGRA 9 mais o dado: seria um
+segundo sistema de componentes ao lado do `@include`, com registro próprio e sem
+struct por view. O `kyse` já dá composição e dado tipado, com uma forma só de
+escrever componente.
 
 ## Onde a view mora — o `porang` foi dissolvido
 
@@ -274,9 +391,16 @@ mais importa.
 
 ## Modo API
 
-`aru new --api` gera o esqueleto sem `resources/views/` e sem os assets
-embutidos. Nada mais muda: o handler decide se devolve fragmento ou JSON, e o
-resto do contrato é idêntico.
+*Corrigido em 07/08/2026:* esta seção anunciava `aru new --api`, gerando o
+esqueleto sem `resources/views/` e sem os assets embutidos. **Esse flag não
+existe.** `aru new` declara um único flag, `--module` (`aru/new.go`), e o
+comando clona o esqueleto inteiro, sempre igual. Não há gatilho nem fase
+declarada para o modo API: o assunto está aberto, e entra por ADR se entrar.
+
+O que existe hoje, e não depende de flag, é a metade da promessa que já vale: o
+handler decide se devolve fragmento ou JSON, e o resto do contrato é idêntico —
+não há `routes/api.go` separado (doc 28). Um projeto que só sirva JSON tem
+`resources/views/` e os assets embutidos no binário sem usá-los.
 
 ## Licença
 

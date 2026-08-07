@@ -15,7 +15,7 @@ framework no primeiro dia; todo mundo dá `ls`.
 meu-app/
 ├── main.go                          ← public/index.php + artisan
 ├── migrate.go  ·  background.go     ← os despachos que main.go usa
-├── *_test.go                        ← sete testes de esqueleto, ao lado do código
+├── *_test.go                        ← onze testes de esqueleto, ao lado do código
 ├── go.mod  ·  go.sum
 ├── arandu.toml
 ├── .env  ·  .env.example
@@ -53,14 +53,15 @@ meu-app/
 │
 ├── resources/
 │   ├── css/app.css
-│   ├── js/app.js
 │   └── views/
 │       ├── layouts/app.kyse.go
 │       ├── home.kyse.go
-│       └── layouts_app.go  ·  home.go        ← o gerado, versionado
+│       ├── layouts_app.go  ·  home.go        ← o gerado, versionado
+│       └── page.go                  ← o struct Page, que toda tela embute (doc 14)
 │
 ├── assets/
-│   └── app.css                      ← a saída do Tailwind, embutida por go:embed
+│   ├── app.css                      ← a saída do Tailwind
+│   └── assets.go                    ← o go:embed do app.css, servido no lugar do padrão
 │
 ├── routes/
 │   ├── web.go
@@ -71,8 +72,8 @@ meu-app/
 │   └── framework/{cache,sessions}/
 │
 ├── public/
-│   ├── favicon.ico
-│   └── robots.txt
+│   ├── favicon.ico  ·  robots.txt
+│   └── public.go                    ← o go:embed dos dois; não é document root
 │
 ├── .github/workflows/ci.yml  ·  .vscode/  ·  .claude/
 ├── Dockerfile  ·  compose.yml  ·  Taskfile.yml
@@ -95,10 +96,11 @@ já foi criada por engano ao menos uma vez.
 | `app/Rules/` | não existe, e **não há o que colocar nele**: `framework/validation` não expõe contrato de regra — sem interface `Rule`, sem registro, sem tag. Uma regra de domínio é uma função chamada dentro do `Validate() Errors` do request. Ver a seção sobre `app/Rules/` no de-para do `app/` |
 | `resources/views/welcome.kyse.go` | não sai do `aru new`. Aparece com `aru make:auth`, junto com `auth/` e o `HomeController` (ADR 0012) |
 
-E a raiz tem **10 arquivos `.go`**, não um: `main.go`, `migrate.go`,
-`background.go` e sete `_test.go`. O `main.go` é o ponto de entrada; os outros
+E a raiz tem **14 arquivos `.go`**, não um: `main.go`, `migrate.go`,
+`background.go` e onze `_test.go`. O `main.go` é o ponto de entrada; os outros
 dois são os despachos que ele chama, separados porque `main.go` decide e não
-executa.
+executa. O que fixa o desenho são os três de código; o número total sobe a cada
+teste de esqueleto novo, e conferir é `ls arandu/*.go`.
 
 ### A migração de `users` não fica no projeto
 
@@ -117,7 +119,7 @@ duas vezes. Vale o mesmo para o `outbox` (`events`) e para `jobs` (`queue`).
 |---|---|---|
 | `public/index.php` | `main.go` na raiz | em Go o binário **é** o servidor; não há front controller nem document root |
 | `bootstrap/cache/packages.php` `services.php` | **somem** | cache de descoberta existe porque o PHP redescobre a cada request. Compilamos uma vez |
-| `tests/Feature/ExampleTest.go` | `*_test.go` ao lado do código | o Go só executa arquivo terminado em `_test.go`, no pacote do código testado. Única convenção que não dobra |
+| `tests/Feature/ExampleTest.php` | `*_test.go` ao lado do código | o Go só executa arquivo terminado em `_test.go`, no pacote do código testado. Única convenção que não dobra |
 | `resources/views/home.blade.php` | `resources/views/home.kyse.go` | o fonte é `.kyse.go`, protegido por `//go:build kyse`; o compilador ignora, o `kyse` lê. O **gerado** vai para a raiz de `resources/views/` — ver abaixo |
 
 Somem também `vendor/`, `.htaccess`, `package.json` e `vite.config.js`.
@@ -151,13 +153,13 @@ que o Laravel só recomendava.*
 | `bootstrap/cache/` | **não existe** | cache de rota e config é para linguagem interpretada. Nós compilamos |
 | `config/` | `config/` — dez arquivos, um por domínio | **igual ao Laravel**: `app`, `auth`, `cache`, `database`, `filesystems`, `logging`, `mail`, `queue`, `services`, `session`. Cada um exporta uma struct tipada, lida do `.env`; erro de chave é erro de compilação |
 | `database/` | `database/` | **igual** — `factories/`, `migrations/`, `seeders/` |
-| `public/` | **quase não existe** | asset entra por `go:embed` (doc 14). Sem `storage:link`, sem asset servido de disco |
+| `public/` | **quase não existe** | asset entra por `go:embed` (doc 14). Sem `storage:link`, sem asset servido de disco. O que sobra é `favicon.ico` e `robots.txt` — endereços que o cliente escolhe, e por isso não podem ter hash no caminho — embutidos por `public/public.go`, com uma rota por nome |
 | `resources/views/` | `resources/views/` | **igual** — layouts, componentes e páginas. É onde as views do dissolvido `porang` foram parar; o runtime de render ficou em `framework/view/` |
 | `resources/css/app.css` | `resources/css/app.css` | **igual** — a entrada do Tailwind; `aru view:build` compila para `assets/app.css`, embutido por `go:embed` |
-| `resources/js/app.js` | `resources/js/app.js` | **igual** — JS à mão, sem npm e sem bundler |
+| `resources/js/app.js` | **não existe** | *corrigido em 07/08/2026.* Esta linha dizia "**igual** — JS à mão, sem npm e sem bundler". O `aru new` não gera `resources/js/`: o esqueleto tem `resources/css/` e `resources/views/`, e não há um `.js` no repositório. HTMX e Alpine vêm embutidos em `framework/view/assets/` |
 | `public/build/` (saída do Vite) | **não existe** | o CSS compilado entra no binário por `go:embed`. Sem bundler, sem diretório de saída servido do disco |
 | `routes/web.php` | `routes/web.go` | **igual** |
-| `routes/api.php` | o mesmo `routes.go` | o handler decide JSON ou fragmento |
+| `routes/api.php` | o mesmo `routes/web.go` | o handler decide JSON ou fragmento |
 | `routes/console.php` | `routes/console.go` | **igual** |
 | `storage/logs/` | **stdout** | log estruturado vai para o agregador, não para arquivo |
 | `tests/` | `*_test.go` ao lado do código | convenção do Go, e é melhor: o teste anda junto |
@@ -183,8 +185,11 @@ Duas camadas, como no Laravel:
 - Salvar a view como `home.kyse` — o fonte é `home.kyse.go`, com
   `//go:build kyse` na primeira linha e cláusula `package`
 - Editar `resources/views/home.go` — é o gerado; a próxima geração apaga
-- Criar `storage/framework/views/` para o compilado — o gerado fica ao lado do
-  fonte, no mesmo pacote. Duas formas para a mesma coisa fere a REGRA 9
+- Criar `storage/framework/views/` para o compilado — o gerado fica na raiz de
+  `resources/views/`, no mesmo pacote do fonte. Duas formas para a mesma coisa
+  fere a REGRA 9
+- Procurar o gerado de `auth/login.kyse.go` dentro de `resources/views/auth/` —
+  ele é `resources/views/auth_login.go`, um diretório acima
 - Passar `map[string]any` para a view — o dado chega como struct tipada por
   página, e o `doctor` reprova o `map`
 - Criar `modules/<nome>/` vertical — a estrutura é a do Laravel, diretório a
@@ -206,7 +211,9 @@ O `resources/assets/sass` e `resources/assets/js` existiam na época do Elixir. 
 Laravel moderno tirou o nível `assets/`: hoje é `resources/css/app.css` e
 `resources/js/app.js`, direto.
 
-Copiamos o atual. Um nível a menos, e o dev que abrir vai reconhecer.
+Copiamos o nível a menos, não os dois diretórios: aqui existe
+`resources/css/app.css` e não existe `resources/js/` — ver o anexo 3. O dev que
+abrir reconhece o caminho do CSS, que é o que a entrada do Tailwind precisa ser.
 
 ### 2. `public/` não fica dentro de `resources/`
 
@@ -230,30 +237,59 @@ Restrição técnica do `go:embed` que decide o layout: a diretiva só alcança
 arquivo no mesmo diretório ou abaixo. Então o arquivo com o `//go:embed` fica na
 raiz do projeto ou dentro de `resources/`, nunca em `internal/`.
 
-### 3. `resources/js/app.js` é permitido — e isso não fura a REGRA 13
+### 3. Arquivo `.js` não fura a REGRA 13 — e o esqueleto não tem nenhum
 
-Ponto que vale esclarecer, porque é fácil ler a regra como "nada de JavaScript".
+*Corrigido em 07/08/2026:* este anexo se chamava "`resources/js/app.js` é
+permitido" e legislava sobre esse arquivo, terminando em "se o arquivo passar a
+ter `fetch`, store global ou regra de negócio, o `doctor` reprova". Duas coisas
+eram falsas.
 
-**Não é isso.** A regra proíbe **Node no build**: npm, `package.json`, bundler,
-Vite. Ela não proíbe arquivo `.js`.
+**O arquivo existiu, e foi apagado em 07/08/2026** — commit `650f9b3` do
+`arandu`, que registra: tinha 37 linhas anexando o `X-CSRF-Token` no
+`htmx:configRequest`, e nada o embutia, servia ou referenciava. Hoje
+`arandu/resources/` tem `css/` e `views/`, e não há
+um `.js` no esqueleto. O `aru` não menciona `resources/js` em lugar nenhum, e
+o `framework/view` não teria como servi-lo: ele embute HTMX, Alpine e o CSS, e a
+única troca que a aplicação pode fazer é `RegisterStylesheet` — não existe
+`RegisterScript`. Servir seria possível por outro caminho, o mesmo que o
+esqueleto já usa para o favicon e o `robots.txt` em `public/public.go`:
+`go:embed`, uma tabela de content type e uma rota por nome. O que não existe é
+lugar para o arquivo, não mecanismo.
+
+**E o `doctor` não lê `.js`.** `parseViews`, em
+`aru/internal/doctor/doctor.go`, percorre `resources/views/` e coleta
+exclusivamente os `*.kyse.go` — é essa lista que a regra
+`alpine-reaches-the-server` varre. Ela reprova `x-data`, `x-init`, `x-effect`,
+`x-on:*` e `@*` que contenham `fetch(`, `axios`, `XMLHttpRequest`, `$store`,
+`navigator.sendBeacon`, `EventSource(` ou `new WebSocket`, **dentro da view**.
+Um `.js` ao lado passaria intocado, porque o `doctor` não o abre.
+
+O que continua valendo, e é por isso que o anexo não sai: é fácil ler a REGRA 13
+como "nada de JavaScript", e não é isso. Ela proíbe **Node no build** — npm,
+`package.json`, bundler, Vite — e não proíbe arquivo `.js`.
 
 | Permitido | Proibido |
 |---|---|
-| `app.js` escrito à mão, embutido e servido | `package.json` |
+| `.js` escrito à mão, embutido e servido | `package.json` |
 | definição de componente Alpine em JS puro | `npm install` |
 | `<script>` apontando para asset embutido | Vite, webpack, esbuild |
 | — | `import` que precise de transpilação |
 
-Ou seja: `resources/js/alpine/components.js` pode existir. Só precisa ser JS que
-o navegador executa direto, sem passar por build.
+Hoje isso é permissão sem uso: não há diretório no esqueleto nem registro no
+`framework/view` para um script da aplicação. Criar um sem ADR seria abrir uma
+segunda origem de JavaScript ao lado do `go:embed` do framework (REGRA 9). Se
+algum dia entrar, o limite do doc 14 continua valendo: estado do cliente,
+efêmero e invisível ao servidor, as três ao mesmo tempo.
 
-**Uma ressalva de conteúdo, não de forma.** Um diretório `alpine/components/`
-crescendo é sinal de que estado está migrando para o cliente — e o limite do
-doc 14 continua valendo: estado do cliente, efêmero e invisível ao servidor. As
-três ao mesmo tempo.
+E há verificação — só não é do `doctor`, cuja checagem para na view. Quem
+impede é o próprio esqueleto: `TestResourcesHoldNoJavaScript` percorre
+`resources/` e reprova qualquer `.js` — *"is never built, embedded or served"* —
+e `TestTheOnlyScriptsServedAreTheEmbeddedOnes` fixa que todo `<script>` emitido
+aponta para os assets embutidos.
 
-Se o arquivo passar a ter `fetch`, store global ou regra de negócio, o `doctor`
-reprova. Não pelo arquivo existir, mas pelo que ele faz.
+O que significa que a permissão da tabela acima é teórica: um `.js` posto em
+`resources/` hoje reprova o test suite do esqueleto, e exercê-la custa apagar um
+teste — que é o atrito certo para uma segunda origem de JavaScript.
 
 ---
 
@@ -308,10 +344,12 @@ arquivo e no import path, por restrição do Go.
 | `resources/views/home.blade.php` | `resources/views/home.kyse.go` |
 | `resources/views/layouts/app.blade.php` | `resources/views/layouts/app.kyse.go` |
 | `storage/framework/views/a3f9…php` (cache) | `resources/views/home.go` (gerado) |
+| `storage/framework/views/…` de uma view aninhada | `resources/views/auth_login.go` (gerado, achatado) |
 
 O par de arquivos existe nos dois. No Laravel o gerado fica escondido em
-`storage/`; aqui ele fica visível ao lado, no mesmo diretório e no mesmo pacote
-— e é código Go de verdade, checado pelo compilador.
+`storage/`; aqui ele fica visível, no mesmo pacote — e é código Go de verdade,
+checado pelo compilador. Na raiz de `resources/views/` ele fica ao lado do
+fonte; para uma view aninhada, não — ver "Onde o gerado fica" adiante.
 
 Uma forma só: `storage/framework/views/` **não existe**. O compilado não sai da
 árvore do fonte.
@@ -357,19 +395,28 @@ qualquer outro pacote.
 @while · @endwhile
 @continue · @break
 @csrf
-{{ variavel }}       escapado
-{!! html !!}         cru
+{{ .Campo }}         escapado
+{!! .Html !!}        cru
 {{-- nota --}}       não chega ao navegador
 @go · @endgo         o @php
 ```
+
+São vinte e três nomes, e o conjunto inteiro está nos dois mapas de
+`aru/internal/kyse/kyse.go`. A lista de referência é a do doc 14.
+
+**A interpolação começa com ponto:** `{{ .Campo }}` vira `d.Campo`, onde `d` é o
+struct daquela página. Sem o ponto a expressão é passada adiante como Go, então
+`{{ variavel }}` não lê campo nenhum — quebra o build.
 
 Mesmos nomes, mesma sintaxe. A única adição é `@go` … `@endgo`, que é o `@php`
 com o nome da linguagem hospedeira trocado — mesmo raciocínio do Blade, e a
 mesma forma de diretiva `@`. Não existe `{{ go }}`: chave dupla é interpolação,
 bloco de código é `@`.
 
-O conjunto é fechado. Caso fora do padrão se escreve em Go, dentro do bloco
-`// arandu:begin custom` (REGRA 15).
+O conjunto é fechado. Caso fora do padrão se escreve em Go, dentro de `@go` …
+`@endgo` (REGRA 15). Numa view **gerada** pelo `aru make:module`, o `@go` já vem
+com um par `// arandu:begin custom` … `// arandu:end custom` dentro dele: é ali
+que o que a regeneração precisa preservar tem de ficar.
 
 ### Onde o gerado fica, e por que nem sempre ao lado
 
