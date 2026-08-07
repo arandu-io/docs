@@ -83,7 +83,8 @@ Entregas — **todas feitas**:
   `arandu/resources/views/`, e o runtime de render e os assets embutidos para
   `framework/view/` — de onze repositórios para dez
 - `aru make:module --tenant` — escopo de tenant no SQL gerado, vindo do Grant
-- `aru make:auth` — o starter kit, publicado no projeto e não importado
+- `go run github.com/arandu-io/ui@latest auth` — o starter kit, publicado no
+  projeto e não importado (ADR 0026; era `aru make:auth`)
   (ADR 0012)
 - `aru view:build` e `aru dev` — toolchain de view gerenciado pela CLI. Entregue
   com `templ` e `tailwindcss` standalone, baixados e cacheados em
@@ -323,7 +324,7 @@ DSL é um conjunto fechado, e cada coisa que entra nela é mantida para sempre.
 
   *Corrigido em 07/08/2026:* este item justificava a ausência dizendo que a
   forma canônica de uma tela ainda não existia e que gerar antes disso seria
-  adivinhar. A ADR 0023 revogou o motivo: o `make:auth` publicou as nove telas
+  adivinhar. A ADR 0023 revogou o motivo: o kit publicou as nove telas
   do `laravel/ui`, o `layouts.app` fixou o contrato de layout, e o
   `aru make:module` passou a emitir quatro telas — `index`, `show`, `create` e
   `edit`, em `resources/views/<plural>/`, com golden file cada uma. A conclusão

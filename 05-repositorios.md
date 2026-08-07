@@ -129,7 +129,7 @@ O que saiu da lista, e para onde foi:
 
 - `porang` foi dissolvido (ADR 0021): as views ficam em
   `arandu/resources/views/` e o runtime de render em `framework/view/`
-- o starter kit não é repositório: é `aru make:auth` (ADR 0012)
+- o starter kit **é** repositório: `arandu-io/ui` (ADR 0026, que supersede a 0012)
 - o inspetor de requests (`marandu`) é core, no console `/_arandu/debug`,
   desde a Fase 3
 - tokens de API estão decididos como core, e **não existem**. Ver a nota abaixo
@@ -148,7 +148,7 @@ tomada, nenhum documento pode citar `security/token.go` como coisa entregue.
 Nota: as primitivas de autenticação (Grant, Policy, sessão, argon2id) ficam no
 **core**, não aqui — e essas quatro existem: `security.Grant` em `policy.go`,
 argon2id em `password.go`. Segurança é a tese do produto; não pode ser um pacote
-opcional que o usuário esquece de instalar. O `aru make:auth` gera só as telas.
+opcional que o usuário esquece de instalar. O `arandu-io/ui` publica só as telas.
 
 ### Distribuição
 
@@ -206,7 +206,14 @@ compilam e estão publicados. `examples` entrou junto: escrever à mão o módul
 o gerador vai emitir é o passo que transforma "template que pareceu bom" em
 "template já usado"
 Fase 2: `kv`, `database`, `homebrew-tap` — **feito**, os três existem e estão
-publicados. `oka` saiu da lista: o starter kit é `aru make:auth`, não um
+publicados. *Corrigido em 07/08/2026 (ADR 0026):* o starter kit **é** um
+repositório — `arandu-io/ui`, o espelho do `laravel/ui` —, e a `aru` perdeu o
+`make:auth`. O que a ADR 0012 mediu foi o custo de **importar** um kit, e
+concluiu contra **publicar** um: `go run <módulo>@latest` roda um módulo
+publicado sem acrescentar uma linha ao `go.mod` de quem chama. O nome `oka` fica
+livre; o texto abaixo é o registro do desenho anterior.
+
+O desenho anterior dizia: `oka` saiu da lista, o starter kit é `aru make:auth`, não um
 repositório (ADR 0012). O `porang` chegou a existir e foi dissolvido pela
 ADR 0021 — view no esqueleto, runtime em `framework/view/`. O `database` é um
 repositório com quatro módulos — o contrato fica no core e cada driver tem o

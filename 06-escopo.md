@@ -121,7 +121,11 @@ competitivo continua sendo o mesmo — é a camada que liga componente a Grant,
 validação e CSRF, e nenhuma biblioteca genérica faz isso — e é justamente por
 isso que ela é core, não dependência opcional.
 
-O starter kit também saiu: `oka` não é repositório, é o comando `aru make:auth`
+O starter kit **voltou** para a lista em 07/08/2026, pela ADR 0026: é
+`arandu-io/ui`, o espelho do `laravel/ui`, e a `aru` perdeu o `make:auth`. A
+linha abaixo é o registro do desenho anterior.
+
+O desenho anterior dizia: `oka` não é repositório, é o comando `aru make:auth`
 (ADR 0012).
 
 ## CONSTRUIR — Fase 3

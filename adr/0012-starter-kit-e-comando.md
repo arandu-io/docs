@@ -32,19 +32,29 @@ arquivo é do projeto a partir do momento em que aparece.
 O que se publica é o `.kyse.go` — o fonte que o humano lê e edita. O `.go` ao
 lado sai do `aru view:build` (ADR 0020).
 
-A portabilidade para a árvore da ADR 0019 **está feita**: o comando emite doze
-arquivos, três controllers e as nove views do `laravel/ui`, todos nos caminhos
-acima e todos em `.kyse.go`.
+A portabilidade para a árvore da ADR 0019 **está feita**: o comando emite
+**treze** arquivos — três controllers, as nove views do `laravel/ui` e o
+`page.go`.
 
 ```
 app/Http/Controllers/Auth/LoginController.go
 app/Http/Controllers/Auth/LoginController_handlers.go
 app/Http/Controllers/HomeController.go
 resources/views/layouts/app.kyse.go
+resources/views/page.go                     ← não é view, e não é .kyse.go
 resources/views/home.kyse.go  ·  resources/views/welcome.kyse.go
 resources/views/auth/login.kyse.go  ·  register.kyse.go  ·  verify.kyse.go
 resources/views/auth/passwords/{confirm,email,reset}.kyse.go
 ```
+
+*Corrigido em 07/08/2026:* esta linha dizia doze e "todos em `.kyse.go`". São
+treze, e três dos treze são `.go` puro — os controllers — mais o `page.go`, que
+o documento **não nomeava**. Ele é o único da lista que não é view nem
+controller, e é o que faz todas as outras funcionarem: a struct `Page`, que toda
+página embute e por onde o layout é lido como interface. Sem ele, toda tela que
+o `aru make:module` gera falha ao renderizar pelo layout que este comando
+instala — e falha em runtime, com o build verde, porque o desacordo é uma
+asserção de tipo. `auth_test.go` exige `want 13`.
 
 Quatro deles — o layout, `home`, `welcome` e o `HomeController` — são
 **substituídos**, não pulados, mesmo sem `--force`: em kyse uma página renderiza

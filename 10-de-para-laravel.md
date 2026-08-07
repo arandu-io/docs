@@ -93,7 +93,9 @@ O `checklist.sh` verifica a tabela contra `aru help`.
 | `make:listener` | `make:listener` | — |
 | `make:command` | `make:command` | — |
 | `make:mail` | — | o repositório `mail` está decidido e adiado (ADR 0016). Sem ele não há contra o que gerar |
-| `ui bootstrap --auth` | `make:auth` | as mesmas nove telas, HTMX + Alpine + Tailwind v4 no lugar do Bootstrap (ADR 0022) |
+| `composer require laravel/ui --dev` | — | `go run <módulo>@latest` roda um módulo publicado sem tocar no `go.mod` |
+| `ui bootstrap --auth` | `go run github.com/arandu-io/ui@latest auth` | as mesmas nove telas, HTMX + Alpine + Tailwind v4 no lugar do Bootstrap (ADR 0022). Sem preset: há uma pilha só |
+| `composer remove laravel/ui` | — | não há o que remover |
 | — | `make:module` | não tem equivalente: é o `make:model --all` com Policy, Service, Repository e as quatro telas de uma vez |
 | `route:list` | `route:list` | — |
 | `migrate` | `migrate` | — |
