@@ -25,7 +25,7 @@ Entregas:
 - `observability` — slog com escopo de request, request_id, Collector
 - `errorpage` — página de erro com stack, snippet, queries, dumps, diagnóstico
 - módulo `auth` completo como referência canônica
-- `aru key:generate`, `aru serve`, `aru migrate`, `aru routes` — a CLI é módulo
+- `aru key:generate`, `aru serve`, `aru migrate`, `aru route:list` — a CLI é módulo
   próprio, e os três últimos delegam ao binário do projeto (ADR 0006)
 
 Critério de saída — **todos** obrigatórios:
@@ -187,7 +187,7 @@ Entregas:
 - agendamento: `kernel.Task`, scheduler in-process com lock, escopo por tenant,
   e a tarefa instrumentada como request no console (doc 16) — **feito**
 - fila: `arandu-io/queue` sobre a tabela e sobre RESP, com backoff, fila morta e
-  `aru work` — **feito**, ADR 0016
+  `aru queue:work` — **feito**, ADR 0016
 - storage: `arandu-io/storage` em disco e sobre o protocolo S3, com R2 como
   padrão — **feito**, ADR 0016
 - deploy: `aru build`, `aru build --docker` e o Dockerfile distroless do

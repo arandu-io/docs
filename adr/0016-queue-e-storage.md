@@ -17,7 +17,7 @@ E o `11-adapters.md:127` diz, sem ambiguidade:
 
 > Fase 3: `queue` (sobre `kv`, depois `nats`), `storage` (local, depois `s3`).
 
-Os dois faltavam. Pior: o `16-agendamento.md` descreve `aru work` — um worker de
+Os dois faltavam. Pior: o `16-agendamento.md` descreve `aru queue:work` — um worker de
 fila — como parte do agendamento, e o `03-roadmap-fases.md` lista **jobs** no
 console da Fase 3. Sem fila, três documentos descreviam algo que não existia.
 
@@ -72,7 +72,7 @@ entrar no grafo.
 - `otel` perde a vaga reservada pela ADR 0015 e passa a ser o décimo segundo,
   quando o gatilho dela disparar. O adiamento não muda
 - `mail` e `ws` (doc 11) continuam sem gatilho: "com demanda"
-- O `aru work` do doc 16 passa a existir de verdade, e o console da Fase 3 passa
+- O `aru queue:work` do doc 16 passa a existir de verdade, e o console da Fase 3 passa
   a mostrar job com timeline, que era o que faltava para a linha do roadmap ser
   verdade
 

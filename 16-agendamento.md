@@ -58,7 +58,7 @@ retry. Scheduler dispara, fila persiste.
 
 ## Workers de fila — **feito**
 
-Mesmo binário, subcomando: `aru work --queue=default --workers=4`. Não é um
+Mesmo binário, subcomando: `aru queue:work --queue=default --workers=4`. Não é um
 segundo artefato, é a mesma imagem com outro argumento — o que mantém o deploy
 com um artefato só (`17-deploy.md`), e impede que o worker rode uma versão
 diferente do código que o servidor.
@@ -73,7 +73,7 @@ mesma transação da linha que o produziu.
 - `aru schedule:run <id> [--tenant=…]` — execução manual, mesmo lock, mesmo
   `Grant`, mesma instrumentação. Rota diferente seria porta dos fundos, e as
   duas divergiriam
-- `aru work [--queue=…] [--workers=…]` — worker de fila
+- `aru queue:work [--queue=…] [--workers=…]` — worker de fila
 
 Os três são o mesmo binário com outro argumento, o que mantém o deploy em um
 artefato só (`17-deploy.md`).

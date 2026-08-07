@@ -10,7 +10,7 @@ contradiz `05-repositorios.md`, item 5: se a CLI vive no módulo do framework,
 todo projeto que importa o framework arrasta as dependências dela — e a CLI vai
 depender de bubbletea na Fase 2.
 
-Há um segundo problema, que só aparece quando se tenta implementar `aru routes`:
+Há um segundo problema, que só aparece quando se tenta implementar `aru route:list`:
 o wiring é explícito e não existe container nem carregamento de plugin (ADR 0001).
 Logo, **uma CLI compilada separadamente não tem como saber quais módulos uma
 aplicação registrou.** Não é limitação de implementação; é consequência direta de
