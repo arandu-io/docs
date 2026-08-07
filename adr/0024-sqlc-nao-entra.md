@@ -41,9 +41,18 @@ correspondente. O segundo está coberto pela suíte de conformidade da ADR 0018,
 que roda as queries geradas contra PostgreSQL e MySQL de verdade.
 
 **Não há risco de injeção.** A concatenação que existe nos templates usa apenas
-constante e nome de coluna de allowlist; todo valor vai em placeholder. O
-`aru doctor` tem a regra `sql-built-with-sprintf`, e ela foi ampliada para
-concatenação de variável livre.
+constante e nome de coluna de allowlist; todo valor vai em placeholder.
+
+O `aru doctor` cobre as duas formas: `sql-built-with-sprintf`, para o texto
+interpolado, e `sql-built-by-concatenation`, para o valor que o chamador passou
+chegando à instrução como texto.
+
+A segunda **não existia quando esta ADR foi escrita**, e este parágrafo afirmava
+que existia — a decisão de não adotar o `sqlc` se apoiava numa barreira com um
+furo exatamente onde ela era invocada. A regra foi escrita depois, com a
+concatenação do próprio gerador como caso negativo: ela distingue um parâmetro
+da função de um `const` de pacote ou de um valor escolhido de allowlist, que é o
+que `aru make:module` emite.
 
 **O custo cairia inteiro no usuário.** O `sqlc` é um binário externo com
 `sqlc.yaml`, passo de geração próprio e um segundo conjunto de arquivos gerados.
