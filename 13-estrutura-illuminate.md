@@ -23,10 +23,10 @@ problema é do PHP
 | **Conditionable** | `if` | não existe |
 | **Config** | `config/` — struct tipada, validada no boot | core |
 | **Console** | `aru` + bubbletea | CLI |
-| **Container** | fiação gerada em `internal/wire` | não existe (ADR 0001) |
+| **Container** | fiação explícita em `bootstrap/app.go`, escrita à mão | não existe (ADR 0001) |
 | **Contracts** | interface vive no pacote que consome | não existe |
 | **Cookie** | `net/http` + cookie assinado no `security/` | stdlib + core |
-| **Database** | `database` + sqlc | adapter |
+| **Database** | `database` + `database/sql` | adapter |
 | **Encryption** | `crypto/*` + `security/` | stdlib + core |
 | **Events** | `events/` in-process; assíncrono via `queue` | core |
 | **Filesystem** | `storage` | adapter |

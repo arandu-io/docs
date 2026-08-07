@@ -32,9 +32,30 @@ arquivo é do projeto a partir do momento em que aparece.
 O que se publica é o `.kyse.go` — o fonte que o humano lê e edita. O `.go` ao
 lado sai do `aru view:build` (ADR 0020).
 
-O comando é anterior à virada de estrutura e ainda emite o layout antigo
-(`modules/authui/`, com a view em `views.templ`). Portar `aru/internal/gen/auth.go`
-para os caminhos acima é pendência da ADR 0019, não uma decisão em aberto.
+A portabilidade para a árvore da ADR 0019 **está feita**: o comando emite doze
+arquivos, três controllers e as nove views do `laravel/ui`, todos nos caminhos
+acima e todos em `.kyse.go`.
+
+```
+app/Http/Controllers/Auth/LoginController.go
+app/Http/Controllers/Auth/LoginController_handlers.go
+app/Http/Controllers/HomeController.go
+resources/views/layouts/app.kyse.go
+resources/views/home.kyse.go  ·  resources/views/welcome.kyse.go
+resources/views/auth/login.kyse.go  ·  register.kyse.go  ·  verify.kyse.go
+resources/views/auth/passwords/{confirm,email,reset}.kyse.go
+```
+
+Quatro deles — o layout, `home`, `welcome` e o `HomeController` — são
+**substituídos**, não pulados, mesmo sem `--force`: em kyse uma página renderiza
+com o tipo do layout dela, então o layout e o que o estende são uma unidade só.
+O `php artisan ui bootstrap --auth` sobrescreve o `home.blade.php` pelo mesmo
+motivo. O `--force` continua governando os outros oito.
+
+**Não existe `modules/authui/` e não existe `views.templ`.** O nome `authui`
+sobrevive só como nome de pacote Go dentro de `app/Http/Controllers/Auth/`.
+Quem ler isto procurando uma pendência para fechar: não há. Recriar o diretório
+vertical seria desfazer a ADR 0019.
 
 ## Por quê
 

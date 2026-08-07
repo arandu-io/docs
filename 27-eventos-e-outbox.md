@@ -79,32 +79,69 @@ CREATE INDEX idx_outbox_unfinished ON outbox (failed_at, published_at, occurred_
 
 Faz parte do runtime, no mesmo binário (mesma lógica do scheduler, doc 16):
 
-- `LISTEN/NOTIFY` do Postgres para latência baixa, com polling de fallback
+- **polling**, com intervalo de 1s por padrão (`RelayOptions.Interval`). O
+  `LISTEN/NOTIFY` foi considerado e **recusado**: é específico do Postgres,
+  colocaria um driver no core e daria a SQLite e MySQL um segundo caminho de
+  código (REGRA 9 e REGRA 11). Um segundo de latência num publish de fundo não é
+  o problema que este framework existe para resolver
 - lock distribuído em `kv` para não publicar duas vezes com N réplicas
-- backoff exponencial por evento, `attempts` e `last_error` gravados
-- depois de N falhas, o evento vai para fila morta e **aparece no `doctor`**
+  (`RelayOptions.Locker`, `LockTTL` de 30s)
+- backoff por evento, `attempts` e `last_error` gravados
+- depois de `MaxAttempts` falhas (10 por padrão) o evento é **estacionado**:
+  `failed_at` preenchido, e ele sai do conjunto pendente até alguém chamar
+  `Outbox.Retry`
 
 ## Idempotência é obrigação do consumidor
 
 Entrega é *at-least-once*. O mesmo evento pode chegar duas vezes, e isso não é
 bug — é o preço da garantia.
 
-O `id` do outbox é a chave de deduplicação, e o handler gerado pelo `aru` já
-nasce com a checagem. Handler sem tratamento de idempotência é reprovado pelo
-`doctor`.
+**A contrapartida que o framework oferece é uma só: o `id` do registro do outbox
+viaja com o evento** (`Stored.ID`), e é uma chave de deduplicação estável — o
+mesmo evento reentregue chega com o mesmo `id`. O que o consumidor faz com ela é
+com ele.
+
+E é preciso ser explícito sobre o que **não** existe, porque já esteve escrito
+aqui que existia:
+
+- **não há handler gerado.** O `aru make:module` não emite listener nenhum;
+  `app/Events/` e `app/Listeners/` saem vazios do `aru new`. Não há checagem de
+  idempotência "que já nasce" em lugar algum
+- **não há regra de `doctor` que reprove handler sem idempotência.** O contrato
+  do lado de fora é `events.Publisher` — uma interface de **saída**. Quem
+  consome está noutro processo, muitas vezes noutra linguagem, e o `doctor` lê o
+  AST deste repositório: ele não tem o consumidor para analisar
+
+Se um dia houver um contrato de consumidor de primeira parte, aí cabe regra. Até
+lá, esta seção é um aviso, não uma garantia.
 
 ## Observabilidade
 
-Aqui o outbox encontra o cargo-chefe. O `Collector` mede:
+Aqui o outbox encontra o cargo-chefe, e em **três** lugares distintos — vale
+separar, porque cada um roda em um momento diferente:
 
-- eventos gravados neste request, com o evento e o agregado
-- **atraso do relay**: quanto tempo o evento mais antigo está pendente
-- taxa de falha e tamanho da fila morta
+| Onde | O quê | Como |
+|---|---|---|
+| `Collector` | eventos gravados **neste request**, com nome e payload | `Collector.RecordEvent` / `Events()`, visíveis no console `/_arandu/debug` |
+| Página de erro | atraso do relay e contagem da fila morta | `events.Module.Diagnose`, um `kernel.Diagnostic` — consultado quando a página renderiza |
+| Health check | o relay parou | `events.Module.Health` falha quando o evento mais antigo passa de `maxLag`, 1 minuto |
 
-E vira `hint` na página de erro, em inglês como toda mensagem do framework:
-*"The oldest unpublished event has been waiting 4m0s. Is the relay running, and
-is the publisher accepting?"*. Isso é diagnóstico. Métrica de dashboard ninguém
-olha.
+O `Diagnose` é o que produz o `hint`, em inglês como toda mensagem do framework:
+
+> *"The oldest unpublished event has been waiting 4m0s. Is the relay running, and
+> is the publisher accepting?"*
+
+> *"3 event(s) gave up after repeated failures, the most recent being
+> invoice.paid: connection refused. They stay in the outbox until retried."*
+
+Isso é diagnóstico. Métrica de dashboard ninguém olha.
+
+**A fila morta não aparece no `aru doctor`, e não pode aparecer.** O `doctor` faz
+análise estática: lê o AST do projeto e nunca executa código nem abre conexão de
+banco. Contar eventos estacionados exige consultar a tabela `outbox` de um
+ambiente — que é exatamente o que o `Diagnose` e o `Health` fazem, dentro do
+processo que já tem o banco aberto. Quem quiser a lista em código chama
+`Outbox.Parked`.
 
 ## Sem modo síncrono
 

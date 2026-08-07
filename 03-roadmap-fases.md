@@ -76,8 +76,11 @@ Entregas — **todas feitas**:
   (ADR 0012)
 - `aru view:build` e `aru dev` — toolchain de view gerenciado pela CLI. Entregue
   com `templ` e `tailwindcss` standalone, baixados e cacheados em
-  `~/.arandu/bin`. Hoje nenhum binário é baixado: o `kyse` é parte da `aru`, e o
-  CSS continua Tailwind v4, com o binário standalone. Zero Node nos dois casos
+  `~/.arandu/bin`. Hoje **um** binário é baixado, não dois: o `templ` saiu, e o
+  `kyse` que o substituiu é código da `aru`; o `tailwindcss` standalone continua
+  sendo baixado pelo `aru view:build`, com SHA-256 verificado contra o
+  `sha256sums.txt` da release e cache em `~/.arandu/bin`. Zero Node nos dois
+  casos — binário único não é npm (REGRA 13)
 - `data.Transaction` e `events.Outbox` — evento gravado na mesma transação da
   escrita, nunca `Publish()` direto (doc 27)
 - `arandu-io/kv` — cache, sessão, rate limit e lock sobre RESP (doc 11)
@@ -88,14 +91,30 @@ Entregas — **todas feitas**:
 
 Critério de saída:
 
-1. `aru make:module cliente --campos "..."` gera módulo que compila, passa
+1. `aru make:module cliente --fields "..."` gera módulo que compila, passa
    `doctor` e tem teste verde sem edição manual — **verificado**, e o checklist
-   gera num projeto temporário e compila o resultado a cada execução
+   gera num projeto temporário e compila o resultado a cada execução. A flag é
+   `--fields`, em inglês como toda a saída da CLI (REGRA 6); `--campos` não
+   existe e o comando para com `flag provided but not defined`
 2. `doctor` roda em CI e falha em pelo menos 3 violações plantadas de propósito —
    **verificado**: oito violações plantadas em `aru/internal/doctor/testdata`,
    e o esqueleto passa no próprio `doctor --strict`
 3. Um CRUD real de um dos seus produtos foi substituído por módulo gerado —
    **aberto**, depende do proprietário
+
+   > **Este critério não aparece em nenhum instrumento de acompanhamento, e
+   > isto aqui é o único registro dele.** O `plans/checklist.sh` cobre os
+   > critérios 1 e 2 da Fase 2 e para; o `plans/O-QUE-FALTA.md` lista quatro
+   > pendências de pessoa e esta não é uma delas. Quem olhar só os dois lê a
+   > Fase 2 como fechada.
+   >
+   > Ele importa mais que os outros três porque é o **único** que testa o
+   > gerador contra um domínio que não foi desenhado junto com ele. Os critérios
+   > 1 e 4 rodam sobre `cliente` e `thing` — entidades inventadas para o teste.
+   > O defeito da Fase 4 (a inicial da entidade sombreando `ctx`, `s` ou `a` na
+   > assinatura da Policy) é exatamente a classe de coisa que um domínio de
+   > verdade acha e um golden file não: *gerador testado com um módulo só nunca
+   > vê isso.*
 4. Tempo medido: do zero ao CRUD funcionando em menos de 5 minutos —
    **verificado**, medido em 2 segundos
 
@@ -122,8 +141,10 @@ proíbe `map` como dado de view.
 
 Na mesma virada, e pelo mesmo motivo — são um trabalho só:
 
-- o Tailwind caiu, e com ele o binário standalone que a `aru` baixava. O CSS é
-  Tailwind v4, com o binário standalone que a `aru` baixa e cacheia
+- o **`templ`** caiu, e com ele o binário de terceiro que a `aru` baixava para
+  compilar view. O **Tailwind ficou**: o CSS continua Tailwind v4, pelo binário
+  standalone que o `aru view:build` baixa, verifica pelo `sha256sums.txt` da
+  release e cacheia em `~/.arandu/bin`. Dos dois binários baixados sobrou um
 - a estrutura do projeto passa a ser a do Laravel, diretório a diretório:
   `app/Http/{Controllers,Middleware,Requests}`, `app/Models`, `app/Enums`,
   `app/Policies`, `app/Services`, `app/Repositories`, `app/Jobs`, `app/Events`,

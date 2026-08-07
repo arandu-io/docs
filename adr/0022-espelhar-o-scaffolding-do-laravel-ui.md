@@ -74,6 +74,48 @@ Fica registrado porque é o tipo de erro que se repete: um nome de tecnologia
 numa frase sobre estrutura foi lido como decisão de stack. A stack estava
 decidida havia semanas e não estava em discussão.
 
+## A restrição: o kit publica as telas, não os handlers
+
+"As mesmas nove views, com a mesma função" vale para a **estrutura**. Não vale
+para o roteamento, e isso precisa ficar escrito porque a diferença é visível na
+primeira execução.
+
+Das nove views, três caminhos respondem: `/` (o esqueleto já registra, e o kit
+substitui o `HomeController` por trás), `GET /auth/login` e os dois POST que o
+módulo `authui` registra — `POST /auth/login` e `POST /auth/logout`. As outras
+seis views não têm rota nenhuma: `welcome`, `auth/register`, `auth/verify` e as
+três de senha são compiladas, entram no binário, e respondem **404**.
+
+Isso não é o que o `laravel/ui` faz. Lá, `Auth::routes()` registra tudo e os
+controllers vêm do framework, montados por trait — `RegistersUsers`,
+`ResetsPasswords`, `VerifiesEmails`. Aqui não vêm, por três motivos:
+
+- **cadastro é regra de negócio.** Quem pode se cadastrar, com qual papel, em
+  qual tenant, com qual verificação: não existe padrão que sirva. Um controller
+  gerado que decide isso sozinho é um controller que todo projeto reescreve — e
+  entregar o que vai ser jogado fora é a segunda forma que a REGRA 9 recusa.
+- **recuperação de senha depende do mailer e do tenant do projeto.** Token, TTL,
+  template e remetente são da aplicação; e o tenant vem do `Grant` (REGRA 14),
+  que o kit não tem como resolver por conta.
+- **herança por trait não existe em Go.** O mecanismo que sustenta o
+  `laravel/ui` não tem equivalente. Portar a forma sem o mecanismo produziria
+  seis controllers gerados por cópia, que é exatamente a duplicação que o
+  gerador existe para evitar.
+
+Fica então: a estrutura das nove views é idêntica — é o que esta ADR decidiu —
+e o roteamento cobre login e logout. As linhas de rota das outras vão no bloco
+`// arandu:begin custom` do `Routes()`, em
+`app/Http/Controllers/Auth/LoginController.go`, preservado na regeração.
+
+**E o `aru make:auth` diz isso na saída.** Gerar nove telas e encontrar seis 404
+sem aviso é alguém concluindo que o comando quebrou. A mensagem nomeia os seis
+caminhos e onde registrar as rotas — e um teste em `aru` casa a mensagem
+impressa com os símbolos que o gerador realmente emite, porque instrução que não
+compila é pior que instrução nenhuma.
+
+Construir os seis handlers é escopo novo. Se e quando for aberto, esta seção é o
+que muda.
+
 ## Consequências
 
 - `aru make:auth` passa a gerar nove views em `resources/views/`, e não quatro

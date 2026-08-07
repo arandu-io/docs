@@ -99,9 +99,14 @@ binário.
 @include('partials.header')
 @if · @elseif · @else · @endif
 @foreach · @endforeach
+@forelse · @empty · @endforelse
+@for · @endfor
+@while · @endwhile
+@continue · @break
 @csrf
 {{ variavel }}       escapado
 {!! html !!}         cru
+{{-- nota --}}       não chega ao navegador
 @go … @endgo         o @php, com Go de verdade dentro
 ```
 
@@ -129,14 +134,15 @@ Uma regra de `aru doctor` reprova `map` como dado de view.
 > Não é o desenvolvedor que garante a arquitetura. É o compilador. Numa view
 > `map`, o compilador não garante nada.
 
-## Toolchain: nenhum binário baixado
+## Toolchain: um binário baixado, não dois
 
-O `kyse` é compilado pela própria `aru`, via `aru view:build`. Não há binário de
-terceiro para baixar, nem versão para fixar em `arandu.toml`, nem cache em
-`~/.arandu/bin`.
+O `kyse` é compilado pela própria `aru`, via `aru view:build`: não há binário de
+terceiro para baixar, nem versão para fixar em `arandu.toml`, nem cache para ele
+em `~/.arandu/bin`.
 
-Isso é uma simplificação em relação ao desenho anterior, que baixava dois
-binários — `templ` e o `tailwindcss` standalone. Ambos saíram:
+O `tailwindcss` standalone **continua sendo baixado** — é o que a seção seguinte
+descreve, e o que a REGRA 13 autoriza: binário único não é npm. O desenho
+anterior baixava dois; hoje é um:
 
 | Saiu | Entrou |
 |---|---|
@@ -148,7 +154,7 @@ binários — `templ` e o `tailwindcss` standalone. Ambos saíram:
 ## CSS: Tailwind v4, pelo binário standalone
 
 O CSS é **Tailwind v4**. O `aru view:build` baixa o binário standalone,
-verifica o SHA-256 contra o `checksums.txt` da release e cacheia em
+verifica o SHA-256 contra o `sha256sums.txt` da release e cacheia em
 `~/.arandu/bin`. Binário único não é npm: não há `package.json`, não há
 `node_modules`, não há lockfile de JavaScript.
 

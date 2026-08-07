@@ -87,12 +87,20 @@ Nomeia o que está configurado, o que está linkado, o comando e a linha. É a t
 do produto — *debug que diz a causa provável* — aplicada ao primeiro erro que
 qualquer pessoa encontra.
 
+> **Defeito conhecido, aberto.** O texto acima é transcrição fiel do que
+> `database/database.go` emite hoje, e ele manda editar `cmd/app/main.go` — um
+> caminho que a ADR 0019 eliminou. O blank import vive no `main.go` da **raiz**
+> do projeto. A correção é de uma linha, e é no código do `arandu-io/database`,
+> não neste documento. Registrado aqui porque uma mensagem de erro que aponta
+> para um caminho inexistente derruba exatamente a promessa que o parágrafo
+> anterior faz.
+
 ## O que **não** muda
 
 - **Trocar de banco continua sendo uma linha no `.env`** (ADR 0009). A lista de
   imports decide quais motores o binário sabe falar; o `.env` decide qual ele
   usa. O esqueleto vem com SQLite e Postgres, que é o que o `.env` oferece
-- **Uma `Repository`, um sqlc, um conjunto de queries, um caminho de
+- **Uma `Repository`, um conjunto de queries, um caminho de
   autorização.** REGRA 11 intacta: adapter atrás de interface não é modo
 - **O core continua com duas dependências** (ADR 0004)
 - `data.Migrate`, `data.Transaction` e o outbox continuam onde estão

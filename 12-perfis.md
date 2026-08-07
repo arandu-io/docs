@@ -31,7 +31,7 @@ do service ou da policy.
 
 | Camada | Convencional | Performance |
 |---|---|---|
-| Banco | PostgreSQL + sqlc | ScyllaDB + gocql |
+| Banco | PostgreSQL + `database/sql` | ScyllaDB + gocql |
 | KV / cache / sessão | Dragonfly (RESP) | Dragonfly (RESP) |
 | Filas | `kv` ou Postgres | NATS |
 | Tempo real | SSE (`net/http`) | WebSocket (`gobwas/ws`) |
@@ -88,8 +88,27 @@ aru make:module cliente              # emite queries.sql
 aru make:module cliente --perfil=ambos   # emite queries.sql e queries.cql
 ```
 
-O perfil vive em `internal/wire/` — o arquivo de fiação gerado. Trocar de perfil
-é regerar a fiação e as queries, não reescrever a aplicação.
+**Nenhuma flag de perfil existe ainda** — nem aqui, nem no `aru doctor` da seção
+anterior. O perfil de performance é trabalho posterior ao convencional, e a `aru`
+de hoje tem exatamente isto:
+
+| Comando | Flags que existem |
+|---|---|
+| `aru new` | `-module` |
+| `aru make:module` | `-fields`, `-tenant`, `-force`, `-dry-run` |
+| `aru doctor` | `-strict` |
+
+Os blocos acima são o **desenho**, não a CLI. E quando as flags entrarem, elas
+entram em inglês como todas as outras (REGRA 6): `--profile`, não `--perfil`.
+
+O perfil vive em `bootstrap/app.go` — a fiação da aplicação. O diretório
+`internal/wire/` **não existe**, e nada nele é gerado: o `aru make:module`
+*imprime* as três linhas de fiação, e quem as cola é você (ADR 0023). Trocar de
+perfil é reescrever essas linhas e regerar as queries, não reescrever a
+aplicação.
+
+Um diretório de fiação gerada convivendo com o `bootstrap/app.go` escrito à mão
+seriam duas fiações, que é exatamente o que a REGRA 9 proíbe.
 
 ## Ordem de construção
 

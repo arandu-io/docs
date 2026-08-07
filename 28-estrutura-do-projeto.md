@@ -14,6 +14,8 @@ framework no primeiro dia; todo mundo dá `ls`.
 ```
 meu-app/
 ├── main.go                          ← public/index.php + artisan
+├── migrate.go  ·  background.go     ← os despachos que main.go usa
+├── *_test.go                        ← sete testes de esqueleto, ao lado do código
 ├── go.mod  ·  go.sum
 ├── arandu.toml
 ├── .env  ·  .env.example
@@ -21,10 +23,6 @@ meu-app/
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/
-│   │   │   ├── Auth/
-│   │   │   │   ├── LoginController.go
-│   │   │   │   ├── RegisterController.go
-│   │   │   │   └── ResetPasswordController.go
 │   │   │   ├── Controller.go
 │   │   │   └── HomeController.go
 │   │   ├── Middleware/
@@ -33,6 +31,7 @@ meu-app/
 │   │   └── User.go
 │   ├── Enums/
 │   ├── Policies/
+│   │   └── UserPolicy.go
 │   ├── Services/                    ← não existe no Laravel
 │   ├── Repositories/                ← não existe no Laravel
 │   ├── Jobs/  ·  Events/  ·  Listeners/  ·  Mail/
@@ -40,8 +39,7 @@ meu-app/
 │       └── AppServiceProvider.go
 │
 ├── bootstrap/
-│   ├── app.go
-│   └── providers.go
+│   └── app.go
 │
 ├── config/
 │   ├── app.go  ·  auth.go  ·  cache.go  ·  database.go
@@ -50,19 +48,19 @@ meu-app/
 │
 ├── database/
 │   ├── factories/UserFactory.go
-│   ├── migrations/0001_01_01_000000_create_users_table.go
-│   └── seeders/DatabaseSeeder.go
+│   ├── migrations/migrations.go
+│   └── seeders/{DatabaseSeeder,AdminSeeder,seeders}.go
 │
 ├── resources/
 │   ├── css/app.css
 │   ├── js/app.js
 │   └── views/
-│       ├── auth/
-│       │   ├── passwords/{confirm,email,reset}.kyse.go
-│       │   ├── login.kyse.go  ·  register.kyse.go  ·  verify.kyse.go
 │       ├── layouts/app.kyse.go
 │       ├── home.kyse.go
-│       └── welcome.kyse.go
+│       └── layouts_app.go  ·  home.go        ← o gerado, versionado
+│
+├── assets/
+│   └── app.css                      ← a saída do Tailwind, embutida por go:embed
 │
 ├── routes/
 │   ├── web.go
@@ -76,13 +74,42 @@ meu-app/
 │   ├── favicon.ico
 │   └── robots.txt
 │
+├── .github/workflows/ci.yml  ·  .vscode/  ·  .claude/
 ├── Dockerfile  ·  compose.yml  ·  Taskfile.yml
-└── README.md  ·  SECURITY.md  ·  LICENSE.md
+└── README.md  ·  CONTRIBUTING.md  ·  SECURITY.md  ·  LICENSE.md
 ```
 
 Os oito diretórios do Laravel — `app`, `bootstrap`, `config`, `database`,
 `public`, `resources`, `routes`, `storage` — nos mesmos lugares, com os mesmos
 nomes, em CamelCase dentro de `app/` como no PSR-4.
+
+### O que o `aru new` **não** gera, e onde aparece
+
+Quatro coisas costumam ser lembradas como parte do esqueleto e não são. Cada uma
+já foi criada por engano ao menos uma vez.
+
+| O quê | Realidade |
+|---|---|
+| `bootstrap/providers.go` | não existe. `bootstrap/` tem **um** arquivo, `app.go`. No Laravel 11 o `providers.php` é uma lista de classes que o container instancia; sem container (ADR 0001) a lista é a própria fiação, e ela já está no `app.go` |
+| `app/Console/Commands/` | não existe. Comando é uma função registrada em `routes/console.go`, no mesmo desenho de `routes/web.go` |
+| `app/Rules/` | não existe, e **não há o que colocar nele**: `framework/validation` não expõe contrato de regra — sem interface `Rule`, sem registro, sem tag. Uma regra de domínio é uma função chamada dentro do `Validate() Errors` do request. Ver a seção sobre `app/Rules/` no de-para do `app/` |
+| `resources/views/welcome.kyse.go` | não sai do `aru new`. Aparece com `aru make:auth`, junto com `auth/` e o `HomeController` (ADR 0012) |
+
+E a raiz tem **10 arquivos `.go`**, não um: `main.go`, `migrate.go`,
+`background.go` e sete `_test.go`. O `main.go` é o ponto de entrada; os outros
+dois são os despachos que ele chama, separados porque `main.go` decide e não
+executa.
+
+### A migração de `users` não fica no projeto
+
+O Laravel gera `database/migrations/0001_01_01_000000_create_users_table.php`. O
+`aru new` **não** gera equivalente: `database/migrations/migrations.go` sai
+vazio, com o bloco custom, e a tabela `users` vem do módulo `auth` do framework,
+que declara a própria migração em `Migrations()`.
+
+O motivo está escrito no comentário de doc do `migrations.go` gerado, e não em
+ADR: repetir aqui o que o kernel já coleta dos módulos aplicaria cada migração
+duas vezes. Vale o mesmo para o `outbox` (`events`) e para `jobs` (`queue`).
 
 ## Os quatro arquivos que não sobrevivem, e por quê
 
@@ -119,7 +146,8 @@ que o Laravel só recomendava.*
 | Laravel | Arandu | Nota |
 |---|---|---|
 | `app/` | `app/` | **igual**, com `Services/` e `Repositories/` a mais |
-| `bootstrap/app.php` | `main.go` | mesma função: o único lugar de configuração |
+| `bootstrap/app.php` | `bootstrap/app.go` | **igual** — o único lugar de fiação. Escrito à mão, e é o que o `aru make:module` manda você editar (ADR 0023) |
+| `public/index.php` + `artisan` | `main.go` | o binário é o servidor **e** a linha de comando. Ele despacha; quem compõe é o `bootstrap/app.go` |
 | `bootstrap/cache/` | **não existe** | cache de rota e config é para linguagem interpretada. Nós compilamos |
 | `config/` | `config/` — dez arquivos, um por domínio | **igual ao Laravel**: `app`, `auth`, `cache`, `database`, `filesystems`, `logging`, `mail`, `queue`, `services`, `session`. Cada um exporta uma struct tipada, lida do `.env`; erro de chave é erro de compilação |
 | `database/` | `database/` | **igual** — `factories/`, `migrations/`, `seeders/` |
@@ -163,8 +191,10 @@ Duas camadas, como no Laravel:
   diretório
 - Criar `tests/` — Go usa `_test.go` ao lado
 - Criar `public/js` e `public/css` — asset é embutido (doc 14, REGRA 13)
-- Escrever arquivo `.gen.go` de `internal/wire/` à mão — é gerado; edite e a
-  próxima geração apaga
+- Criar `internal/wire/` — o diretório não existe e nunca existiu. A fiação é
+  `bootstrap/app.go`, escrita à mão: o `aru make:module` **imprime** as três
+  linhas e não edita arquivo nenhum (ADR 0023). Fiação gerada ao lado da fiação
+  escrita à mão seriam duas fiações (REGRA 9)
 
 ---
 
@@ -185,8 +215,13 @@ document root para onde o servidor aponta. Misturar os dois é o erro.
 
 E aqui `public/` praticamente não existe: asset é embutido (REGRA 13), não
 servido de disco. O que o Laravel joga em `public/build/` — a saída do Vite — em
-nós não tem equivalente: o CSS compilado é embutido no binário dentro
-de `resources/css/` e entra no binário por `go:embed`.
+nós vai para **`assets/app.css`**, na raiz do projeto, e entra no binário por
+`go:embed`.
+
+Fonte e saída não moram juntos: `resources/css/app.css` é a **entrada** do
+Tailwind e `assets/app.css` é o que o `aru view:build` escreve. Só o segundo é
+embutido, e editar o segundo é trabalho perdido — a próxima compilação o
+sobrescreve.
 
 Se sobrar alguma coisa que precise ser servida de disco em dev, ela vai em
 `public/` na **raiz**, não dentro de `resources/`.
@@ -233,10 +268,30 @@ reprova. Não pelo arquivo existir, mas pelo que ele faz.
 | `app/Enums/Status.php` | `app/Enums/Status.go` |
 | `app/Policies/PedidoPolicy.php` | `app/Policies/PedidoPolicy.go` |
 | `app/Providers/AppServiceProvider.php` | `app/Providers/AppServiceProvider.go` |
-| `app/Jobs/` `Events/` `Listeners/` `Mail/` `Rules/` | iguais |
-| `app/Console/Commands/` | `app/Console/Commands/` |
+| `app/Jobs/` `Events/` `Listeners/` `Mail/` | iguais |
+| `app/Rules/` | **não existe** — ver abaixo |
+| `app/Console/Commands/` | **não existe** — comando é uma função em `routes/console.go` |
 | — | **`app/Services/`** — regra de negócio |
 | — | **`app/Repositories/`** — acesso a dado, exige `Grant` |
+
+### `app/Rules/` não existe, e não é omissão
+
+No Laravel, `app/Rules/` guarda classes que implementam `ValidationRule` e são
+referenciadas por nome numa lista de regras — o mecanismo de string do
+`Validator`. **`framework/validation` não tem esse mecanismo**: não há interface
+`Rule`, não há registro, não há tag de struct, e a validação não usa reflection.
+O contrato é `Validatable`, com um único método `Validate() Errors`, e as regras
+são funções comuns — `Required`, `MinLen`, `MaxLen`, `Email`, `NotZero` — que
+recebem o `Errors` e escrevem nele.
+
+Uma regra de domínio, então, é uma função Go chamada de dentro do `Validate()`
+do request, no mesmo pacote em que ela é usada. Sem diretório, sem registro e
+sem indireção.
+
+Criar `app/Rules/` só faz sentido junto com um contrato de regra, e um contrato
+de regra é uma segunda forma de validar ao lado do `Validate() Errors` que já
+existe (REGRA 9). Se algum dia entrar, entra por ADR — não por alguém notando
+que o Laravel tem o diretório.
 
 Nome de arquivo em CamelCase, como no PSR-4. Não é convenção de Go — mas é o
 que faz o dev Laravel reconhecer, e é o objetivo. O nome de **pacote** dentro do
@@ -297,9 +352,14 @@ qualquer outro pacote.
 @include('partials.header')
 @if · @elseif · @else · @endif
 @foreach · @endforeach
+@forelse · @empty · @endforelse
+@for · @endfor
+@while · @endwhile
+@continue · @break
 @csrf
 {{ variavel }}       escapado
 {!! html !!}         cru
+{{-- nota --}}       não chega ao navegador
 @go · @endgo         o @php
 ```
 

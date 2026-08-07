@@ -34,21 +34,49 @@ Todo módulo declara metadado, e isso tem que existir desde a **Fase 2**: módul
 gerado sem esse arquivo não tem como ganhar o metadado depois sem quebrar quem já
 instalou.
 
-```toml
-nome     = "fulano/crm"
-framework = ">= 1.2"
-perfis   = ["convencional"]         # ver 12-perfis.md
+**As chaves são em inglês, como todo identificador (REGRA 6).** O arquivo é lido
+por `aru/internal/manifest`, que recusa chave desconhecida em vez de ignorá-la —
+permissão escrita errado é permissão que parece declarada e não está. Este bloco
+é o que o parser aceita, e nada além dele:
 
-[permissoes]
-rede_externa = true                  # faz chamada HTTP para fora
-filesystem   = false
-exec         = false
-migrations   = true
+```toml
+# profiles: conventional | performance, ver 12-perfis.md
+name = "fulano/crm"
+framework = ">= 1.2"
+profiles = ["conventional"]
+
+[permissions]
+# network: o módulo faz chamada HTTP para fora
+network = true
+filesystem = false
+exec = false
+migrations = true
 ```
 
+O leitor é um parser de TOML **mínimo**, escrito à mão porque o core não toma
+dependência de terceiro (REGRA 2): ele entende seção, `chave = valor`, string
+entre aspas, lista e booleano. Comentário só em **linha inteira**, começando com
+`#`. Comentário no fim de uma linha de valor não é reconhecido e vira parte do
+valor — `network = true  # faz chamada` para com
+`network must be true or false`. Por isso o bloco acima comenta acima, nunca ao
+lado.
+
+Quatro permissões, e só essas quatro: `network`, `filesystem`, `exec` e
+`migrations`. Qualquer outra é erro de leitura, com arquivo e linha. A seção se
+chama `[permissions]`; `[permissoes]` é seção desconhecida e para o parser na
+primeira linha, com `unknown section [permissoes]`.
+
 O `doctor` confere a declaração contra os imports reais: módulo que declara
-`rede_externa = false` e importa `net/http` como cliente é reprovado. Permissão
-declarada e não usada é aviso; usada e não declarada é erro.
+`network = false` e importa `net/http` como cliente é reprovado. Permissão
+declarada e não usada é aviso; usada e não declarada é erro. É a regra
+`permission-not-declared` do `aru doctor`.
+
+**Quem escreve o arquivo hoje.** O `aru make:module` deixou de emiti-lo na
+ADR 0023, junto com o `modules/<nome>/` que ele descrevia: o gerador escreve na
+árvore do Laravel, e um projeto Arandu não é um módulo publicável. Enquanto a
+registry não existe, o `arandu.mod.toml` é escrito à mão por quem for publicar —
+e o leitor ainda procura os módulos em `modules/`, que é dívida registrada na
+ADR 0023, não decisão.
 
 ## Instalação
 

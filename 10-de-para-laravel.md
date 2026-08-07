@@ -69,9 +69,14 @@ propósito — não há vocabulário novo a aprender aqui.
 | `@include('partials.header')` | `@include('partials.header')` | idêntico |
 | `@if` `@elseif` `@else` `@endif` | iguais | idêntico |
 | `@foreach` / `@endforeach` | `@foreach` / `@endforeach` | idêntico |
+| `@forelse` / `@empty` / `@endforelse` | iguais | idêntico |
+| `@for` / `@endfor` | `@for(i := 0; i < n; i++)` | as três cláusulas em Go |
+| `@while` / `@endwhile` | iguais | Go tem um laço só, e é `for` |
+| `@continue` / `@break` | iguais | idêntico |
 | `@csrf` | `@csrf` | idêntico |
 | `{{ $var }}` | `{{ var }}` | escapado nos dois |
 | `{!! $html !!}` | `{!! html !!}` | cru nos dois |
+| `{{-- comentário --}}` | `{{-- comentário --}}` | não chega ao navegador, nos dois |
 | `@php` / `@endphp` | `@go` / `@endgo` | só troca o nome da linguagem hospedeira |
 | `storage/framework/views/` (cache) | **não existe** | o gerado é o `.go` ao lado, legível e versionável |
 
