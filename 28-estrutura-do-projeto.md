@@ -91,7 +91,7 @@ nomes, em CamelCase dentro de `app/` como no PSR-4.
 | `public/index.php` | `main.go` na raiz | em Go o binário **é** o servidor; não há front controller nem document root |
 | `bootstrap/cache/packages.php` `services.php` | **somem** | cache de descoberta existe porque o PHP redescobre a cada request. Compilamos uma vez |
 | `tests/Feature/ExampleTest.go` | `*_test.go` ao lado do código | o Go só executa arquivo terminado em `_test.go`, no pacote do código testado. Única convenção que não dobra |
-| `resources/views/home.blade.php` | `resources/views/home.kyse.go` | o fonte é `.kyse.go`, protegido por `//go:build kyse`; o compilador ignora, o `kyse` lê. O **gerado** é `home.go`, ao lado |
+| `resources/views/home.blade.php` | `resources/views/home.kyse.go` | o fonte é `.kyse.go`, protegido por `//go:build kyse`; o compilador ignora, o `kyse` lê. O **gerado** vai para a raiz de `resources/views/` — ver abaixo |
 
 Somem também `vendor/`, `.htaccess`, `package.json` e `vite.config.js`.
 
@@ -310,3 +310,24 @@ bloco de código é `@`.
 
 O conjunto é fechado. Caso fora do padrão se escreve em Go, dentro do bloco
 `// arandu:begin custom` (REGRA 15).
+
+### Onde o gerado fica, e por que nem sempre ao lado
+
+Para uma view na raiz, o gerado fica ao lado: `resources/views/home.kyse.go`
+gera `resources/views/home.go`.
+
+Para uma view aninhada, não. `resources/views/auth/login.kyse.go` gera
+`resources/views/auth_login.go` — na raiz de `resources/views/`, com o caminho
+no nome.
+
+**É restrição da linguagem, não preferência.** Go tem um pacote por diretório.
+Com o gerado ao lado de um fonte aninhado, `resources/views/auth/` seria um
+pacote diferente de `resources/views/`, e a struct que o layout declara não
+seria visível para a página que o estende — que é exatamente o que faz uma
+página herdar o dado do layout.
+
+A alternativa seria achatar o fonte também, e aí se perde o que a estrutura
+existe para dar: o desenvolvedor Laravel abrindo `resources/views/auth/` e
+encontrando `login`, `register` e `passwords/` onde espera.
+
+Descoberto ao implementar, não ao decidir. Estava escrito "ao lado" para todos.

@@ -92,7 +92,7 @@ que está abaixo, o documento está velho.
    que elegância de organização (doc 28)
 2. **Motor de template próprio: `kyse`**, do guarani *kysê*, faca — o Blade do
    Arandu. O **templ caiu**. `resources/views/home.kyse.go` é o que se escreve,
-   `resources/views/home.go` é o que o `aru view:build` gera ao lado, e
+   `resources/views/home.go` é o que o `aru view:build` gera, e
    `@go`/`@endgo` é o `@php` com Go de verdade dentro (doc 14, ADR 0020)
 3. **O scaffolding de auth espelha o do `laravel/ui`**: as mesmas nove views,
    nos mesmos caminhos. A stack não muda — HTMX, Alpine e Tailwind v4 (ADR 0022)

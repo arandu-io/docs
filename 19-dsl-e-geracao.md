@@ -46,18 +46,23 @@ item que entra na DSL é mantido para sempre:
 - **relações `belongs_to` e `has_many`** — só fazem sentido dentro do agregado, e
   o `data.Repository` já é por agregado. Relação na DSL viraria join gerado, e
   join gerado é o começo de um ORM
-- **telas `list`, `form` e `show`** — gerariam view, e a forma canônica de uma
-  tela ainda não existe. O `make:auth` publica a primeira, e é dela que se
-  aprende o que uma tela gerada deve parecer. Gerar antes disso é adivinhar
+- **telas na DSL** — não existe `screens:` na spec, e não vai existir. O que
+  mudou é outra coisa: o gerador **passou a emitir as quatro telas do CRUD**
+  (`index`, `show`, `create`, `edit`) a partir dos campos que a spec já declara,
+  sem nenhuma chave nova. A forma canônica de uma tela deixou de ser hipótese
+  quando o `make:auth` publicou as dela e o `layouts.app` do esqueleto fixou o
+  contrato — uma interface `Layout` com `PageTitle`
 
-Ambas voltam à mesa quando houver um módulo real pedindo. Ver `03-roadmap-fases.md`.
+A relação volta à mesa quando houver um módulo real pedindo. Ver
+`03-roadmap-fases.md`.
 
 ## O que a DSL não expressa, e por quê
 
 - lógica de negócio condicional
 - SQL customizado
-- template livre — toda tela se escreve à mão em `.kyse.go`, com as diretivas do
-  `kyse`
+- template livre — a spec não descreve markup. As quatro telas geradas saem dos
+  campos, e a partir daí são suas: editadas à mão em `.kyse.go`, com as
+  diretivas do `kyse` e nenhuma outra
 
 Este é o ponto que decide se o produto vive. DSL expressiva demais vira uma
 linguagem que você mantém para sempre; restrita demais e o cliente esbarra no
@@ -88,15 +93,22 @@ Nos diretórios do Laravel, os mesmos que `aru new` já criou. Não existe
 | permissões por ação e papel | `app/Policies/PedidoPolicy.go` |
 | acesso a dado | `app/Repositories/PedidoRepository.go` |
 | regra de negócio | `app/Services/PedidoService.go`, com os blocos custom |
-| validações | `app/Http/Requests/StorePedido.go` |
-| ações HTTP | `app/Http/Controllers/PedidoController.go` |
-| rotas | linhas em `routes/web.go` |
-| campos e tipos | migração em `database/migrations/` e as queries do sqlc |
-| o que o módulo declara sobre si | `arandu.mod.toml`, conferido pelo `doctor` |
-| teste | o teste do módulo, verde sem edição manual |
+| validações | `app/Http/Requests/PedidoRequest.go`, com `StorePedido` e `UpdatePedido` |
+| ações HTTP | `app/Http/Controllers/PedidoController.go`, as sete do `Resource` |
+| telas | `resources/views/pedidos/{index,show,create,edit}.kyse.go` |
+| campos e tipos | migração em `database/migrations/`, listada em `All()` |
+| teste | `app/Http/Controllers/PedidoController_test.go`, verde sem edição manual |
+| a spec | `database/specs/pedido.yaml`, commitada com o código |
 
-**O gerador não escreve view.** Telas ficaram fora da DSL, e o `.kyse.go` se
-escreve à mão. O `.go` ao lado dele sai do `aru view:build`, nunca daqui.
+**O gerador escreve a view fonte, nunca a gerada.** O `.kyse.go` sai daqui; o
+`.go` ao lado dele sai do `aru view:build`, e editá-lo é trabalho perdido na
+próxima compilação.
+
+**O gerador não escreve fiação.** Três linhas ficam por conta de quem gerou — o
+campo em `routes.Deps` e o `Resource` em `routes/web.go`, o construtor em
+`bootstrap/app.go`, e a migração em `All()`. O comando imprime as três. Um
+gerador que editasse esses arquivos sozinho tiraria deles a única propriedade
+que justificam ter: dizer, por escrito, do que a aplicação é feita.
 
 O dado que chega a uma view é struct tipada por página, nunca `map` — campo
 errado é erro de compilação, e uma regra do `aru doctor` proíbe `map` como dado

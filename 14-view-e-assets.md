@@ -83,7 +83,7 @@ resources/views/home.go        ← o aru view:build gera, mesmo pacote
 ```
 
 O par existe também no Laravel. Lá o gerado fica escondido em
-`storage/framework/views/`; aqui ele fica visível ao lado, no mesmo diretório e
+`storage/framework/views/`; aqui ele fica visível, no mesmo pacote e
 no mesmo pacote — e é código Go de verdade, checado pelo compilador.
 
 **Não existe `storage/framework/views/`.** Cache de template compilado é

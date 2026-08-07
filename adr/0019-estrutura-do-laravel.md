@@ -92,29 +92,34 @@ Os dez repositórios: `framework` (= laravel/framework), `arandu`
 `examples`, `homebrew-tap`, `docs`. Licença MIT, ADR 0008 — qualquer menção a
 Apache-2.0 é regressão.
 
-## Custo técnico conhecido
+## Custo técnico conhecido — pago
 
-O `aru doctor` foi escrito contra `modules/`. O campo `file.module` só é
-preenchido para caminhos que começam com `modules/`
-(`aru/internal/doctor/doctor.go:276`), e fica vazio para todo o resto. Com a
-árvore nova, ele fica vazio sempre — e regra que testa `f.module == ""` e sai não
-reporta nada. Ela não falha: ela passa.
-
-Param de funcionar, e precisam ser reescritas para `app/<Categoria>/`:
-
-- `repositoryNeedsPolicy`
-- `policyMustBeOpened`
-- `sensitiveFieldNeedsRedaction`
-- `moduleMustNotImportModule`
-- `declaredPermissionsMatchTheCode`
-
-Mais os auxiliares que elas usam — `hasRedaction`, `usedPermissions`,
-`project.modules` e `project.blind` — todos com a mesma dependência.
+O `aru doctor` foi escrito contra `modules/`. O campo `file.module` só era
+preenchido para caminhos que começavam com `modules/`, e ficava vazio para todo o
+resto. Com a árvore nova ele ficaria vazio sempre — e regra que testa
+`f.module == ""` e sai não reporta nada. Ela não falha: ela passa.
 
 **Buraco de doctor é buraco na tese.** Um doctor que passa porque não olhou é
-pior que doctor nenhum: ele dá um verde. Esta ADR não está concluída enquanto as
-cinco não estiverem reescritas e cobertas por teste que falha se o caminho mudar
-de novo.
+pior que doctor nenhum: ele dá um verde.
+
+A detecção foi reescrita: `classify` deriva **categoria** e **entidade** do
+caminho — `app/Policies/InvoicePolicy.go` é `Policies`/`Invoice` — e as regras
+passaram a raciocinar por entidade, não por diretório de módulo.
+`project.blind` pergunta pela entidade, `hasRedaction` pelo diretório do tipo
+(que é o pacote do receiver) e `usedPermissions` lê o `arandu.mod.toml` da raiz,
+porque a unidade de distribuição é o módulo Go (doc 18), não um subdiretório.
+
+- `repositoryNeedsPolicy`, `policyMustBeOpened`, `sensitiveFieldNeedsRedaction`,
+  `declaredPermissionsMatchTheCode` — reescritas por entidade
+- `handlerMustNotReachData` virou `controllerMustNotReachData`
+- `moduleMustNotImportModule` **cai** com a estrutura que policiava, e é
+  substituída por `controllerMustNotReachTheRepository` — a mesma fronteira, na
+  direção que a árvore nova tem
+- duas regras novas que o doc 14 exige: `view-data-is-a-map` e
+  `view-does-not-exist`
+
+`TestTheTreeIsLaravels` falha se o caminho mudar de novo, que é o que esta seção
+pedia.
 
 ## O que isso não fecha
 
@@ -129,6 +134,6 @@ framework — com contrato de módulo, gerador e regra de doctor apontando para 
 - ADR 0010 — estrutura de views
 - `docs/10-de-para-laravel.md` — o modelo mental é Laravel + Inertia
 - `docs/09-uma-forma-so.md`
-- `aru/internal/doctor/doctor.go:276`
+- `aru/internal/doctor/doctor.go` — `classify`, categoria e entidade
 
 Supersede a ADR 0003.
