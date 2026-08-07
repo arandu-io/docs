@@ -12,9 +12,14 @@ pessoa saber o que fazer.
 | Core, sem repositório próprio | **2** |
 | Não é projeto — vive dentro de outro | **1** |
 | Deferido, com gatilho escrito | **5** |
-| Construir na Fase 3 | **1** |
+| Construir na Fase 3 | ~~1~~ **0** |
 
-**Um repositório novo sai desta lista de catorze.**
+**Nenhum repositório novo saiu desta lista de catorze.**
+
+*Atualizado em 07/08/2026:* o único candidato era o `marandu`, a UI do Telescope,
+e ele foi entregue **como core** — console, timeline, `aru trace` e detector de
+N+1 vivem em `framework/observability/`. O repositório foi dissolvido antes de
+existir, e o nome está livre. Nenhum gatilho dos outros treze disparou.
 
 ## A lista
 

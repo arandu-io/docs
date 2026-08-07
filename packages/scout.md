@@ -29,4 +29,5 @@ Cliente com volume ou requisito (typo tolerance, facetas) que o Postgres não at
 
 ## Alternativa enquanto não existe
 
-`tsvector` + GIN, com as queries geradas por sqlc.
+`tsvector` + GIN, com as queries escritas à mão nos templates do gerador — o
+sqlc não entrou (ADR 0024).

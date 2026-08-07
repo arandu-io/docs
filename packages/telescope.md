@@ -1,7 +1,14 @@
 # Telescope
 
-**Veredito:** DIVIDIDO — parte core, parte Fase 3
-**Nome Arandu:** marandu
+**Veredito:** CORE — inteiro. *Atualizado em 07/08/2026.*
+**Nome Arandu:** — (o `marandu` foi dissolvido; o nome está livre)
+
+> **O que este documento previa já foi entregue, e como core.** Ele dividia a
+> captura (core) da UI e do histórico (o repositório `marandu`, Fase 3). As
+> quatro peças estão em `framework/observability/`: o histórico de requests em
+> `recorder.go`, o console e a timeline em `console.go`, servidos em
+> `/_arandu/debug`, o `aru trace` em `aru/trace.go`, e o detector de N+1 em
+> `Collector.SuspectedNPlusOne`. Nenhum repositório novo saiu daqui.
 
 ## O que o Laravel faz
 

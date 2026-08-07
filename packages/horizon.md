@@ -1,7 +1,10 @@
 # Horizon
 
 **Veredito:** DEFERIDO
-**Nome Arandu:** potiron [?]
+**Nome Arandu:** potiron `[?]` — **e o `[?]` é o ponto.** O nome nunca passou os
+cinco filtros da REGRA 4, e como o veredito é deferido ninguém volta a ele. Se o
+gatilho disparar, o nome passa pelos cinco **antes** de virar código; entrar por
+inércia é como um nome reprovado chega a extensão de arquivo.
 
 ## O que o Laravel faz
 

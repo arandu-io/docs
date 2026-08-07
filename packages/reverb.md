@@ -1,7 +1,8 @@
 # Reverb
 
 **Veredito:** DEFERIDO
-**Nome Arandu:** uirapuru
+**Nome Arandu:** uirapuru — nome escolhido, repositório **deferido**: só existe
+quando o gatilho disparar (o SSE do HTMX não bastar)
 
 ## O que o Laravel faz
 
