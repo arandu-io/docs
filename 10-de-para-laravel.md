@@ -55,6 +55,44 @@ já sabe usar.
 | `artisan` | `aru` | — |
 | — | `app/Services/` e `app/Repositories/` | os 20% que o Laravel só recomendava |
 
+### Comando: o que o dev Laravel digita de memória
+
+O alvo do produto é quem **migra** uma aplicação Laravel existente. Numa migração
+não se gera o módulo inteiro: porta-se um controller, depois uma migration,
+depois um middleware. `php artisan make:controller` é memória muscular, e a
+tabela abaixo é o que ela encontra do outro lado.
+
+Enquanto uma linha desta tabela não tiver comando, ela é uma promessa em aberto.
+O `checklist.sh` verifica a tabela contra `aru help`.
+
+| `artisan` | `aru` | nota |
+|---|---|---|
+| `make:controller` | `make:controller` | `--resource` gera as sete ações, por `httpx.Resource` |
+| `make:model` | `make:model` | **o Model é struct de dados, não Active Record** — quem toca o banco é o Repository, e ele exige `security.Grant` (doc 01, REGRA 17). É a diferença que mais surpreende quem migra |
+| `make:migration` | `make:migration` | `--create=` e `--table=`, como no artisan |
+| `make:middleware` | `make:middleware` | — |
+| `make:request` | `make:request` | validação tipada; erro de campo é erro de compilação |
+| `make:seeder` | `make:seeder` | — |
+| `make:factory` | `make:factory` | — |
+| `make:policy` | `make:policy` | já existe. Nasce negando tudo, e é isso que faz o padrão ser seguro |
+| `make:job` | `make:job` | fila é a tabela `jobs` da própria aplicação |
+| `make:event` / `make:listener` | idem | o evento vai no outbox, na mesma transação da escrita (doc 27) |
+| `make:command` | `make:command` | — |
+| `make:mail` | — | o repositório `mail` está decidido e adiado (ADR 0016). Sem ele não há contra o que gerar |
+| `ui bootstrap --auth` | `make:auth` | as mesmas nove telas, HTMX + Alpine + Tailwind v4 no lugar do Bootstrap (ADR 0022) |
+| — | `make:module` | não tem equivalente: é o `make:model --all` com Policy, Service, Repository e as quatro telas de uma vez |
+| `route:list` | `route:list` | — |
+| `migrate`, `migrate:rollback`, `migrate:fresh`, `migrate:status` | iguais | — |
+| `db:seed` | `db:seed` | — |
+| `queue:work` | `queue:work` | — |
+| `schedule:run` | `schedule:run` | — |
+| `key:generate` | `key:generate` | — |
+| `serve` | `serve` | e `aru dev`, que recompila a view ao salvar |
+| `tinker` | **não entra** | REPL para linguagem dinâmica; `docs/06-escopo.md` veta |
+| `optimize`, `config:cache`, `view:clear` | **não entram** | cache de config e de view resolvem custo de boot do PHP. Aqui a config é struct e a view é Go compilado |
+| `storage:link` | **não entra** | o disco público é servido pelo binário, não por link simbólico |
+| — | `doctor` | não tem equivalente: é o que faz a arquitetura ser garantida pelo compilador |
+
 ### View: as diretivas são as do Blade
 
 O motor de template é o `kyse`, nosso. As diretivas mantêm o nome do Blade de
