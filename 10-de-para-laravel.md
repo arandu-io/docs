@@ -74,15 +74,20 @@ O `checklist.sh` verifica a tabela contra `aru help`.
 | `make:request` | `make:request` | validação tipada; erro de campo é erro de compilação |
 | `make:seeder` | `make:seeder` | — |
 | `make:factory` | `make:factory` | — |
+| `make:enum` | `make:enum` | `--values` é obrigatório: em Go o enum é exatamente o boilerplate, e um tipo sozinho não emite linha útil |
 | `make:policy` | `make:policy` | já existe. Nasce negando tudo, e é isso que faz o padrão ser seguro |
 | `make:job` | `make:job` | fila é a tabela `jobs` da própria aplicação |
-| `make:event` / `make:listener` | idem | o evento vai no outbox, na mesma transação da escrita (doc 27) |
+| `make:event` | `make:event` | o evento vai no outbox, na mesma transação da escrita (doc 27) |
+| `make:listener` | `make:listener` | — |
 | `make:command` | `make:command` | — |
 | `make:mail` | — | o repositório `mail` está decidido e adiado (ADR 0016). Sem ele não há contra o que gerar |
 | `ui bootstrap --auth` | `make:auth` | as mesmas nove telas, HTMX + Alpine + Tailwind v4 no lugar do Bootstrap (ADR 0022) |
 | — | `make:module` | não tem equivalente: é o `make:model --all` com Policy, Service, Repository e as quatro telas de uma vez |
 | `route:list` | `route:list` | — |
-| `migrate`, `migrate:rollback`, `migrate:fresh`, `migrate:status` | iguais | — |
+| `migrate` | `migrate` | — |
+| `migrate:rollback` | `migrate:rollback` | — |
+| `migrate:fresh` | `migrate:fresh` | — |
+| `migrate:status` | `migrate:status` | — |
 | `db:seed` | `db:seed` | — |
 | `queue:work` | `queue:work` | — |
 | `schedule:run` | `schedule:run` | — |
