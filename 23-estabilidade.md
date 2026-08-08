@@ -110,10 +110,30 @@ existe:
 |---|---|
 | golden files do gerador — saída idêntica byte a byte, salvo mudança declarada | **existe** — `aru/internal/gen/golden_test.go`, com os fixtures em `internal/gen/testdata` e `-update` para regravar |
 | `go build` da aplicação de exemplo da versão anterior contra a nova | **não existe** — a CI do `examples` constrói a versão corrente contra a corrente, nada mais |
-| `apidiff` entre tags, com o diff aparecendo na revisão do PR | **não existe** — `grep -rn apidiff` nos nove `ci.yml` não devolve nada |
+| `apidiff` entre tags, com o diff aparecendo na revisão do PR | **existe desde 08/08/2026** — passo `api diff against the last release` na CI do `framework`, pacote a pacote contra a última tag |
 
-*Corrigido em 07/08/2026:* esta seção afirmava as três como fatos da CI. Só a
-primeira é verdade. Dos nove `.github/workflows/ci.yml` do projeto, oito são de
+*Atualizado em 08/08/2026:* a segunda das três passou a existir, e a política
+deixou de ser declaração de intenção.
+
+O passo `api diff against the last release` compara a árvore de trabalho com a
+última tag, pacote a pacote, e imprime toda mudança incompatível no log do
+build. Ele **não proíbe quebrar** — em `v0.x` quebrar é permitido, e congelar
+uma forma sobre a qual ninguém construiu é pior. Ele proíbe quebrar **em
+silêncio**: mudança incompatível sem entrada no `UPGRADE.md` reprova, num diff
+que o revisor está olhando, em vez de no build de alguém três semanas depois.
+
+O `UPGRADE.md` do `framework` existe, e foi escrito **por medição**: `apidiff`
+entre a `v0.1.0` e a `v0.13.3`, sobre os quinze pacotes. O levantamento anterior
+falava em seis quebras publicadas; são mais, e estão lá, agrupadas por pacote —
+`data.Wrap`, `data.AppliedMigrations`, `Query.Filter`, os cinco verbos do
+`Router` e o `Route.Name`, o `middleware.Observe`, quatro campos do `Collector`
+e o `HandleDebugConsole`, `kernel.Routes`, `config.DatabaseURL` e o `auth.New`.
+
+Falta a terceira: o build da aplicação de exemplo da versão anterior contra a
+nova.
+
+*Corrigido em 07/08/2026:* esta seção afirmava as três como fatos da CI, e só a
+primeira era verdade. Dos nove `.github/workflows/ci.yml` do projeto, oito são de
 repositório Go e rodam `gofmt`, `go vet`, `go test -race` e `govulncheck`. O
 `go build` está só em três deles (`aru`, `arandu` e `examples`), e cada um
 carrega ainda a sua própria guarda: orçamento de dependência no `framework` e no

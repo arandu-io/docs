@@ -9,7 +9,17 @@ Tokens de API leves e autenticação de SPA por cookie, sem a complexidade de OA
 
 ## Decisão
 
-Vive no core, em `security/token.go`.
+Vive no core, em `security/token.go` — **decidido, e não construído.**
+
+*Corrigido em 08/08/2026:* esta linha estava no presente, como se o arquivo
+existisse. Não existe: `framework/security/` tem `csrf.go`, `password.go`,
+`policy.go` e `session.go`, e `find` por `*token*` no projeto inteiro não devolve
+nada. O único caminho autenticado hoje é o cookie de sessão.
+
+Foi assim que este pacote atravessou duas fases: veredito CORE, gatilho "não se
+aplica" — que é a forma de dizer "é para construir" — e zero linhas. Um veredito
+de construir sem código é uma promessa, e o placar de `00-indice.md` a contava
+como entregue.
 
 ## Por quê
 
@@ -26,7 +36,16 @@ Tecnicamente, token de API é uma variação de sessão: emitir, assinar, verifi
 
 ## Gatilho para construir
 
-Não se aplica.
+Não se aplica: a decisão é construir, e o que falta é a ordem em que isso entra.
+
+**O gatilho verdadeiro é o `aru new --api`**, que também não existe e é anunciado
+no `docs/14`. Os dois são a mesma entrega vista de dois lados: um esqueleto sem
+`resources/views/` não tem sessão por cookie para oferecer, e um token sem
+esqueleto de API é um mecanismo sem quem o use.
+
+Enquanto nenhum dos dois existir, o registro diz isso — e é decisão do
+proprietário construir os dois ou rebaixar ambos para DEFERIDO com gatilho
+escrito.
 
 ## Alternativa enquanto não existe
 

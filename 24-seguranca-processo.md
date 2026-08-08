@@ -24,28 +24,23 @@ O `SECURITY.md` existe nos dez repositórios: `framework`, `aru`, `arandu`,
 Issue pública sobre vulnerabilidade é fechada e movida para advisory privado,
 com agradecimento — não com bronca.
 
-### O `security@arandu.dev` não recebe mensagem
+### O canal é o GitHub Security Advisory, e só ele
 
-*Corrigido em 07/08/2026:* este documento anunciava o endereço dedicado como
-canal primário e o GitHub Security Advisory como alternativo. É o contrário do
-que funciona hoje, e o endereço não funciona de forma alguma: **o domínio
-`arandu.dev` não tem registro MX.** `dig MX arandu.dev` devolve zero respostas —
-só o SOA do registrador (`verify-contact-details.namecheap.com`). Mail enviado
-para `security@arandu.dev` não chega a lugar nenhum, e os dez `SECURITY.md`
-publicam esse endereço.
+*Resolvido em 08/08/2026.* O endereço saiu dos onze `SECURITY.md`.
 
-Um canal de vulnerabilidade que engole a mensagem é pior que canal ausente:
-quem reporta acredita ter reportado e o embargo começa a correr sozinho.
+Este documento anunciava `security@arandu.dev` como canal primário e o advisory
+como alternativo. Era o contrário do que funciona: **o domínio não tem registro
+MX** — `dig MX arandu.dev` devolve zero respostas —, então mail enviado para lá
+não chegava a lugar nenhum.
 
-A decisão é do proprietário, e são duas saídas: apontar MX para uma caixa que
-alguém leia, ou remover o endereço dos dez `SECURITY.md` e deixar o GitHub
-Security Advisory como canal único. Até que uma das duas aconteça, o canal real
-é o advisory.
+Canal de vulnerabilidade que engole a mensagem é pior que canal ausente: quem
+reporta acredita ter reportado, e o embargo começa a correr sozinho.
 
-*Corrigido em 07/08/2026:* a linha "chave PGP publicada, opcional para quem
-quiser usar" foi removida. **Não existe chave PGP.** Não há `.asc`, `.gpg` nem
-impressão digital em repositório nenhum, e nenhum `SECURITY.md` menciona PGP —
-a única ocorrência da palavra no projeto inteiro era esta linha.
+Das duas saídas que estavam abertas — apontar MX, ou deixar o advisory como
+canal único —, foi tomada a segunda, porque ela fecha o furo hoje e não depende
+de a verificação de contato do registrador terminar. Se um dia o domínio tiver
+caixa lida por alguém, acrescentá-lo de volta é uma linha; anunciá-lo antes
+disso é o que não pode acontecer de novo.
 
 ## Prazos, escritos
 

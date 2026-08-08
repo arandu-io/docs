@@ -46,10 +46,17 @@ inteira.
   funcionar porque a varredura automática a pegou.
 - O fallback do framework passa a ser só a camada base. Ele é servido a um
   projeto que apagou a própria folha de estilo, e essas páginas ficam sem
-  utilitário. É coerente — o framework não tem view desde a ADR 0021 — mas
-  contradiz o comentário do `viewbuild.go` que promete "as views ainda renderizam
-  estilizadas". **Fica aberto:** ou o comentário muda, ou o fallback deixa de
-  existir. Não foi decidido aqui.
+  utilitário. É coerente: o framework não tem view desde a ADR 0021, logo não tem
+  fonte para declarar, e folha que não declara fonte não emite utilitário.
+
+  *Fechado em 08/08/2026.* Estava aberto entre mudar o comentário do
+  `viewbuild.go` — que prometia "as views ainda renderizam estilizadas" — ou
+  tirar o fallback. Ficou o primeiro: apagar o fallback custaria uma página de
+  erro sem reset nenhum, e o comentário estava errado de qualquer forma, porque
+  descrevia o fallback de antes desta ADR, quando ele carregava utilitário por
+  acidente da varredura automática. O comentário agora diz o que acontece — quem
+  apaga a própria folha recebe a camada base e nada mais, que é o resultado
+  honesto de apagar a própria folha.
 
 ## Como isso não volta
 
