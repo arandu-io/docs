@@ -105,7 +105,7 @@ Verificado:
 | npm | livre |
 | PyPI | **ocupado** (pacote de memória para agentes de IA) |
 | crates.io | livre |
-| arandu.io | **ocupado** (monitor de tendências, BR) |
+| arandu.io | **nosso** desde 08/08/2026 — ver nota abaixo |
 | arandu.app | **ocupado** (visualizador de Markdown, CLI `arandu`) |
 | arandu.studio | **ocupado** (estúdio de UX/UI) |
 | GitHub `@Arandu` | **ocupado** |
