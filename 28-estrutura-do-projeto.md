@@ -94,7 +94,7 @@ já foi criada por engano ao menos uma vez.
 | `bootstrap/providers.go` | não existe. `bootstrap/` tem **um** arquivo, `app.go`. No Laravel 11 o `providers.php` é uma lista de classes que o container instancia; sem container (ADR 0001) a lista é a própria fiação, e ela já está no `app.go` |
 | `app/Console/Commands/` | não existe. Comando é uma função registrada em `routes/console.go`, no mesmo desenho de `routes/web.go` |
 | `app/Rules/` | não existe, e **não há o que colocar nele**: `framework/validation` não expõe contrato de regra — sem interface `Rule`, sem registro, sem tag. Uma regra de domínio é uma função chamada dentro do `Validate() Errors` do request. Ver a seção sobre `app/Rules/` no de-para do `app/` |
-| `resources/views/welcome.kyse.go` | não sai do `aru new`. Aparece com `aru make:auth`, junto com `auth/` e o `HomeController` (ADR 0012) |
+| `resources/views/welcome.kyse.go` | não sai do `aru new`. Aparece com `go run github.com/arandu-io/ui@latest auth`, junto com `auth/` e o `HomeController` (ADR 0026) |
 
 E a raiz tem **14 arquivos `.go`**, não um: `main.go`, `migrate.go`,
 `background.go` e onze `_test.go`. O `main.go` é o ponto de entrada; os outros
@@ -119,10 +119,60 @@ duas vezes. Vale o mesmo para o `outbox` (`events`) e para `jobs` (`queue`).
 |---|---|---|
 | `public/index.php` | `main.go` na raiz | em Go o binário **é** o servidor; não há front controller nem document root |
 | `bootstrap/cache/packages.php` `services.php` | **somem** | cache de descoberta existe porque o PHP redescobre a cada request. Compilamos uma vez |
-| `tests/Feature/ExampleTest.php` | `*_test.go` ao lado do código | o Go só executa arquivo terminado em `_test.go`, no pacote do código testado. Única convenção que não dobra |
+| `tests/Feature/ExampleTest.php` | `*_test.go` ao lado do código | única convenção que não dobra — ver abaixo por quê, e o que exatamente quebra |
 | `resources/views/home.blade.php` | `resources/views/home.kyse.go` | o fonte é `.kyse.go`, protegido por `//go:build kyse`; o compilador ignora, o `kyse` lê. O **gerado** vai para a raiz de `resources/views/` — ver abaixo |
 
 Somem também `vendor/`, `.htaccess`, `package.json` e `vite.config.js`.
+
+### Por que não existe `tests/`
+
+*Escrito em 07/08/2026, e a linha da tabela acima dizia menos do que devia — e
+uma parte errada: "o Go só executa arquivo terminado em `_test.go`, no pacote do
+código testado". A primeira metade é verdade; a segunda não.*
+
+**O Go acha, sim, um teste dentro de `tests/`.** `go test ./...` roda um
+`tests/conta_test.go` normalmente — medido. Não é proibição.
+
+O que quebra são duas coisas, e as duas importam:
+
+**1. A cobertura vai para o pacote errado.** Com o teste em `tests/`:
+
+```
+probe            coverage: 0.0% of statements
+probe/tests   ok coverage: [no statements]
+```
+
+O pacote que está sendo testado reporta **zero**, e o pacote de teste reporta
+que não tem código. Nenhum dos dois números descreve a realidade, e é a partir
+deles que se decide o que falta testar.
+
+Com o mesmo teste ao lado do código: `ok probe — coverage: 100.0% of statements`.
+
+**2. O teste só alcança o que é exportado.** De `tests/`, `probe.naoExportado()`
+é `undefined: probe.naoExportado` — erro de compilação. Metade do que se testa
+neste projeto é comportamento não exportado: a regra do doctor, o gerador do
+kyse, o helper que decide escopo.
+
+### E o Go já tem a distinção que a pasta `tests/` costuma querer dizer
+
+Uma pasta `tests/` normalmente separa "teste de unidade" de "teste que só usa a
+API pública". O Go expressa isso **sem pasta**, com dois pacotes no mesmo
+diretório:
+
+| arquivo | pacote | enxerga |
+|---|---|---|
+| `conta_test.go` | `package probe` | tudo, inclusive o não exportado |
+| `conta_ext_test.go` | `package probe_test` | só a API pública, como um cliente |
+
+O `probe_test` é o único nome de pacote que o Go deixa conviver com outro no
+mesmo diretório, e existe exatamente para isso. Este projeto usa os dois: **50
+arquivos** em `package X_test` e **25** em `package X`, e a escolha entre eles é
+a pergunta "isto é o contrato ou é a implementação?".
+
+É por isso que a linha da tabela diz *"única convenção que não dobra"*: não é
+teimosia com o Laravel, é que a ferramenta atribui cobertura por diretório e a
+visibilidade por pacote. Uma pasta `tests/` custa as duas coisas para ganhar uma
+árvore mais parecida.
 
 A extensão dupla é o que faz o fonte conviver com o Go sem tooling paralelo:
 `.kyse.go` termina em `.go`, então `go build`, `go vet`, `go test` e `go run`
