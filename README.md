@@ -7,16 +7,17 @@
 <a href="LICENSE.md"><img src="https://img.shields.io/github/license/arandu-io/docs" alt="License"></a>
 </p>
 
+
 ## About this record
 
 Not a usage guide — that is the next phase, and it will be an Arandu
 application. This is the record: twenty-nine numbered documents and the
-architecture decision records.
+architecture decision records behind them.
 
 An ADR is ten lines and captures the *why*, which is the part that cannot be
-reconstructed from the code afterwards. They are written when a decision closes
-a door: no dependency injection container, no facades, no Active Record, no
-Node in the build, no second way to reach the database.
+reconstructed from the code afterwards. One is written whenever a decision
+closes a door: no dependency injection container, no runtime reflection, no
+Active Record, no Node in the build, no second way to reach the database.
 
 Written in Brazilian Portuguese, unlike everything else in the project. The code
 is in English because the product is global and pkg.go.dev publishes the doc
@@ -29,7 +30,7 @@ The API reference is generated from the doc comments and lives on
 symbol carries one, and that is deliberate: it is the documentation that cannot
 drift from the code, because it sits in the same file.
 
-The CLI documents itself — `aru help` lists every command, and each one explains
+The CLI documents itself. `aru help` lists every command, and each one explains
 what it writes and what to do with it. `aru doctor` explains what it found and
 what breaks, not which rule was violated.
 
