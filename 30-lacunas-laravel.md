@@ -42,21 +42,26 @@ Para a lista abaixo ser lida como o que falta, e não como o que existe:
 
 ## 2. Falta, e é bloqueante para um SaaS
 
-### 2.1 Mail
+### 2.1 Mail — **FEITO**
 
 **Laravel:** `Mail::to()->send(new OrderShipped($order))`, Mailables, markdown
 mail, `MAIL_MAILER`, filas por padrão.
 
-**Aqui:** `app/Mail/` existe e está vazio. `aru make:mail` não existe. O reset de
-senha do `examples` **imprime o link no log** porque não há para onde mandá-lo.
+**Aqui:** `framework/mail` tem `Mailable`, `Envelope`, `Content`, `Mailer` e
+cinco transportes — smtp, log, array, **resend** e **sendgrid**. Os dois
+provedores ficam no core e não em submódulo, porque nenhum dos dois arrasta SDK:
+são um POST com corpo JSON sobre `net/http` (ADR 0031). Amazon SES continua fora,
+e é o único que precisaria de assinatura de requisição.
 
-**Falta:** um pacote `mail` no core com uma interface `Mailer`, um Mailable
-tipado, render pelo kyse, e envio pela fila por padrão. Os drivers pesados vão
-para submódulo com `go.mod` próprio (`mail/ses`, `mail/smtp`), porque em Go não
-existe dependência opcional (REGRA 11).
+`Content` tem `View` e `TextView`, ambas por nome de view. Só tinha `Text string`,
+literal Go, e por causa disso a view de texto que o projeto gerava **não tinha
+como ser enviada**: toda mensagem saía só em HTML.
 
-É a lacuna mais cara: sem ela não há convite, recuperação de senha, recibo nem
-verificação de e-mail — e três telas do kit já publicado dependem dela.
+`ErrRetryable` separa 429 e 5xx de endereço recusado — sem isso um rate limit
+engole o link de verificação em silêncio.
+
+**Ainda falta:** `aru make:mail`, e envio pela fila como caminho de uma linha
+(hoje é um job que chama `Send`, o que é o desenho certo, mas não tem gerador).
 
 ### 2.2 Cache
 
@@ -79,16 +84,26 @@ REGRA 11 proíbe depender (`RedisJSON`, Lua avançado).
 genérico: o Laravel precisa dele porque a notificação é polimórfica em runtime;
 aqui um `Notifier` tipado por canal resolve sem inventar despacho dinâmico.
 
-### 2.4 Verificação de e-mail e registro
+### 2.4 Verificação de e-mail e registro — **FEITO no `examples`**
 
 **Laravel:** `MustVerifyEmail`, `Auth::routes()`.
 
-**Aqui:** o kit publica as telas de registro e verificação — **e não os
-handlers**, por decisão (ADR 0022). O `examples` também não os tem.
+**Aqui:** o `framework/auth` ganhou `Register`, `MarkVerified`, `EnsureUser`,
+`Lookup` e `Names`; `User` ganhou `Name` e `VerifiedAt`; `Subject` ganhou
+`Verified`. O `examples` escreveu os handlers como referência
+(`RegisterController.go`) e as duas telas publicadas passaram a ter rota.
 
-**Falta:** ou o `auth` do framework passa a oferecer `Register` e
-`VerifyEmail`, ou o `examples` os escreve como referência. Hoje seis das nove
-telas do kit não têm rota.
+O link é **assinado e não armazenado** (`security.Signer`), com propósito dentro
+da assinatura, e não abre sessão. Confirmar o endereço compra uma coisa só, e é
+o ponto: `CommentPolicy` recusa `CommentCreate` sem ela. ADR 0032.
+
+Auto-registro passa pela policy: convidado declarado (ADR 0029) sobre
+`ActionUserCreate`, e a policy decide olhando o **candidato** — sem papel, ou não.
+
+**Ainda falta:** portar isso para o `arandu-io/ui`. O starter kit continua
+publicando `register.kyse.go` e `verify.kyse.go` **sem** handler, e a instrução
+que ele imprime ainda mostra a assinatura de quatro argumentos do
+`authui.New` — que é a dele e está coerente, mas é a versão sem registro.
 
 ---
 
@@ -220,9 +235,9 @@ Repetido aqui para a lista acima não ser lida como incompleta:
 
 Por dependência, não por tamanho:
 
-1. **Mail** (2.1) — destrava três telas já publicadas e o `make:mail`
+1. ~~**Mail** (2.1)~~ — feito. Sobra o `make:mail`
 2. **`arandutest`** (5.3) — todo o resto fica mais barato de provar
-3. **Registro e verificação** (2.4) — fecha o kit de autenticação
+3. ~~**Registro e verificação** (2.4)~~ — feito no `examples`; falta o `ui`
 4. **Upload** (3.3) e **paginação** (3.2) — todo CRUD real precisa dos dois
 5. **Cache** (2.2) e **`queue:failed`** (4) — operação
 6. **Realce do kyse** (5.2) — a primeira impressão de quem abre o editor
