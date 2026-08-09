@@ -44,7 +44,7 @@ O comando escreve cinco coisas:
 |---|---|
 | `assets/fonts/*.woff2` | os bytes, commitados |
 | `assets/fonts/OFL-*.txt` | a licença, ao lado do que ela cobre |
-| `assets/fonts.go` | `go:embed` + `view.RegisterFont`, gerado |
+| `assets/fonts.go` | `go:embed` + `fonts.Register`, gerado |
 | `resources/css/fonts.css` | `@font-face`, fallback métrico, `--font-display` |
 | `arandu.toml` `[fonts.*]` | família, peso, subset, licença, métricas |
 
@@ -91,10 +91,21 @@ já são por escrito, que é o corte que importa.
   paint. Só o display é vendorizado — é onde a identidade mora, e são poucas
   palavras por página.
 - O `examples` custa **18 KB** e desenha igual em todo sistema operacional.
-- `view.FontPreloads()` emite o `<link rel=preload>` de cada face registrada,
+- **A camada de fonte mora no `kyse`, não no framework.** Quais formatos
+  entram, quanto um `.woff2` custa contra um `.ttf` e o que um
+  `<link rel=preload>` precisa dizer são decisões tipográficas — são da pilha
+  que desenha a página. O framework ficou com `view.RegisterAsset`, que é nome,
+  content type e bytes, sem opinião sobre o que carrega.
+- `kyse/fonts.Preloads()` emite o `<link rel=preload>` de cada face registrada,
   com `crossorigin` — sem ele o preload é uma **segunda** requisição em vez de
   cache quente, que é a forma mais comum de um preload deixar a página mais
   lenta.
+- `aru font:search` e `aru font:info` tornam o catálogo navegável: 1942 famílias,
+  e um comando que só aceita o nome exato é um comando que exige um navegador
+  aberto do lado.
+- `aru font:add --file` aceita face própria — `.woff2`, `.ttf` ou `.otf` — com a
+  mesma fiação. `--family` é obrigatório, porque nome de arquivo não é nome de
+  família.
 - `font-src 'self'` foi escrito na CSP. O `default-src` já cobria; explicitar faz
   a linha dizer o que vale, para quem for perguntar se uma URL do Google
   funcionaria.
