@@ -119,7 +119,7 @@ linguagem.
 
 | Componente | Por quê |
 |---|---|
-| **Container** | reflection em runtime; substituído por fiação gerada e legível |
+| **Container** | reflection em runtime; substituído por fiação escrita à mão em `bootstrap/app.go` — ver a linha do Container acima, na mesma tabela, que sempre esteve certa |
 | **Contracts** | Go põe interface no consumidor, não num pacote central de contratos |
 | **Macroable** | adicionar método a uma classe em runtime. Impossível e indesejável |
 | **Conditionable** | `->when()` existe porque encadeamento fluente não aceita `if` |

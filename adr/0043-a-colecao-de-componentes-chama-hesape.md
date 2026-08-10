@@ -1,7 +1,8 @@
 # ADR 0043 — A coleção de componentes se chama `hesape`
 
-**Status:** Aceita quanto ao nome. **Recorte e endereço pendentes** da auditoria
-contra os 38 componentes do Illuminate. Data: 10/08/2026.
+**Status:** Aceita quanto ao nome; filtro 4 fechado. **Endereço pendente** — ver
+`docs/31-reorganizacao-hesape.md`, seção 2, que pesa as três formas com o custo
+medido de cada uma. Data: 10/08/2026.
 
 ## Contexto
 
@@ -52,6 +53,10 @@ proprietário com três filtros em aberto**:
   tupi antigo"* já está no `checklist.sh`. Esta é a mesma checagem.
 - **Filtro 3 — leitura em inglês.** `hesape` lido por um falante de inglês soa
   como *"he's ape"*. O produto é global e em inglês (REGRA 6, doc 04).
+
+**Filtro 4 — etimologia atestada: FECHADO.** O proprietário confirmou em
+10/08/2026: `hesape` é iluminação em guarani. É a tradução direta de
+`Illuminate`, que é o que o nome precisa ser.
 
 **Filtro 5:** `hesape.com` está ocupado; `.dev` e `.io` livres.
 

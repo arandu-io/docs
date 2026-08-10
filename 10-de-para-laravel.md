@@ -15,7 +15,7 @@ exatamente o que o HTMX faz — trocando props em JSON por fragmento de HTML.
 Laravel + Inertia            Arandu
 ─────────────────────        ─────────────────────
 routes/web.php           →   routes/web.go
-Route::get(...)          →   r.Get(...)
+Route::get(...)          →   r.Action("GET", ...)
 Controller               →   Controller em app/Http/Controllers
 Inertia::render(         →   ctx.View(
   'Clientes/Index',            "clientes.index",
@@ -56,13 +56,13 @@ já sabe usar.
 | `app/Policies/` | `app/Policies/`, `Policy[T]` + `Grant` | **aqui é obrigatório, não opcional** |
 | `app/Providers/` | `app/Providers/` | sem container: o provider registra a fiação explícita |
 | `routes/web.php` | `routes/web.go` | **igual** — central, uma só, não por módulo |
-| `Route::get('/x', ...)` | `r.Get("/x", ...)` | mesma leitura, em Go |
+| `Route::get('/x', [C::class,'index'])` | `r.Action("GET", "/x", d.C.Index)` | **`r.Get` existe e não serve**: ele toma `http.HandlerFunc`; action de controller é `func(*Context) error` e registra por `Action` |
 | `routes/console.php` | `routes/console.go` | igual |
 | `config/*.php` (dez arquivos) | `config/*.go` (os mesmos dez) | struct tipada; erro de chave vira erro de compilação |
-| `database/migrations/` | `database/migrations/` | igual; `aru migrate` é passo de pipeline, nunca boot |
+| `database/migrations/` | `database/migrations/` | `aru migrate` é passo de pipeline, nunca boot. **E o arquivo não é descoberto**: toda migration entra à mão em `All()`, e esquecer não falha em lugar nenhum — o schema simplesmente não muda |
 | `database/seeders/` | `database/seeders/` | igual |
-| `database/factories/` | `database/factories/` | igual |
-| Event / Listener | `app/Events/` / `app/Listeners/` | — |
+| `database/factories/` | `database/factories/` | mesmo lugar, outro contrato: **não há `->create()`** (a factory não toca o banco), não há faker (os valores são contadores), `->count()` é `MakeMany` e não há `->state()` |
+| Event / Listener | `app/Events/` / `app/Listeners/` | **muda tudo**: não existe dispatcher em processo. O evento é linha no outbox dentro da transação, entregue pelo relay cerca de um segundo depois |
 | Job / Queue | `app/Jobs/` | a fila padrão é a tabela `jobs` da própria aplicação; RESP no submódulo, NATS só com demanda |
 | `artisan` | `aru` | — |
 | — | `app/Services/` e `app/Repositories/` | os 20% que o Laravel só recomendava |
@@ -81,7 +81,7 @@ O `checklist.sh` verifica a tabela contra `aru help`.
 |---|---|---|
 | `make:controller` | `make:controller` | `--resource` gera as sete ações, por `httpx.Resource` |
 | `make:model` | `make:model` | **o Model é struct de dados, não Active Record** — quem toca o banco é o Repository, e ele exige `security.Grant` (doc 01, REGRA 17). É a diferença que mais surpreende quem migra |
-| `make:migration` | `make:migration` | `--create=` e `--table=`, como no artisan |
+| `make:migration` | `make:migration` | `--create=` e `--table=` como no artisan, mas **`--fields` é obrigatório** — `aru make:migration add_status --table=posts` sozinho é erro |
 | `make:middleware` | `make:middleware` | — |
 | `make:request` | `make:request` | validação tipada; erro de campo é erro de compilação |
 | `make:seeder` | `make:seeder` | — |
@@ -92,7 +92,7 @@ O `checklist.sh` verifica a tabela contra `aru help`.
 | `make:event` | `make:event` | o evento vai no outbox, na mesma transação da escrita (doc 27) |
 | `make:listener` | `make:listener` | — |
 | `make:command` | `make:command` | — |
-| `make:mail` | — | o repositório `mail` está decidido e adiado (ADR 0016). Sem ele não há contra o que gerar |
+| `make:mail` | `make:mail` | existe desde que o `framework/mail` entrou no core. Escreve o mailable e as duas partes da mensagem. Esta linha dizia que não existia |
 | `composer require laravel/ui --dev` | — | `go run <módulo>@latest` roda um módulo publicado sem tocar no `go.mod` |
 | `ui bootstrap --auth` | `go run github.com/arandu-io/ui@latest auth` | as mesmas nove telas, HTMX + Alpine + Tailwind v4 no lugar do Bootstrap (ADR 0022). Sem preset: há uma pilha só |
 | `composer remove laravel/ui` | — | não há o que remover |
@@ -102,13 +102,14 @@ O `checklist.sh` verifica a tabela contra `aru help`.
 | `migrate:rollback` | `migrate:rollback` | — |
 | `migrate:fresh` | `migrate:fresh` | — |
 | `migrate:status` | `migrate:status` | — |
-| `db:seed` | `db:seed` | — |
-| `queue:work` | `queue:work` | — |
-| `schedule:run` | `schedule:run` | — |
-| `key:generate` | `key:generate` | — |
+| `db:seed` | `db:seed` | o nome é **posicional**: `--class=` é recusado com erro, e é justamente o que a mão digita sozinha |
+| `queue:work` | `queue:work` | mesmo nome, dois flags contra dezesseis: só `--queue` (uma fila, não lista) e `--workers` |
+| `schedule:run` | `schedule:run` | **outro comando com o mesmo nome**: exige um id e roda **uma** tarefa. O laço de agendamento vive dentro do `aru serve` |
+| `key:generate` | `key:generate` | a chave faz outro trabalho: aqui ela é **só** chave de HMAC (sessão, CSRF, links assinados). Não cifra nada — não existe `Crypt` |
 | `serve` | `serve` | e `aru dev`, que recompila a view ao salvar |
 | `tinker` | **não entra** | REPL para linguagem dinâmica; `docs/06-escopo.md` veta |
-| `optimize`, `config:cache`, `view:clear` | **não entram** | cache de config e de view resolvem custo de boot do PHP. Aqui a config é struct e a view é Go compilado |
+| `optimize`, `config:cache` | **não entram** | resolvem custo de boot do PHP. Aqui a config é struct |
+| `view:clear` | **falta** | existe sim um diretório de view compilada que envelhece, em `storage/framework/views/`, no mesmo lugar do Laravel. Apagá-lo é o remédio de folclore que o `aru view:build` já deveria tornar desnecessário |
 | `storage:link` | **não entra** | o disco público é servido pelo binário, não por link simbólico |
 | — | `doctor` | não tem equivalente: é o que faz a arquitetura ser garantida pelo compilador |
 
@@ -119,7 +120,7 @@ propósito — não há vocabulário novo a aprender aqui.
 
 | Laravel | Arandu | Muda algo? |
 |---|---|---|
-| `resources/views/home.blade.php` | `resources/views/home.kyse.go` | o gerado é `home.go`, em `resources/views/`; view aninhada achata o nome — `auth/login.kyse.go` gera `auth_login.go` |
+| `resources/views/home.blade.php` | `resources/views/home.kyse.go` | o gerado é `storage/framework/views/home.go` — **sob `storage/`, não ao lado**, e a árvore é espelhada: `auth/login.kyse.go` gera `auth/login.go`, sem achatar |
 | `@extends('layouts.app')` | `@extends('layouts.app')` | idêntico |
 | `@section` / `@endsection` | `@section` / `@endsection` | idêntico |
 | `@yield('content')` | `@yield('content')` | idêntico |
@@ -129,13 +130,13 @@ propósito — não há vocabulário novo a aprender aqui.
 | `@forelse` / `@empty` / `@endforelse` | iguais | idêntico |
 | `@for` / `@endfor` | `@for(i := 0; i < n; i++)` | as três cláusulas em Go |
 | `@while` / `@endwhile` | iguais | Go tem um laço só, e é `for` |
-| `@continue` / `@break` | iguais | idêntico |
+| `@continue` / `@break` | iguais | **sem condição**: o Blade aceita `@break($i > 3)`, aqui só a forma nua. A diferença é silenciosa |
 | `@csrf` | `@csrf` | idêntico |
 | `{{ $var }}` | `{{ .Var }}` | escapado nos dois; o **ponto** é o que faz virar campo do dado |
 | `{!! $html !!}` | `{!! .Html !!}` | cru nos dois; mesma regra do ponto |
 | `{{-- comentário --}}` | `{{-- comentário --}}` | não chega ao navegador, nos dois |
 | `@php` / `@endphp` | `@go` / `@endgo` | só troca o nome da linguagem hospedeira |
-| `storage/framework/views/` (cache) | **não existe** | o gerado é `.go` versionável, não cache descartável |
+| `storage/framework/views/` | **é exatamente onde o gerado fica** | mesmo endereço do Laravel e mesmo motivo: é saída de build, gitignorada. O que difere é que o nosso é Go legível com a árvore espelhada, não um hash |
 
 A tabela acima é o conjunto **inteiro** de diretivas: sete de bloco (`section`,
 `if`, `foreach`, `forelse`, `for`, `while`, `go`, cada uma com seu `end`) e nove
