@@ -35,14 +35,27 @@ respondia com um pacote que ninguém escreveu e não dá para obter.
 
 ## Decisão
 
-**O sinal de recarregar é a identidade de quem responde a conexão, não uma
-mensagem.**
+> **Emenda de 10/08/2026 — era um `EventSource`, e segurar a conexão era o
+> defeito.** O HTTP/1.1 dá seis conexões por origem, e um stream aberto gasta
+> uma. Ao navegar, o navegador abandona o stream da página que está deixando
+> **sem fechá-lo**, e o servidor só percebe quando a próxima escrita falha — até
+> o keepalive depois. Seis cliques rápidos deixavam seis streams mortos
+> ocupando todas as vagas, e o sétimo não fazia nada. Relatado como "navego,
+> volto, navego, e trava". O mesmo defeito fazia o `Shutdown` esperar o timeout
+> inteiro a cada restart do `aru dev`.
+>
+> A página agora **pergunta** em vez de ouvir: uma requisição de 17 bytes por
+> segundo, que não pergunta enquanto a aba está escondida e pergunta na hora em
+> que você volta a ela. Custa uma conexão por milissegundo e não acumula. Saíram
+> junto o ticker de keepalive, o flush, o tipo de conteúdo de stream e o canal
+> de desligamento — o desenho certo tinha menos peças que o errado.
 
-Todo processo sorteia um `bootID` ao subir. O navegador ouve
-`/_arandu/reload` por `EventSource`, que reconecta sozinho. Identidade diferente
-da que a página carregou significa outro processo respondendo, e a página
-recarrega. Rede que caiu e voltou no mesmo processo devolve a mesma identidade e
-não recarrega nada.
+**O sinal de recarregar é a identidade de quem responde, não uma mensagem.**
+
+Todo processo sorteia um `bootID` ao subir. A página pergunta a `/_arandu/reload`
+quem está respondendo; identidade diferente da que ela carregou significa outro
+processo, e a página recarrega. Servidor reiniciando devolve erro, que é ignorado
+— a próxima pergunta chega em um segundo.
 
 Assim o mecanismo é consequência de como o `aru dev` já funciona, e não um
 protocolo entre dois programas — uma coisa para manter em pé, não duas.
