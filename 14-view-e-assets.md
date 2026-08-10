@@ -245,8 +245,18 @@ verifica o SHA-256 contra o `sha256sums.txt` da release e cacheia em
 `~/.arandu/bin`. Binário único não é npm: não há `package.json`, não há
 `node_modules`, não há lockfile de JavaScript.
 
-`resources/css/app.css` é a entrada, e `assets/app.css` a saída compilada, que
-entra no binário por `go:embed`.
+`resources/css/app.css` é a folha do projeto, e `assets/app.css` a saída
+compilada, que entra no binário por `go:embed`. **A entrada entregue ao Tailwind
+não é o arquivo: é montada pelo `aru` e passada por stdin** — o `@import`
+absoluto do `app.css` do projeto mais um `@source` apontando para o diretório do
+`kyse`, que é módulo importado (ADR 0027) e por isso mora fora da árvore que o
+projeto sabe declarar. Sem essa linha, nenhuma classe que só os componentes
+desenham chega à página, e nada falha. Ver ADR 0037.
+
+O diretório vem do `go list -m`, com o `vendor/` do projeto quando ele existe.
+Quando o módulo é exigido e o fonte não está na máquina, o comando **para e
+diz** — folha de estilo sem as classes dos componentes é defeito que só aparece
+na tela.
 
 O que o `laravel/ui` empresta é a **estrutura**, não o CSS: as nove views de
 `resources/views/`, com a mesma função e nos mesmos caminhos, escritas em

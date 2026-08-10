@@ -88,8 +88,12 @@ usuário a partir de formulário.
   `verified_at`, ambas anuláveis (REGRA 16).
 - `security.Signer` é geral. O próximo link em e-mail — descadastro, convite —
   usa o mesmo, com outro propósito.
-- O `PasswordController` continua com o mapa em memória. Migrar aquele fluxo é
-  outra mudança, e o comentário dele já diz o que custa.
+- ~~O `PasswordController` continua com o mapa em memória. Migrar aquele fluxo é
+  outra mudança, e o comentário dele já diz o que custa.~~ **Feito em
+  10/08/2026, ADR 0042.** O mapa era a origem de oito defeitos, e o desenho que
+  fechou cinco deles de uma vez é o desta ADR aplicado ao reset: token assinado,
+  guardado em lugar nenhum, com uma impressão digital do hash da senha no payload
+  para ser de uso único sem tabela.
 - Teste de feature segue o link **que a aplicação mandou**, lido do transporte
   array. Foi ele que achou o kyse engolindo linha em branco: a URL saía colada
   na frase seguinte, e todo cliente que autolinka produzia token com três

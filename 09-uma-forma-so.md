@@ -60,18 +60,28 @@ primeiro tutorial popular usa.
 
 ## O gerado mora em um lugar só
 
-A regra também decidiu onde o `kyse` escreve. `resources/views/home.kyse.go` é o
-que se escreve; `resources/views/home.go` é o que o gerador emite — ao lado, no
-mesmo diretório e no mesmo pacote. **Não existe `storage/framework/views/`.**
+`resources/views/home.kyse.go` é o que se escreve; `storage/framework/views/home.go`
+é o que o `aru view:build` emite. Um artefato, um lugar.
 
-No Laravel o mesmo template tem duas moradas: o fonte em `resources/` e o
-compilado em `storage/framework/views/`, com nome derivado de hash. São duas
-respostas para "onde está o código que rodou", e a segunda ninguém lê porque não
-foi feita para ser lida.
+Esta seção dizia o contrário — que o gerado ficava **ao lado**, no mesmo
+diretório, e que `storage/framework/views/` **não existia**. Nunca foi assim no
+código: `aru/internal/kyse/kyse.go` escreve sob `storage/` desde que a árvore do
+Laravel entrou, o `.gitignore` de todo projeto ignora aquele diretório, e o
+comentário de doc exportado do `OutputPath` afirmava "beside its source" com um
+exemplo falso — publicado no `pkg.go.dev`. Corrigido em 10/08/2026.
 
-Manter as duas aqui seria uma segunda forma de responder à mesma pergunta. O
-gerado ao lado é código Go de verdade, checado pelo compilador, aberto no editor
-e diferenciável no git. Um artefato, um lugar.
+O motivo de ser sob `storage/` é o mesmo que fez o Laravel escolher aquele
+diretório: **o gerado é saída de build, e saída de build não se versiona**. Ao
+lado do fonte, cada `aru view:build` sujaria o `git status` com 28 arquivos que
+ninguém escreveu e que o revisor teria que ignorar em toda revisão. Sob
+`storage/`, uma linha de `.gitignore` resolve, e o diretório inteiro pode ser
+apagado sem perder nada.
+
+O que a regra proíbe continua valendo, e é o que o Laravel faz de fato errado
+ali: nome derivado de hash. O nosso gerado espelha a árvore do fonte
+(`auth/login.kyse.go` → `auth/login.go`), é Go de verdade, é checado pelo
+compilador, abre no editor e aparece num diff. A pergunta "onde está o código que
+rodou" tem uma resposta só, e ela é legível.
 
 ## A página de erro é o caso-teste
 

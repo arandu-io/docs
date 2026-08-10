@@ -85,10 +85,15 @@ existe, então o que varia é o verbo: `auth` hoje, e o que mais ganhar lugar.
 
 ## O que não muda
 
-Os treze arquivos, os caminhos, o conteúdo e as cinco substituições sem
-`--force` — o layout, `page.go`, `home`, `welcome` e o `HomeController`, que são
-uma unidade porque em kyse a página renderiza com o tipo do layout. As golden
-files vieram junto e não mudaram um byte.
+Os caminhos, o conteúdo e as cinco substituições sem `--force` — o layout,
+`page.go`, `home`, `welcome` e o `HomeController`, que são uma unidade porque em
+kyse a página renderiza com o tipo do layout. As golden files vieram junto e não
+mudaram um byte.
+
+Eram treze arquivos quando isto foi escrito. São vinte e dois: registro,
+verificação e recuperação de senha deixaram de ser 404 depois, e a contagem
+ficou para trás aqui e no `README` do `ui` até 10/08/2026. É a unidade das cinco
+substituições que esta seção fixa, não o número.
 
 ## Alternativa considerada
 

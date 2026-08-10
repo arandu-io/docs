@@ -207,7 +207,7 @@ sobre uma resposta HTML. Cada projeto reescreve.
 |---|---|
 | **Health check detalhado** | existe `/_arandu/health`; falta um por dependência |
 | **Graceful shutdown** | o kernel para; falta drenar a fila antes |
-| **Rate limit por rota** | existe global; falta `.Middleware(throttle("60,1"))` |
+| **Rate limit por rota** | existe global; falta `.Middleware(throttle("60,1"))`. A entrada tem o seu, por identidade, sob o `Authenticate` — ADR 0038 |
 | **Sessão em RESP** | o `kv` oferece; o esqueleto usa memória e diz que é errado com duas réplicas |
 | **`queue:failed`** | ver 4 |
 | **Métricas** | `observability` exporta OpenTelemetry; falta o exemplo de fiação |

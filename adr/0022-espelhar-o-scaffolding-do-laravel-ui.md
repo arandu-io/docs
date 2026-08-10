@@ -80,6 +80,34 @@ decidida havia semanas e não estava em discussão.
 para o roteamento, e isso precisa ficar escrito porque a diferença é visível na
 primeira execução.
 
+> **Emenda de 10/08/2026 — esta seção descrevia um estado que não existe mais.**
+> Ela terminava dizendo "construir os seis handlers é escopo novo; se e quando
+> for aberto, esta seção é o que muda". Foi aberto, e a seção não mudou — ficou
+> descrevendo seis telas 404 enquanto o kit já roteava cinco delas, e um
+> mapeamento contra o `laravel/ui` usou este texto como justificativa para
+> **não** construir a sexta. Descrição velha vira desculpa. O que segue é o
+> estado atual; o histórico está preservado abaixo, marcado.
+
+Hoje **toda tela publicada tem rota e handler**, que é o que a saída do comando
+sempre afirmou. Cadastro, verificação de endereço, recuperação e confirmação de
+senha vêm fiados. Os três motivos que a decisão original deu caíram um a um:
+
+- *"cadastro é regra de negócio"* — continua verdade, e é por isso que o
+  handler é **publicado** em vez de morar no framework: ele é do projeto no
+  instante em que é escrito, dentro de um bloco `custom` que sobrevive à
+  regeração. O que não serve é publicar a tela sem o handler.
+- *"recuperação de senha depende do mailer e do tenant"* — resolvido pelo
+  desenho da ADR 0032, estendido em 10/08/2026: o token é **assinado**, carrega o
+  tenant, e não existe tabela para o kit precisar decidir por ninguém.
+- *"herança por trait não existe em Go"* — continua verdade e continua sendo o
+  motivo de não haver seis controllers. São quatro, publicados, sem herança.
+
+O que a ADR original fixou e **não** mudou: a estrutura das nove telas espelha o
+`laravel/ui`, as classes são Tailwind, e as cinco substituições sem `--force` são
+uma unidade porque em kyse a página renderiza com o tipo do layout.
+
+<details><summary>O texto original, de quando seis telas respondiam 404</summary>
+
 Das nove views, três caminhos respondem: `/` (o esqueleto já registra, e o kit
 substitui o `HomeController` por trás), `GET /auth/login` e os dois POST que o
 módulo `authui` registra — `POST /auth/login` e `POST /auth/logout`. As outras
@@ -115,6 +143,8 @@ compila é pior que instrução nenhuma.
 
 Construir os seis handlers é escopo novo. Se e quando for aberto, esta seção é o
 que muda.
+
+</details>
 
 ## Consequências
 
