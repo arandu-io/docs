@@ -6,9 +6,9 @@ continua de pé, e o que esta ADR acrescenta é a resposta que faltava a ela.
 
 ## Contexto
 
-A ADR 0001 tem doze linhas e recusa o container de injeção de dependência. A ADR
-0002 tem cinco e recusa as facades. As duas estão certas e nenhuma das duas diz
-o que se escreve no lugar.
+A ADR 0001 recusa o container de injeção de dependência num parágrafo de três
+frases; a ADR 0002 recusa as facades em outro do mesmo tamanho. As duas estão
+certas e nenhuma das duas diz o que se escreve no lugar.
 
 Isso passou despercebido enquanto quem escrevia o framework era quem tinha
 tomado a decisão. Apareceu na auditoria contra o clone do Illuminate: o
@@ -17,18 +17,32 @@ componente virou decisão em vez de pacote, e o `doc.go` dele tinha oito linhas,
 das quais três apontavam para um documento de reorganização. Alguém vindo do
 Laravel que abrisse aquele arquivo procurando `singleton` saía dele sem resposta.
 
-O `Illuminate\Container` tem 64 métodos públicos. A maior parte deles some numa
-frase — struct com os campos, função `New` que os recebe, montagem explícita em
-`bootstrap/app.go`. Quatro não somem, e são exatamente os quatro pelos quais a
-pessoa foi lá: `singleton`, `scoped`, `tagged` e o binding contextual
-(`when`/`needs`/`give`). Uma recusa que responde os sessenta fáceis e cala nos
-quatro difíceis é uma recusa que manda procurar container no `pkg.go.dev` — e há
-container em Go de sobra para achar.
+O componente tem **66 métodos públicos**, contados de um jeito que dá para
+recontar: 55 no `Container.php`, 1 estático no `BoundMethod.php`, 4 no
+`ContextualBindingBuilder.php`, 2 no `RewindableGenerator.php` e 4 estáticos no
+`Util.php`, mais os dois construtores. O `Container::resolve` não está entre
+eles — é `protected`, e `make`, `makeWith` e `get` são as portas públicas para
+ele; o nome `resolve` é público mesmo assim, porque é o handler estático que cada
+um dos catorze atributos contextuais expõe.
+
+O `plans/cobertura.sh` relata **64** para este componente, e a diferença é conta,
+não divergência: ele conta nomes distintos na árvore inteira, `Attributes/`
+incluído, e descarta os que começam com `__`. São os 66, menos `__get` e
+`__set`, menos o segundo `call` — o `Container` e o `BoundMethod` têm um cada, e
+o nome conta uma vez —, mais o `resolve` que os atributos compartilham. O que ele
+relata é `0 de 64`, e é esse número que este documento existe para explicar.
+
+A maior parte desses 66 some numa frase — struct com os campos, função `New` que
+os recebe, montagem explícita em `bootstrap/app.go`. Quatro não somem, e são
+exatamente os quatro pelos quais a pessoa foi lá: `singleton`, `scoped`,
+`tagged` e o binding contextual (`when`/`needs`/`give`). Uma recusa que responde
+os sessenta e dois fáceis e cala nos quatro difíceis é uma recusa que manda
+procurar container no `pkg.go.dev` — e há container em Go de sobra para achar.
 
 ## Decisão
 
 **O `hesape/container` não exporta nada, e o `doc.go` dele é a resposta
-completa**, com a tabela dos 64 métodos e uma seção por dificuldade real.
+completa**, com a tabela dos 66 métodos e uma seção por dificuldade real.
 
 O documento canônico é o comentário de doc, não esta ADR: ele é o que o
 `pkg.go.dev` publica e o que aparece no editor de quem está escrevendo o código
@@ -63,7 +77,7 @@ serve uma requisição; no momento em que deixa de servir — Octane — aparece
 o estado de outra. Nada aqui tem essa classe de bug, porque nada é compartilhado
 sem que uma linha de código compartilhe.
 
-### A resposta curta, e os 64 métodos
+### A resposta curta, e os 66 métodos
 
 Struct com os campos, `New` que os recebe, montagem em `bootstrap/app.go`. A
 interface é declarada por quem consome, não por quem fornece, então o construtor
@@ -87,12 +101,23 @@ Isso resolve, em uma linha cada:
 | `bound` / `has` | o compilador; na borda opcional, `!= nil` num campo com nome |
 | `resolved` / `isShared` / `isAlias` | não há slot preguiçoso nem lifetime para interrogar |
 | `getBindings` | `bootstrap/app.go`, lido de cima a baixo |
+| `getAlias` | a interface que quem consome declarou já é o nome; não há apelido para resolver |
 | `currentlyResolving` | o stack trace, que já diz melhor |
 | `forgetInstance` / `forgetInstances` / `flush` / `forgetScopedInstances` | construa outra `App` |
+| `forgetExtenders` | o decorador é uma linha no `Build`; tirar é apagar a linha |
 | `beforeResolving` / `resolving` / `afterResolving` | faça uma vez, no `Build`, à vista |
+| `afterResolvingAttribute` / `fireAfterResolvingAttributeCallbacks` | é o container chamando a si mesmo; não há resolução aqui para rodar depois |
 | `rebinding` / `refresh` | não se troca binding de aplicação rodando; se a necessidade for real, `atomic.Pointer` |
 | `bindMethod` / `hasMethodBinding` / `callMethodBinding` | campo de func, ou método no tipo |
 | `getInstance` / `setInstance` | é o container global; é o que a ADR 0001 recusou |
+| `resolveEnvironmentUsing` / `currentEnvironmentIs` | um `if` em `cfg.App.Env`, no `Build` — ver abaixo |
+| `singleton` / `scoped` / `tag` / `tagged` | ver as quatro seções abaixo |
+| `when` / `needs` / `give` / `giveTagged` / `giveConfig` | idem |
+| `whenHasAttribute` / `addContextualBinding` / `resolveFromAttribute` | é a máquina embaixo dos `Attributes/`; ver a tabela deles |
+| `offsetExists` / `offsetGet` / `offsetSet` / `offsetUnset` / `__get` / `__set` | `ArrayAccess` e magia — razão 1 da ADR 0046. São `bound`, `make`, `bind` e um `unset`, escritos com colchete |
+| `getIterator` / `count` (`RewindableGenerator`) | `IteratorAggregate` e `Countable` — razão 1 |
+| `Util::getParameterClassName` / `getContextualAttributeFromDependency` | reflexão de PHP — razão 1 |
+| `Util::arrayWrap` / `unwrapIfClosure` | são `Arr::wrap` e o helper `value()`, copiados para o componente não depender do `Support`. O primeiro mora em `support/arr.Wrap`; o segundo não tem o que fazer, porque em Go func e valor são tipos diferentes e a assinatura já diz qual chegou |
 
 O `call` merece nota, porque é onde mora um terço da reflexão do componente
 (`BoundMethod.php`): ele injeta as dependências de um método a partir da
@@ -267,16 +292,28 @@ a funcionalidade silenciosamente não faz nada — não há erro, porque tag vaz
 legal. Slice não se digita errado, e elemento de tipo errado é falha de build.
 
 **A ordem.** Passa a ser a ordem da lista de argumentos, que é onde quem procura
-vai procurar, em vez de ser a ordem em que os registros aconteceram.
+vai procurar, em vez de ser a ordem em que os registros aconteceram. O `tag` do
+Laravel anexa sem conferir, então marcar a mesma classe duas vezes a coloca duas
+vezes na lista e o `tagged` a entrega duas vezes; o slice tem a mesma
+propriedade, com a diferença de que no slice dá para ver.
 
 **A preguiça.** Essa é perda real. O `RewindableGenerator.php` existe para que
-`tagged` devolva um gerador: os membros só são construídos se iterados, e a
-interface `Countable` permite contar sem construir. Isso importa quando uma tag
-tem vinte serviços e a requisição usa dois. Se um membro for caro o bastante
-para importar, o tipo do elemento vira fábrica — `[]func() Channel` — e a
-preguiça fica visível no tipo em vez de escondida no container. Na prática os
-membros são handles, e construir todos no boot custa nada e falha no boot em vez
-de falhar na vigésima requisição.
+`tagged` devolva um gerador: os membros só são construídos se iterados, e o
+`count()` dele é o número de abstratos registrados, então contar também não
+constrói. Isso importa quando uma tag tem vinte serviços e a requisição usa
+dois. Se um membro for caro o bastante para importar, o tipo do elemento vira
+fábrica e a preguiça fica visível no tipo em vez de escondida no container:
+
+```go
+type LazyNotifier struct{ channels []func() Channel }
+
+func NewLazyNotifier(channels ...func() Channel) *LazyNotifier {
+	return &LazyNotifier{channels: channels}
+}
+```
+
+Na prática os membros são handles, e construir todos no boot custa nada e falha
+no boot em vez de falhar na vigésima requisição.
 
 `giveTagged` e `giveConfig` são as formas contextuais da mesma coisa: um
 argumento de slice e um campo de config.
@@ -308,44 +345,88 @@ inteira outra implementação — é argumento de construtor passado adiante, o 
 mais o que digitar que o PHP e é também a única forma de descobrir depois qual
 subárvore recebeu o quê.
 
+### `resolveEnvironmentUsing` / `currentEnvironmentIs`
+
+Esses dois existem para servir o `#[Bind]`. O atributo é repetível e carrega uma
+lista de ambientes, então uma classe declara "em produção o `Mailer` é este,
+fora dela é aquele"; o `currentEnvironmentIs` pergunta ao callback que o
+`resolveEnvironmentUsing` instalou — e devolve `false` quando ninguém instalou
+nenhum — e `['*']` é o caso que sobra quando nenhum ambiente listado bate.
+
+Em Go é uma função com um `if` dentro:
+
+```go
+func mailerFor(cfg Config, log *slog.Logger) Mailer {
+	if cfg.App.Env == "production" {
+		return SMTPMailer{Host: cfg.App.Name}
+	}
+	return LogMailer{Log: log}
+}
+```
+
+A diferença não é de quantidade de código, é de **onde mora a resposta**. Com o
+atributo, descobrir o que produção recebe de fato exige abrir cada classe
+candidata e ler o que está escrito nela, porque o binding é declarado em cima da
+coisa vinculada. Aqui os dois ramos estão na mesma função, e a pergunta se
+responde lendo.
+
 ### Os `Attributes/`
 
-Os dezesseis arquivos de `Attributes/` são binding contextual escrito no
-parâmetro do construtor. Cada um é campo de struct preenchido no
-`bootstrap/app.go`, ou leitura da requisição:
+Os dezesseis arquivos de `Attributes/` no clone — mais o `BindWhen` e o
+`RequestAttribute`, que a 13.24.0 acrescentou — são binding contextual escrito no
+parâmetro do construtor. Catorze dos dezoito implementam `ContextualAttribute` e
+têm um `resolve` estático que vai buscar **uma** coisa nomeada no container.
+Cada um é campo de struct preenchido no `bootstrap/app.go`, ou leitura da
+requisição:
 
 | Atributo | Go |
 | --- | --- |
-| `#[Auth('web')]` | campo `auth *auth.Service`; o guard é escolhido na fiação |
+| `#[Auth('web')]` | campo com o guard, escolhido na fiação |
 | `#[Authenticated]` | `GrantFrom(ctx)` — o `Grant` carrega quem chamou |
 | `#[CurrentUser]` | `GrantFrom(ctx)`; ele herda de `Authenticated` |
-| `#[Cache('redis')]` | campo `cache *cache.Repository` |
+| `#[Cache('redis')]` | campo com o store: `cache *cache.Repository` |
 | `#[Config('app.name')]` | campo da struct de config tipada: `cfg.App.Name` |
-| `#[Context('trace')]` | `context.WithValue` com chave de tipo não exportado |
-| `#[Database('reporting')]` | campo `db *data.DB` |
+| `#[Context('trace')]` | `logcontext.For(ctx).Get("trace")` |
+| `#[Database('reporting')]` | campo com a conexão, escolhida na fiação |
 | `#[DB]` | idem; herda de `Database` |
-| `#[Give(Foo::class)]` | o argumento que você passa |
+| `#[Give(Foo::class, params)]` | o argumento que você passa, construído como você construiu |
 | `#[Log('billing')]` | campo `log *slog.Logger`, ou `log.With("component", ...)` |
 | `#[RouteParameter('id')]` | `r.PathValue("id")` no handler |
-| `#[RequestAttribute('x')]` | valor no `r.Context()`, igual ao `#[Context]` |
-| `#[Storage('s3')]` | campo `disk *filesystem.Disk` |
+| `#[RequestAttribute('x')]` | valor no `r.Context()`, posto lá pelo middleware |
+| `#[Storage('s3')]` | campo com o disco: `disk *filesystem.Disk` |
 | `#[Tag('reports')]` | campo de slice; ver `tagged` |
 | `#[Singleton]` / `#[Scoped]` | ver as seções acima |
 | `#[Bind]` / `#[BindWhen]` | uma linha no `bootstrap/app.go`; a condição é um `if` |
 
-Dois merecem separação.
+Os quatro de classe funcionam como conjunto e vale ler juntos: `#[Bind]` e
+`#[BindWhen]` nomeiam um concreto para a classe em que estão — por lista de
+ambientes e por closure, respectivamente — e `#[Singleton]` ou `#[Scoped]` na
+mesma classe decide com qual lifetime aquele binding é registrado. Quatro
+atributos em duas classes para dizer o que o `Build` diz em uma linha e um `if`.
 
-`#[Authenticated]` e `#[CurrentUser]` resolvem o usuário autenticado a partir do
-container, o que quer dizer que qualquer objeto, em qualquer lugar, pode
-perguntar quem está logado. Aqui quem chamou chega como `security.Grant` no
-contexto da requisição e alcança a camada de dados como argumento, porque a
-REGRA 14 faz do `Grant` a única fonte de tenant para SQL e a REGRA 17 o exige
-também na leitura. Tornar isso alcançável sem passar é precisamente o que este
-framework não faz.
+Três merecem separação.
+
+`#[Authenticated]` e `#[CurrentUser]` chamam o `userResolver` do `auth`, o que
+quer dizer que qualquer objeto, em qualquer lugar, pode perguntar quem está
+logado — e que o retorno é `Authenticatable|null`, então o parâmetro é anulável e
+nada obriga a tratar o caso do visitante. Aqui quem chamou chega como
+`security.Grant` no contexto da requisição e alcança a camada de dados como
+argumento, e o acessor devolve erro em vez de usuário nulo, porque a REGRA 14 faz
+do `Grant` a única fonte de tenant para SQL e a REGRA 17 o exige também na
+leitura. Tornar isso alcançável sem passar é precisamente o que este framework
+não faz.
 
 `#[Config]` é aquele em que a substituição é melhor, não apenas equivalente:
-`#[Config('app.nmae')]` injeta `null` e a falha aparece em outro lugar;
-`cfg.App.Nmae` não compila.
+`#[Config('app.nmae')]` injeta o default, quase sempre `null`, e a falha aparece
+em outro lugar; `cfg.App.Nmae` não compila.
+
+`#[Context]` é o que já tem casa neste módulo. Ele lê o repositório de contexto
+de log — chave/valor por requisição que acompanha o trabalho até os logs e até o
+job enfileirado — e a flag `hidden` quer dizer "carregue, mas não imprima". Isso
+é o `log/context` aqui, e a leitura é `logcontext.For(ctx).Get(key)`, ou
+`GetHidden(key)` para a metade escondida. O `ctx` que ele lê é o da requisição,
+que é a **forma A** de `scoped` — o único lugar em que este documento a
+recomenda.
 
 ## Consequências
 
@@ -371,9 +452,9 @@ framework não faz.
   trocar um binding. Teste troca construindo a aplicação com outro argumento,
   que é a mesma substituição feita no único momento em que ela é segura.
 
-- A ADR 0001 continua com doze linhas e continua sendo a decisão. Esta é a
-  resposta que faltava a ela, e o lugar de procurar quando alguém perguntar
-  "então como eu faço `scoped`?".
+- A ADR 0001 continua sendo a decisão, do tamanho que tem. Esta é a resposta que
+  faltava a ela, e o lugar de procurar quando alguém perguntar "então como eu
+  faço `scoped`?".
 
 ## Alternativa considerada
 

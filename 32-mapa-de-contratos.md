@@ -23,15 +23,20 @@ este documento reconstrói.
 
 | Veredito | Contratos | Fração |
 |---|---:|---:|
-| **MISSING** — não existe equivalente nenhum | **85** | 57% |
-| **PARCIAL** — existe, faltam métodos | **42** | 28% |
-| **EXISTS** — o conjunto inteiro respondido | **23** | 15% |
+| **MISSING** — não existe equivalente nenhum | **81** | 54% |
+| **PARCIAL** — existe, faltam métodos | **39** | 26% |
+| **EXISTS** — o conjunto inteiro respondido | **30** | 20% |
 
-Os 85 MISSING são o produto deste documento. Eles vêm primeiro.
+Os 81 MISSING são o produto deste documento. Eles vêm primeiro.
 
 Convenção das tabelas: a coluna **Go** nomeia o tipo e o arquivo; `—` quer dizer
 que não há nada. A coluna **Faltando** lista os métodos do contrato PHP que
 ninguém responde, com o nome do PHP.
+
+A medição é volátil: o `cookie` era stub inteiro na primeira passagem deste
+documento e hoje responde os dois contratos dele; `support.Htmlable`,
+`support.Jsonable`, `pipeline.Hub` e `process.ProcessResult` mudaram de veredito
+no mesmo dia. Quem reusar estes números confira a data antes.
 
 ---
 
@@ -45,8 +50,8 @@ Active Record). O que existe é o query builder.
 
 | Contrato | Veredito | Go | Faltando |
 |---|---|---|---|
-| `Query/Builder` | EXISTS | `database.Builder` — `database/query/builder.go` | marcador sem método; o builder responde `toSql`, `where`, `join`, `orderBy`, `limit`, `union`, `lock` e o resto |
-| `Query/Expression` | EXISTS | `database.Expression.GetValue` — `database/query/expression.go` | — |
+| `Query/Builder` | EXISTS | `query.Builder` — `database/query/builder.go` | marcador sem método; o builder responde `toSql`→`ToSQL`, `where`, `join`, `orderBy`, `limit`, `union`, `lock` e o resto |
+| `Query/Expression` | EXISTS | `query.Expression.GetValue` — `database/query/expression.go` | — |
 | `Query/ConditionExpression` | MISSING | — | marcador; nada distingue expressão-condição de expressão |
 | `ConcurrencyErrorDetector` | MISSING | — | `causedByConcurrencyError` |
 | `LostConnectionDetector` | MISSING | — | `causedByLostConnection` |
@@ -72,9 +77,9 @@ prova, como se recupera a senha — não existe.
 
 | Contrato | Veredito | Go | Faltando |
 |---|---|---|---|
-| `Access/Gate` | PARCIAL | `auth.Policy[T]`, `auth.Authorize`, `auth.Allows`, `auth.Grant` — `auth/policy.go` | `has`, `define`, `resource`, `policy`, `before`, `after`, `denies`, `any`, `inspect`, `raw`, `getPolicyFor`, `forUser`, `abilities` |
-| `Guard` | PARCIAL | `auth.Check`, `auth.SubjectFrom`, `auth.WithSubject`, `Subject.IsGuest` — `auth/context.go` | `id`, `validate`, `hasUser`, `setUser` |
-| `Access/Authorizable` | MISSING | — | `can` (existe como função livre `auth.Allows`, não como método do sujeito) |
+| `Access/Gate` | PARCIAL | `auth.Policy[T].Can`, `auth.Authorize`, `auth.Allows`, `auth.Grant` — `auth/policy.go` | `has`, `define`, `resource`, `policy`, `before`, `after`, `denies`, `any`, `inspect`, `raw`, `getPolicyFor`, `forUser`, `abilities` |
+| `Guard` | PARCIAL | `auth.Check`, `auth.SubjectFrom`, `auth.Guest`, `auth.WithSubject`, `Subject.IsGuest` — `auth/context.go` | `id`, `validate`, `hasUser`, `setUser` |
+| `Access/Authorizable` | MISSING | — | `can` (existe como `auth.Allows` e como `Policy.Can`, nunca como método do sujeito) |
 | `Authenticatable` | MISSING | — (`auth/users` é stub) | `getAuthIdentifierName`, `getAuthIdentifier`, `getAuthPasswordName`, `getAuthPassword`, `getRememberToken`, `setRememberToken`, `getRememberTokenName` |
 | `UserProvider` | MISSING | — | `retrieveById`, `retrieveByToken`, `updateRememberToken`, `retrieveByCredentials`, `validateCredentials`, `rehashPasswordIfRequired` |
 | `StatefulGuard` | MISSING | — | `attempt`, `once`, `login`, `loginUsingId`, `onceUsingId`, `viaRemember`, `logout` |
@@ -86,8 +91,10 @@ prova, como se recupera a senha — não existe.
 | `SupportsBasicAuth` | MISSING | — | `basic`, `onceBasic` |
 | `Middleware/AuthenticatesRequests` | MISSING | — (`auth/middleware` é stub) | marcador |
 
-O `auth.SignInThrottle` (`auth/throttle.go`) não corresponde a contrato nenhum:
-o Laravel resolve isso com o trait `ThrottlesLogins`, que não é contrato.
+O `auth.SignInThrottle` (`auth/throttle.go`) — `Attempt`, `Refund`, `Clear` — não
+corresponde a contrato nenhum: o Laravel resolve isso com o trait
+`ThrottlesLogins`, que não é contrato. É a única peça de autenticação que existe,
+e é a que protege o formulário que ninguém escreveu ainda.
 
 ## Queue/ — 10 MISSING, 3 PARCIAL, 1 EXISTS
 
@@ -108,23 +115,6 @@ o Laravel resolve isso com o trait `ThrottlesLogins`, que não é contrato.
 | `ShouldQueue` | MISSING | — | marcador |
 | `ShouldQueueAfterCommit` | MISSING | — | marcador |
 
-## Support/ — 7 MISSING, 1 PARCIAL, 4 EXISTS
-
-| Contrato | Veredito | Go | Faltando |
-|---|---|---|---|
-| `MessageBag` | EXISTS | `support.MessageBag` — `support/messagebag.go` | — |
-| `MessageProvider` | EXISTS | `support.MessageProvider` — `support/messagebag.go` | — |
-| `Arrayable` | EXISTS | `support.Arrayer` — `support/arr/arr.go` | — |
-| `ValidatedData` | EXISTS | `validation.Input` — `validation/set.go` | `ArrayAccess`/`IteratorAggregate` pulados por serem interface de linguagem do PHP |
-| `Jsonable` | PARCIAL | `MessageBag.ToJson`, `Paginator.ToJSON` | não existe a interface; cada tipo tem o método por conta própria |
-| `Htmlable` | MISSING | — (`html` é stub) | `toHtml` |
-| `Renderable` | MISSING | — | `render` (existe `view.Renderer.Render`, que é o motor, não o valor) |
-| `Responsable` | MISSING | — | `toResponse` |
-| `CanBeEscapedWhenCastToString` | MISSING | — | `escapeWhenCastingToString` |
-| `DeferringDisplayableValue` | MISSING | — | `resolveDisplayableValue` |
-| `HasOnceHash` | MISSING | — | `onceHash` |
-| `DeferrableProvider` | MISSING | — | `provides` — **razão 2**: só serve service provider (ADR 0002) |
-
 ## Validation/ — 7 MISSING, 4 PARCIAL, 0 EXISTS
 
 O hesape valida com regra compilada em `Set` (`validation/compile.go`). O Laravel
@@ -135,7 +125,7 @@ contrato de regra do Illuminate tem equivalente.
 |---|---|---|---|
 | `Validator` | PARCIAL | `validation.Set.Validate` — `validation/set.go` | `failed`, `sometimes`, `after` (`validate`/`validated`→ retorno `(Input, Errors)`, `fails`→`Errors.Any`, `errors`→`Errors`) |
 | `Factory` | PARCIAL | `validation.Compile`, `validation.MustCompile`, `validation.WithMessages` | `extend`, `extendImplicit`, `replacer` — não há registro de regra definida pelo usuário |
-| `Rule` | PARCIAL | funções `validation.Required`, `Email`, `MinLen`, `MaxLen`, `Confirmed`, `NotZero` | `passes`/`message` não são métodos: a função escreve direto no `Errors` |
+| `Rule` | PARCIAL | funções `validation.Required`, `Email`, `MinLen`, `MaxLen`, `Confirmed`, `NotZero`, `Unique` | `passes`/`message` não são métodos: a função escreve direto no `Errors` |
 | `ValidationRule` | PARCIAL | `validation.Validatable.Validate() Errors` — `validation/validator.go` | forma diferente: valida o objeto inteiro, não um atributo com callback `$fail` |
 | `CompilableRules` | MISSING | — | `compile` |
 | `DataAwareRule` | MISSING | — | `setData` |
@@ -165,7 +155,7 @@ Não é buraco: é ADR 0001. A fiação é explícita e escrita à mão em
 
 | Contrato | Veredito | Go | Faltando |
 |---|---|---|---|
-| `Broadcaster` | PARCIAL | `notifications.Broadcaster.Push` — `notifications/channels/broadcast.go` | `auth`, `validAuthenticationResponse` — não há autorização de canal privado |
+| `Broadcaster` | PARCIAL | `channels.Broadcaster.Push` — `notifications/channels/broadcast.go` | `auth`, `validAuthenticationResponse` — não há autorização de canal privado |
 | `ShouldBroadcast` | PARCIAL | `channels.BroadcastNotification.ToBroadcast` — `notifications/channels/broadcast.go` | `broadcastOn` — o canal vem do `Notifiable`, não do evento |
 | `Factory` | MISSING | — | `connection` |
 | `HasBroadcastChannel` | MISSING | — | `broadcastChannelRoute`, `broadcastChannel` |
@@ -173,17 +163,25 @@ Não é buraco: é ADR 0001. A fiação é explícita e escrita à mão em
 | `ShouldBeUnique` | MISSING | — | marcador |
 | `ShouldRescue` | MISSING | — | marcador |
 
-## Redis/ — 4 MISSING
+## Support/ — 6 MISSING, 0 PARCIAL, 6 EXISTS
 
-`hesape/redis` é stub inteiro. O `kv` é repositório à parte (ADR 0016) e não
-entra nesta contagem.
+O diretório que mais mudou: `Htmlable` e `Jsonable` passaram a existir como
+interface, não como método solto num tipo ou outro.
 
 | Contrato | Veredito | Go | Faltando |
 |---|---|---|---|
-| `Connection` | MISSING | — | `subscribe`, `psubscribe`, `command` |
-| `Connector` | MISSING | — | `connect`, `connectToCluster` |
-| `Factory` | MISSING | — | `connection` |
-| `LimiterTimeoutException` | MISSING | — | — (`cache.ErrLockTimeout` é o do cache, não o do limiter Redis) |
+| `Arrayable` | EXISTS | `arr.Arrayer` — `support/arr/arr.go` | — |
+| `Htmlable` | EXISTS | `support.Htmlable`, `support.HtmlString` — `support/htmlstring.go` | — |
+| `Jsonable` | EXISTS | `support.Jsonable` — `support/htmlstring.go` (`toJson`→`ToJson() (string, error)`, porque `encoding/json` falha com erro e não tem flags) | — |
+| `MessageBag` | EXISTS | `support.MessageBag` — `support/messagebag.go` | — |
+| `MessageProvider` | EXISTS | `support.MessageProvider` — `support/messagebag.go` | — |
+| `ValidatedData` | EXISTS | `validation.Input` — `validation/set.go` | `ArrayAccess`/`IteratorAggregate` pulados por serem interface de linguagem do PHP (**razão 1**) |
+| `Renderable` | MISSING | — | `render` (existe `view.Renderer.Render`, que é o motor, não o valor) |
+| `Responsable` | MISSING | — | `toResponse` |
+| `CanBeEscapedWhenCastToString` | MISSING | — | `escapeWhenCastingToString` |
+| `DeferringDisplayableValue` | MISSING | — | `resolveDisplayableValue` |
+| `HasOnceHash` | MISSING | — | `onceHash` |
+| `DeferrableProvider` | MISSING | — | `provides` — **razão 2**: só serve service provider (ADR 0002) |
 
 ## Foundation/ — 4 MISSING, 1 PARCIAL
 
@@ -199,6 +197,18 @@ entra nesta contagem.
 `Migratable` e `Health` (`foundation/module.go`) são o contrato de módulo do
 hesape. Não correspondem a contrato do Illuminate: substituem o service provider.
 
+## Redis/ — 4 MISSING
+
+`hesape/redis` é stub inteiro. O `kv` é repositório à parte (ADR 0016) e não
+entra nesta contagem.
+
+| Contrato | Veredito | Go | Faltando |
+|---|---|---|---|
+| `Connection` | MISSING | — | `subscribe`, `psubscribe`, `command` |
+| `Connector` | MISSING | — | `connect`, `connectToCluster` |
+| `Factory` | MISSING | — | `connection` |
+| `LimiterTimeoutException` | MISSING | — | — (`cache.ErrLockTimeout` é o do cache, não o do limiter Redis) |
+
 ## Mail/ — 3 MISSING, 2 PARCIAL
 
 | Contrato | Veredito | Go | Faltando |
@@ -209,6 +219,11 @@ hesape. Não correspondem a contrato do Illuminate: substituem o service provide
 | `MailQueue` | MISSING | — | `queue`, `later` |
 | `Attachable` | MISSING | — | `toMailAttachment` |
 
+Curiosidade que vale registrar: `fakes.MailFake`
+(`support/testing/fakes/mailfake.go`) **tem** `Raw`, `SendNow`, `Queue` e `Later`. O
+dublê de teste responde quatro métodos que o `mail.Mailer` de verdade não tem, o
+que significa que um teste passa exercitando uma API que produção não oferece.
+
 ## View/ — 3 MISSING, 1 PARCIAL
 
 | Contrato | Veredito | Go | Faltando |
@@ -218,25 +233,29 @@ hesape. Não correspondem a contrato do Illuminate: substituem o service provide
 | `View` | MISSING | — | `name`, `with`, `getData`, `render` — não existe objeto de view; `view.Page` é a struct de dados |
 | `ViewCompilationException` | MISSING | — | — (`view.WrongData` é outro erro: dado do tipo errado, não template quebrado) |
 
-## Cookie/ — 2 MISSING
-
-`hesape/cookie` é stub. Cookies são escritos direto por `session.Flash`,
-`session.Store` e `httpx.Intended`, cada um com as próprias flags.
-
-| Contrato | Veredito | Go | Faltando |
-|---|---|---|---|
-| `Factory` | MISSING | — | `make`, `forever`, `forget` |
-| `QueueingFactory` | MISSING | — | `queue`, `unqueue`, `getQueuedCookies` |
-
 ## Routing/ — 2 MISSING, 3 PARCIAL
 
 | Contrato | Veredito | Go | Faltando |
 |---|---|---|---|
-| `Registrar` | PARCIAL | `routing.Router` — `routing/router.go` | `options`, `substituteBindings`, `substituteImplicitBindings` |
-| `ResponseFactory` | PARCIAL | `httpx.Context` — `httpx/context.go`; `filesystem.Send` | `make`, `noContent`, `jsonp`, `eventStream`, `stream`, `streamJson`, `streamDownload`, `redirectToAction`, `redirectGuest` |
-| `UrlGenerator` | PARCIAL | `routing.Routes.Route`/`Must`, `routing.SignedRoute`, `view.URL`, `httpx.Context.FullURL`, `httpx.Back` | `to`, `secure`, `query`, `action`, `getRootControllerNamespace`, `setRootControllerNamespace` |
+| `Registrar` | PARCIAL | `routing.Router`, `routing.Resource[C]` — `routing/router.go` | `options`, `substituteBindings`, `substituteImplicitBindings` |
+| `ResponseFactory` | PARCIAL | `httpx.Context` — `httpx/context.go`; `filesystem.Send`; `httpx.Intended` | `make`, `noContent`, `jsonp`, `eventStream`, `stream`, `streamJson`, `streamDownload`, `redirectToAction`, `redirectGuest` |
+| `UrlGenerator` | PARCIAL | `support.UrlGenerator` (`To`, `Route`, `SignedRoute`, `Action`), `support.TemporarySignedRoute`, `routing.Routes.Route`/`Must`, `httpx.Context.FullURL`, `httpx.Back`, `view.Assets` | `secure`, `query`, `getRootControllerNamespace`, `setRootControllerNamespace` |
 | `UrlRoutable` | MISSING | — | `getRouteKey`, `getRouteKeyName`, `resolveRouteBinding`, `resolveChildRouteBinding` |
 | `BindingRegistrar` | MISSING | — | `bind`, `getBindingCallback` |
+
+## Cache/ — 1 MISSING, 2 PARCIAL, 4 EXISTS
+
+O diretório mais bem coberto que ainda tem furo.
+
+| Contrato | Veredito | Go | Faltando |
+|---|---|---|---|
+| `Repository` | EXISTS | `cache.Repository` + `Remember[T]`, `Get[T]`, `Pull[T]`, `Sear[T]`, `RememberForever[T]` — `cache/repository.go` | — |
+| `Lock` | EXISTS | `cache.Lock` — `cache/lock.go` (`get`→`Get`, `block`→`Block`, `release`, `owner`, `forceRelease`) | — |
+| `LockProvider` | EXISTS | `cache.Locks.Lock`, `cache.Locks.RestoreLock` — `cache/lock.go` | — |
+| `LockTimeoutException` | EXISTS | `cache.ErrLockTimeout` — `cache/lock.go` | — |
+| `Store` | PARCIAL | `cache.Store` — `cache/store.go` (declara `Get`, `Put`, `Add`, `Forget`, `Increment`, `Flush`) | `many`, `putMany`, `decrement`, `forever`, `touch`, `getPrefix` **não estão na interface** — o `ArrayStore` implementa todos, então um Store novo compila sem eles |
+| `CanFlushLocks` | PARCIAL | `cache.CanFlushLocks` — `cache/store.go` | `hasSeparateLockStore` está no `ArrayStore`, não na interface |
+| `Factory` | MISSING | — | `store` |
 
 ## Console/ — 1 MISSING, 2 PARCIAL, 1 EXISTS
 
@@ -247,26 +266,12 @@ hesape. Não correspondem a contrato do Illuminate: substituem o service provide
 | `Application` | PARCIAL | `console.Registry.Call`, `console.Registry.CallSilent` | `output` |
 | `PromptsForMissingInput` | MISSING | — | marcador — `console.IO.Ask` existe, mas nada liga argumento ausente a pergunta |
 
-## Cache/ — 1 MISSING, 2 PARCIAL, 4 EXISTS
-
-O diretório mais bem coberto que ainda tem furo.
-
-| Contrato | Veredito | Go | Faltando |
-|---|---|---|---|
-| `Repository` | EXISTS | `cache.Repository` + `Remember[T]`, `Get[T]`, `Pull[T]`, `Sear[T]`, `RememberForever[T]` — `cache/repository.go` | — |
-| `Lock` | EXISTS | `cache.Lock` — `cache/lock.go` | — |
-| `LockProvider` | EXISTS | `cache.Locks` — `cache/lock.go` | — |
-| `LockTimeoutException` | EXISTS | `cache.ErrLockTimeout` — `cache/lock.go` | — |
-| `Store` | PARCIAL | `cache.Store` — `cache/store.go` | `many`, `putMany`, `decrement`, `forever`, `touch`, `getPrefix` **não estão na interface** — o `ArrayStore` implementa todos, então um Store novo compila sem eles |
-| `CanFlushLocks` | PARCIAL | `cache.CanFlushLocks` — `cache/store.go` | `hasSeparateLockStore` está no `ArrayStore`, não na interface |
-| `Factory` | MISSING | — | `store` |
-
 ## Events/ — 1 MISSING, 1 PARCIAL, 1 EXISTS
 
 | Contrato | Veredito | Go | Faltando |
 |---|---|---|---|
 | `ShouldDispatchAfterCommit` | EXISTS | `events.Outbox.Store` + `events.ErrNoTransaction` — `events/events.go` | não é marcador: **todo** evento é after-commit por construção, e um fora de transação é recusado |
-| `Dispatcher` | PARCIAL | `events.Publisher`, `events.On`, `events.Listeners`, `events.Outbox` — `events/listeners.go` | `hasListeners`, `subscribe`, `until`, `push`, `flush`, `forget`, `forgetPushed` |
+| `Dispatcher` | PARCIAL | `events.Publisher` (`On`, `Publish`, `Listeners`), `events.Outbox` — `events/listeners.go` | `hasListeners`, `subscribe`, `until`, `push`, `flush`, `forget`, `forgetPushed` |
 | `ShouldHandleEventsAfterCommit` | MISSING | — | marcador (é sobre o *listener*, não sobre o evento) |
 
 ## Filesystem/ — 1 MISSING, 2 PARCIAL, 2 EXISTS
@@ -292,14 +297,7 @@ vive em `httpx` e `routing`.
 
 | Contrato | Veredito | Go | Faltando |
 |---|---|---|---|
-| `ContextLogProcessor` | MISSING | — | marcador sobre a `ProcessorInterface` do Monolog; `log.With`, `log.Fields` e `log.Into` (`log/logger.go`) fazem o trabalho, sem interface |
-
-## Pipeline/ — 1 MISSING, 1 PARCIAL
-
-| Contrato | Veredito | Go | Faltando |
-|---|---|---|---|
-| `Pipeline` | PARCIAL | `pipeline.Chain[H]` — `pipeline/pipeline.go` | `send`, `through`, `via`, `then` são uma chamada só: `Chain(h, mws...)` |
-| `Hub` | MISSING | — | `pipe` |
+| `ContextLogProcessor` | MISSING | — | marcador sobre a `ProcessorInterface` do Monolog; `log.With`, `log.Fields`, `log.Into` e `log.ShareContext` (`log/logger.go`) fazem o trabalho, sem interface |
 
 ## Session/ — 1 MISSING, 1 PARCIAL
 
@@ -316,7 +314,7 @@ vive em `httpx` e `routing`.
 
 | Contrato | Veredito | Go | Faltando |
 |---|---|---|---|
-| `LengthAwarePaginator` | PARCIAL | `pagination.LengthAwarePaginator[T]` — `pagination/lengthaware.go` | `render` |
+| `LengthAwarePaginator` | PARCIAL | `pagination.LengthAwarePaginator[T]` — `pagination/lengthaware.go` (`getUrlRange`→`GetURLRange`, `total`, `lastPage`) | `render` |
 | `Paginator` | PARCIAL | `pagination.Paginator[T]` — `pagination/simple.go` | `render` |
 | `CursorPaginator` | PARCIAL | `pagination.CursorPaginator[T]` — `pagination/cursorpaginator.go` | `appends`, `fragment`, `withQueryString`, `path`, `isEmpty`, `isNotEmpty`, `render` |
 
@@ -324,18 +322,18 @@ vive em `httpx` e `routing`.
 `LinkCollection()`, e quem desenha é a view. É decisão, mas não está escrita em
 ADR nenhuma.
 
-## Process/ — 2 PARCIAL
+## Bus/ — 2 PARCIAL
 
 | Contrato | Veredito | Go | Faltando |
 |---|---|---|---|
-| `ProcessResult` | PARCIAL | `process.Result` (struct) — `process/result.go` | `command`, `successful`, `failed`, `output`, `seeInOutput`, `errorOutput`, `seeInErrorOutput`, `throw`, `throwIf` — os dados estão nos campos `ExitCode`, `Stdout`, `Stderr`; nenhum é método |
-| `InvokedProcess` | PARCIAL | `process.Invoked` — `process/runner.go` | `command`, `output`, `errorOutput`, `latestOutput`, `latestErrorOutput`, `waitUntil` (`id`→`PID`) |
+| `Dispatcher` | PARCIAL | `bus.Chain.Dispatch`, `bus.Queue.Push`, `queue.Worker.Handle` — `bus/chain.go` | `dispatchSync`, `dispatchNow`, `dispatchAfterResponse`, `hasCommandHandler`, `getCommandHandler`, `pipeThrough` (`chain`→`NewChain`, `map`→`Worker.Handle`) |
+| `QueueingDispatcher` | PARCIAL | `bus.Store.Find`, `bus.NewBatch`, `bus.Queue.Push` — `bus/batch.go` | os três métodos são respondidos, mas por três tipos: não há um despachante |
 
 ## Debug/ — 2 PARCIAL
 
 | Contrato | Veredito | Go | Faltando |
 |---|---|---|---|
-| `ExceptionHandler` | PARCIAL | `exception.Handler` — `exception/handler.go` | `shouldReport` não é exportado (é `dontReport`, não exportado) |
+| `ExceptionHandler` | PARCIAL | `exception.Handler` — `exception/handler.go` (`report`, `render`, `renderForConsole`) | `shouldReport` não é exportado (é `dontReport`, não exportado) |
 | `ShouldntReport` | PARCIAL | `exception.Config.DontReport []error` — `exception/handler.go` | é lista de sentinelas comparada com `errors.Is`, não marcador no tipo do erro |
 
 ## Notifications/ — 2 PARCIAL
@@ -345,20 +343,38 @@ ADR nenhuma.
 | `Dispatcher` | PARCIAL | `notifications.Notifier.Send`, `SendMany` — `notifications/notifier.go` | `sendNow` — não há distinção entre enfileirar e entregar agora |
 | `Factory` | PARCIAL | `notifications.Notifier.Channels` — `notifications/notifier.go` | `channel($name)` — lista nomes, mas não devolve o canal |
 
-## Bus/ — 2 PARCIAL
-
-| Contrato | Veredito | Go | Faltando |
-|---|---|---|---|
-| `Dispatcher` | PARCIAL | `bus.Chain`, `bus.Queue.Push`, `queue.Worker.Handle` — `bus/chain.go` | `dispatch`, `dispatchSync`, `dispatchNow`, `dispatchAfterResponse`, `hasCommandHandler`, `getCommandHandler`, `pipeThrough` (`chain`→`NewChain`, `map`→`Worker.Handle`) |
-| `QueueingDispatcher` | PARCIAL | `bus.Store.Find`, `bus.NewBatch`, `bus.Queue.Push` — `bus/batch.go` | os três métodos são respondidos, mas por três tipos: não há um despachante |
-
 ## Translation/ — 2 PARCIAL, 1 EXISTS
 
 | Contrato | Veredito | Go | Faltando |
 |---|---|---|---|
 | `HasLocalePreference` | EXISTS | `notifications.Localized.PreferredLocale` — `notifications/notification.go` | — |
-| `Translator` | PARCIAL | `translation.Translator` — `translation/translation.go` | `setLocale` — o idioma vem do contexto (`translation.WithLocale`), não de estado no tradutor (`get`→`T`) |
-| `Loader` | PARCIAL | `translation.Loader` — `translation/loader.go` | `addNamespace`, `addJsonPath`, `namespaces` — `WithNamespace` é opção do `Translator`, não método do loader |
+| `Translator` | PARCIAL | `translation.Translator` — `translation/translation.go` (`get`→`Get`, `choice`→`Choice`, `getLocale`→`Locale`) | `setLocale` — o idioma vem do contexto (`translation.WithLocale`), não de estado no tradutor |
+| `Loader` | PARCIAL | `translation.Loader.Load` — `translation/loader.go` | `addNamespace`, `addJsonPath`, `namespaces` — `WithNamespace` é opção do `Translator`, não método do loader |
+
+## Process/ — 1 PARCIAL, 1 EXISTS
+
+| Contrato | Veredito | Go | Faltando |
+|---|---|---|---|
+| `ProcessResult` | EXISTS | `process.ProcessResult` — `process/result.go` (`command`, `successful`, `failed`, `exitCode`, `output`, `seeInOutput`, `errorOutput`, `seeInErrorOutput`, `throw`, `throwIf`) | — |
+| `InvokedProcess` | PARCIAL | `process.InvokedProcess` — `process/invoked.go` (`id`→`ID`, `signal`, `running`, `output`, `errorOutput`, `latestOutput`, `latestErrorOutput`, `wait`) | `command`, `waitUntil` |
+
+## Pipeline/ — 2 EXISTS
+
+| Contrato | Veredito | Go | Faltando |
+|---|---|---|---|
+| `Pipeline` | EXISTS | `pipeline.Pipeline[T]` — `pipeline/pipeline.go` (`send`→`Send`, `through`→`Through`, `then`→`Then`) | `via` pulado pela **razão 1**: escolhe por nome qual método chamar em cada pipe, que é despacho dinâmico do PHP; um `Pipe[T]` tipado tem um método só |
+| `Hub` | EXISTS | `pipeline.Hub[T].Pipe` — `pipeline/hub.go` | — |
+
+## Cookie/ — 2 EXISTS
+
+Era stub inteiro na primeira medição deste documento, no mesmo dia. Hoje o
+`cookie.CookieJar` responde os dois contratos, e `cookie/middleware` traz
+`EncryptCookies` e `AddQueuedCookiesToResponse`.
+
+| Contrato | Veredito | Go | Faltando |
+|---|---|---|---|
+| `Factory` | EXISTS | `cookie.CookieJar.Make`, `.Forever`, `.Forget` — `cookie/jar.go` | — |
+| `QueueingFactory` | EXISTS | `cookie.CookieJar.Queue`, `.Unqueue`, `.GetQueuedCookies` — `cookie/jar.go` | — |
 
 ## Concurrency/ — 1 PARCIAL
 
@@ -373,11 +389,11 @@ Quatro diretórios, sete contratos, nenhum furo.
 | Contrato | Veredito | Go |
 |---|---|---|
 | `Config/Repository` | EXISTS | `config.Repository` — `config/repository.go` (`has`, `get`, `all`, `set`, `prepend`, `push`) |
-| `Encryption/Encrypter` | EXISTS | `encryption.Encrypter` + `Encrypt[T]`/`Decrypt[T]` — `encryption/encrypter.go` |
+| `Encryption/Encrypter` | EXISTS | `encryption.Encrypter` + `Encrypt[T]`/`Decrypt[T]` — `encryption/encrypter.go` (`getKey`, `getAllKeys`, `getPreviousKeys`) |
 | `Encryption/StringEncrypter` | EXISTS | `encryption.Encrypter.EncryptString`/`DecryptString` — `encryption/encrypter.go` |
 | `Encryption/DecryptException` | EXISTS | `encryption.ErrDecrypt` |
 | `Encryption/EncryptException` | EXISTS | `encryption.ErrEncrypt` |
-| `Hashing/Hasher` | EXISTS | `hashing.BcryptHasher`, `ArgonHasher`, `Argon2IdHasher` — `hashing/hashers.go` (`info`, `make`, `check`, `needsRehash`) |
+| `Hashing/Hasher` | EXISTS | `hashing.Hasher` — `hashing/hashers.go` (`info`, `make`, `check`, `needsRehash`), com `BcryptHasher`, `ArgonHasher`, `Argon2IdHasher` |
 | `JsonSchema/JsonSchema` | EXISTS | `jsonschema.Object`, `Array`, `String`, `Integer`, `Number`, `Boolean` — `jsonschema/type.go` |
 
 ---
@@ -392,9 +408,11 @@ do Laravel abre o pacote esperando `Auth::attempt($credentials)` e encontra a
 metade do problema que vem *depois* de saber quem é a pessoa. Um projeto Arandu
 hoje escreve o login à mão: buscar o usuário, comparar o hash, iniciar a sessão,
 lembrar o dispositivo, mandar o e-mail de verificação, expirar o token de reset.
-São seis peças, todas com armadilha de segurança, e nenhuma tem dono. É o buraco
-que impede a primeira aplicação real de existir sem código de framework escrito
-no projeto — exatamente o que o framework existe para evitar.
+São seis peças, todas com armadilha de segurança, e nenhuma tem dono. O
+`auth.SignInThrottle` já está pronto — é o cadeado do formulário que ninguém
+escreveu. É o buraco que impede a primeira aplicação real de existir sem código
+de framework escrito no projeto, que é exatamente o que o framework existe para
+evitar.
 
 **A camada de fila entrega, mas não se administra. 10 MISSING em 14.**
 `queue.Queue` e `queue.Worker` fazem o essencial: empurrar, reservar com lease,
@@ -408,16 +426,18 @@ lembrar. Somado ao `Job` PARCIAL — 17 métodos ausentes, porque no hesape as
 operações são do `Queue` e não do `Job` — o resultado é uma fila que roda e uma
 fila que ninguém opera.
 
-**Três componentes são stub inteiro: `broadcasting`, `redis`, `cookie`.**
-São 13 contratos MISSING que não têm uma linha de Go. Broadcasting derruba o
-canal `ShouldBroadcast` de notificação real — o `notifications.Broadcaster` só
-tem `Push`, sem `auth` de canal privado, então **não existe canal privado**:
-qualquer um que abra o stream vê o que passa por ele. Redis ausente não é grave
-por si (o `kv` é repositório à parte, ADR 0016), mas `Connection.subscribe` é o
-transporte que o broadcasting precisaria. E `cookie` sem `Factory` significa que
-`session.Flash`, `session.Store` e `httpx.Intended` escrevem cookie cada um com
-as próprias flags de `Secure`, `SameSite` e `HttpOnly` — três lugares para acertar
-a mesma decisão de segurança, que é a definição de errar em um deles.
+**Dois componentes ainda são stub inteiro: `broadcasting` e `redis`.**
+São 9 contratos MISSING sem uma linha de Go. Broadcasting derruba o canal
+`ShouldBroadcast` de notificação real: o `channels.Broadcaster` só tem `Push`,
+sem `auth` de canal privado, então **não existe canal privado** — qualquer um que
+abra o stream vê o que passa por ele. Redis ausente não é grave por si (o `kv` é
+repositório à parte, ADR 0016), mas `Connection.subscribe` é o transporte que o
+broadcasting precisaria, então os dois buracos são um só.
+
+O terceiro stub desta lista saiu dela hoje. O `cookie` era MISSING nos dois
+contratos e agora responde os dois, com `CookieJar` e o middleware que criptografa
+e anexa a fila à resposta — o que tira três lugares que decidiam `Secure`,
+`SameSite` e `HttpOnly` por conta própria e põe um.
 
 **Todo o Eloquent está fora, e isso é decisão, não buraco.**
 13 dos 15 contratos de `Database/` são MISSING e nove deles são casts e relações
@@ -430,12 +450,16 @@ deadlock, e nenhum depende de ORM. Hoje um erro de conexão perdida e um erro de
 SQL malformado são o mesmo `error` para quem chama.
 
 **O que a contagem não diz.**
-Os 23 EXISTS são reais e completos — `cache.Repository`, `config.Repository`,
-`hashing`, `encryption`, `support.MessageBag`, `jsonschema`. Mas quatro dos 42
-PARCIAL são de um tipo específico e pior: o contrato existe como interface Go e
-**está incompleto na própria interface**. `cache.Store` não declara `many`,
+Os 30 EXISTS são reais e completos. Mas dois dos 39 PARCIAL são de um tipo
+específico e pior: o contrato existe como interface Go e **está incompleto na
+própria interface**. `cache.Store` declara seis métodos e não declara `many`,
 `putMany`, `decrement`, `forever`, `touch` nem `getPrefix`, embora o `ArrayStore`
 implemente todos os seis. Um Store novo — Redis, Postgres — compila sem eles e
 passa nos testes. `cache.CanFlushLocks` tem o mesmo problema com
 `hasSeparateLockStore`. Interface incompleta é pior que método faltando, porque o
 compilador para de cobrar.
+
+E há o inverso, no `mail`: o `fakes.MailFake` responde `Raw`, `SendNow`, `Queue`
+e `Later`, que o `mail.Mailer` de produção não tem. O dublê é maior que o
+original, então existe teste verde exercitando API que a aplicação não pode
+chamar.

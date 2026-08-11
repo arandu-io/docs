@@ -3,7 +3,9 @@
 **Status:** Aceita. Data: 10/08/2026.
 **Supersede parcialmente:** `docs/31-reorganizacao-hesape.md:390`, a linha que
 lista `->when()`/`->unless()`/`Conditionable` "em qualquer forma" entre o que a
-REGRA 9 rejeita. A rejeição geral cai; entra uma regra estreita, na seção 2.
+REGRA 9 rejeita, e `docs/31:116`, a linha da tabela que dá "`if` existe em
+posição de statement em Go" como motivo da recusa. A rejeição geral cai nas
+duas; entra uma regra estreita, na seção 2.
 
 ## Contexto
 
@@ -126,19 +128,20 @@ Esta é a marcação que estava errada, e a evidência estava dentro do reposit�
 
 `docs/31:390` põe `->when()`/`->unless()` entre o que a REGRA 9 rejeita, com o
 argumento de que "Go tem `if` em posição de statement". Enquanto isso,
-`hesape/collections/enumerates.go:544-590` já carrega **seis** desses métodos —
+`hesape/collections/enumerates.go:635-682` já carrega **seis** desses métodos —
 `When`, `Unless`, `WhenEmpty`, `WhenNotEmpty`, `UnlessEmpty`, `UnlessNotEmpty` —
 escritos, testados e com o comentário de doc nomeando a trait. Registro que
 afirma o contrário do código é registro que ninguém vai consultar duas vezes.
 
 ### O argumento, contra o `database/query/builder.go` que acabou de ser escrito
 
-O builder é fluente de verdade: `Where`, `OrderBy`, `Limit`, `Join` e mais
-cinquenta métodos mutam e devolvem o receptor. Com filtro condicional, o `if`
-custa isto:
+O builder é fluente de verdade, e dá para medir: em `builder.go`, **67 dos 84
+métodos exportados devolvem `*Builder`** — `Where`, `OrderBy`, `Limit`, `Join` e
+o resto mutam e devolvem o receptor. Encadear não é um estilo possível ali, é o
+modo normal de usar o tipo. Com filtro condicional, o `if` custa isto:
 
 ```go
-q := db.Table("posts")
+q = q.From("posts")
 if published {
 	q = q.Where("published", true)
 }
@@ -148,10 +151,15 @@ q = q.OrderBy("id")
 contra isto:
 
 ```go
-db.Table("posts").
+q.From("posts").
 	When(published, func(q *query.Builder) { q.Where("published", true) }, nil).
 	OrderBy("id")
 ```
+
+As duas formas foram compiladas contra o builder como ele está, num pacote de
+rascunho fora da árvore, antes de serem citadas. A grafia Laravel da primeira
+linha é `db.table('posts')`, que é `Connection::table` e ainda não está escrita;
+`From` é `Builder::from`, e é o ponto de entrada que existe hoje.
 
 A primeira forma não é errada e ninguém fica impedido de escrevê-la. Ela é mais
 longa por uma variável que existe só para ser reatribuída — e a reatribuição é
@@ -180,10 +188,18 @@ Onde estão hoje:
 | `collections.Collection[T]` | `When`, `Unless`, `WhenEmpty`, `WhenNotEmpty`, `UnlessEmpty`, `UnlessNotEmpty` (já existiam) |
 | `query.Builder` | `When`, `Unless` (`hesape/database/query/conditionable.go`, escrito aqui) |
 
-Candidatos que a regra alcança e que ficam por escrever, cada um no seu pacote:
-`mail.Pending`, `httpx` client `PendingRequest`, e o registrador de rota — os
-três são fluentes, e os três usam `Conditionable` no Laravel. Ficam registrados
-como pendência, não como decisão nova.
+Candidatos que a regra alcança e que ficam por escrever, cada um **no seu
+pacote, por quem o escreve** — esta ADR não os toca:
+
+| Candidato | Estado hoje | Usa `Conditionable` no PHP |
+|---|---|---|
+| `mail.Pending` (`mail/mail.go:222`) | escrito e fluente (`CC`, `BCC` devolvem `*Pending`) | `PendingMail` sim |
+| `routing.Route` (`routing/name.go:13`) | escrito e fluente (`Name` devolve `*Route`) | `Route` sim |
+| `http/client.PendingRequest` | **não escrito**: `http/client/` tem só `doc.go` e subpastas | `PendingRequest` sim |
+
+A ADR anterior a esta revisão dizia "`httpx` client `PendingRequest`". Errado:
+`httpx` é o contexto de requisição, e o cliente HTTP é `http/client`. Corrigido
+aqui para que a pendência aponte para o pacote certo.
 
 ### As três mudanças mecânicas, e o que é pulado
 
@@ -228,8 +244,13 @@ compilador. Onde a informação é mesmo necessária, a `aru` a lê de `go/ast` 
 tempo de build, em `aru/internal/typeinfo`, e emite Go.
 
 **Recusar construir o pacote vale menos do que saber onde a reflexão entrou
-assim mesmo.** Então foi contada. Em 487 arquivos `.go`, o `hesape` importa
-`reflect` em **quatro arquivos não-teste**, em **doze pontos de chamada**:
+assim mesmo.** Então foi contada — e a contagem se mexeu três vezes durante a
+redação, o que é informação e não ruído. Leia a seção sabendo disso: **a tabela
+é a auditoria linha a linha de oito arquivos; o total do repositório está no fim
+da seção e é maior.**
+
+Auditados linha a linha, **oito arquivos não-teste, vinte e um pontos de
+chamada**:
 
 | Arquivo:linha | Símbolo | Para quê | Dá para trocar por genérico ou interface? |
 |---|---|---|---|
@@ -239,36 +260,96 @@ assim mesmo.** Então foi contada. Em 487 arquivos `.go`, o `hesape` importa
 | `support/arr/arr.go:500` | `IsAssoc` | `Arr::isAssoc` | **Não**, mesma razão da primeira linha |
 | `support/arr/arr.go:509` | `IsList` | `Arr::isList` | **Não**, mesma razão |
 | `support/arr/list.go:297` | `Wrap` | `Arr::wrap`: percorrer slice de qualquer tipo para produzir `[]any` | **Parcial.** `Wrap[T any](s []T) []any` cobre o caso tipado e deixa o caso `any` ainda em `reflect` — duas grafias de `Arr::wrap`, que a REGRA 9 recusa |
+| `support/optional.go:33` | `Optional.Get` | `Optional::__get`: campo de struct por nome, chave de mapa, atravessando ponteiro | **Não.** Uma interface `interface{ Get(string) any }` só responderia por tipo que optou por ela, e `optional()` existe exatamente para o valor que já se tem na mão |
+| `support/interactswithdata.go:311` | `matchesEnumCase` | `BackedEnum::tryFrom`: comparar o valor cru com o backing do case, sem que `type Status string` escape do type switch | **Sim, por interface, e com preço.** `interface{ Value() any }` é o `BackedEnum` do PHP escrito em Go, mas exige o método em todo enum da aplicação; hoje um `type Status string` sem método nenhum funciona. É o único da tabela em que a troca é possível e a decisão é de custo, não de mecanismo |
+| `support/testing/fakes/fakes.go:46` | `class` | `get_class()`: o tipo sob o qual o fake arquiva o valor gravado | **Não.** O fake guarda valores heterogêneos numa lista; o tipo foi apagado na inserção, e genérico não responde depois disso |
+| `support/testing/fakes/fakes.go:69` | `classToken` | `SomeJob::class` normalizado | **Não**, mesma razão |
+| `support/testing/fakes/fakes.go:91` | `tokenName` | o nome que a mensagem de asserção imprime | **Não**, mesma razão |
+| `support/testing/fakes/fakes.go:122` | `instanceOf` | `$valor instanceof $tipo`, com token de interface satisfeito também pelo ponteiro | **Não.** É a pergunta de subtipo em runtime, que é o serviço |
+| `support/testing/fakes/fakes.go:153` | `restore` | `unserialize(serialize())`: o round-trip que o job faz pela fila | **Não.** `restore[T any](v T) T` resolveria, mas o registro é `[]any` — a erosão do tipo é na lista, não aqui |
 | `testing/t.go:200` | `assertIsArray` | `PHPUnit::assertIsArray` sobre valor decodificado | **Não**, mesma razão da primeira linha |
 | `testing/t.go:239` | `identical` | `DeepEqual` sobre a forma canônica, para o `===` do PHP | **Não.** A comparação estrutural é o serviço, não um detalhe da implementação |
 | `testing/t.go:302` | `canonical` | normalizar slice, mapa e ponteiro do que `json.Unmarshal` devolveu | **Não**, mesma razão de `From` |
 | `testing/t.go:367` | `isNil` | o `null` do PHP, inclusive interface não-nula carregando valor nil | **Não.** É a única forma de fazer essa pergunta em Go |
 | `testing/t.go:408` | `count` | o `count()` do PHP | **Não**, mesma razão da primeira linha |
-| `view/runtime.go:74` | `funcName` | detectar que `{{ .Name }}` interpolou o método em vez do resultado, para dizer isso no panic | **Sim, e é a única.** O kyse compila o template e conhece o tipo: a mesma checagem cabe em `aru view:build`, sobre `go/ast` |
+| `view/runtime.go:74` | `funcName` | detectar que `{{ .Name }}` interpolou o método em vez do resultado, para dizer isso no panic | **Sim, e é a única que sai de vez.** O kyse compila o template e conhece o tipo: a mesma checagem cabe em `aru view:build`, sobre `go/ast` |
+| `log/context/repository.go:736` | `stackContains` | `in_array` com `$strict`: `Context::stackContains` | **Não.** O `mixed` está na assinatura porque a pilha de contexto guarda o que lhe derem |
+| `log/context/repository.go:871` | `looseEqual` | o `==` do PHP: `in_array` sem `$strict` | **Não**, mesma razão de `identical` |
 
 Leitura da tabela:
 
-- **Nove dos doze são a mesma pergunta**, feita a um valor cujo tipo estático é
-  `any`: é mapa, é slice, qual o tamanho, é nil. Estão em `support/arr` e em
-  `testing`, os dois espelhando superfície PHP tipada `mixed`. Genérico não
-  responde pergunta sobre valor cujo tipo já foi apagado na chamada — o `any`
-  está na assinatura porque `Arr::get` e `assertEquals` recebem `mixed`. Sair de
-  `reflect` ali é reprojetar a assinatura, não trocar o mecanismo.
+- **Dez dos vinte e um estão em pacote que só existe para servir teste** —
+  `testing/t.go` e `support/testing/fakes/fakes.go`. Não são arquivos `_test.go`,
+  então a contagem os inclui de propósito; mas nada que atenda uma requisição
+  chega neles.
+- **Nove dos onze restantes são a mesma pergunta**, feita a um valor cujo tipo
+  estático é `any`: é mapa, é slice, qual o tamanho, é nil, são iguais. Estão em
+  `support/arr`, `support/optional` e `log/context`, os três espelhando
+  superfície PHP tipada `mixed`. Genérico não responde pergunta sobre valor cujo
+  tipo já foi apagado na chamada — o `any` está na assinatura porque `Arr::get`,
+  `Optional::__get` e `Context::stackContains` recebem `mixed`. Sair de `reflect`
+  ali é reprojetar a assinatura, não trocar o mecanismo.
 - **Um é cosmético** (`typeName`) e **um é parcial** (`Wrap`), e o parcial custa
   uma segunda grafia.
 - **Um pode ir para tempo de build** (`view/runtime.go:74`), e fica como gatilho:
   quando o `kyse` tiver a checagem de tipo do template, a mensagem de panic vira
   erro de compilação e o `reflect` sai do `view`.
-- **Nenhum dos doze está em caminho de requisição, e nenhum decide autorização,
-  roteamento, despacho ou persistência.** `routing`, `validation`, `security`,
-  `queue`, `events` e `database` não importam `reflect` em arquivo não-teste.
-  É a tese se sustentando, medida em vez de afirmada.
+- **Um tem resposta de interface e a resposta foi recusada por preço**
+  (`matchesEnumCase`): `BackedEnum` em Go é um método a mais em todo enum de toda
+  aplicação, para tirar um `reflect.Kind` de uma função de dez linhas. Fica
+  registrado como troca conhecida, não como pendência.
+- **Nenhum dos vinte e um decide autorização, roteamento, despacho ou
+  persistência.** Medido, não afirmado: `auth`, `routing`, `validation`, `queue`,
+  `events`, `database`, `session`, `encryption`, `hashing`, `http` e `cache`
+  importam `reflect` em **zero** arquivos não-teste.
 
-Em arquivo de teste o `reflect` aparece em cinco lugares, quatro deles
-`DeepEqual`. O quinto, `filesystem/disk_test.go:41`, percorre os métodos da
-interface `Adapter` para provar que **todos** recebem um `Grant` — reflexão
-usada para verificar invariante de arquitetura, que é o uso que este projeto
-quer, e num teste, que é onde ele cabe.
+A versão anterior desta seção dizia que nenhum dos pontos estava "em caminho de
+requisição". Era forte demais e sai: `support/arr`, `support/optional` e
+`log/context` são alcançáveis de dentro de uma requisição. O que se sustenta é a
+frase estreita acima — nenhum deles **decide** nada.
+
+Em arquivo de teste o `reflect` aparece em cinco arquivos e dezenove pontos,
+dezoito deles `DeepEqual`. O décimo nono, `filesystem/disk_test.go:41`, percorre
+os métodos da interface `Adapter` para provar que **nenhum** recebe um `Grant` —
+reflexão usada para verificar invariante de arquitetura, que é o uso que este
+projeto quer, e num teste, que é onde ele cabe.
+
+### Segunda medição, no fim do mesmo dia — e o que fica para auditar
+
+Entre a auditoria acima e o fechamento desta ADR, cinco arquivos novos passaram
+a importar `reflect`. Foram **contados, não auditados linha a linha**, e a
+distinção está aqui de propósito: número medido por comando é uma coisa,
+veredito por ponto de chamada é outra, e misturar os dois é como uma tabela
+envelhece sem avisar.
+
+| Arquivo | Ocorrências de `reflect.` | O que é, em uma linha |
+|---|---|---|
+| `collections/arr/access.go` | 41 | `Arr` completo sobre mapa e slice de qualquer tipo — chave, `Get`/`Set`/`Forget`, `IsAssoc`, `IsList` |
+| `collections/arr/typed.go` | 4 | as variantes tipadas do mesmo `Arr` |
+| `support/testing/fakes/queuefake.go` | 4 | `reflect.TypeFor` como token de classe, e `DeepEqual` sobre o round-trip |
+| `support/testing/fakes/busfake.go` | 2 | o mesmo, no `BusFake` |
+| `jsonschema/deserializer.go` | 1 | `DeepEqual` comparando ramos irmãos do schema |
+
+**Total do repositório na última medição: 13 arquivos não-teste, 98 ocorrências
+de `reflect.` fora de comentário.** Contra 8 e 21 algumas horas antes, e 4 e 12
+de manhã.
+
+Dois recados, e nenhum deles é alarme:
+
+1. **A subida é quase toda um pacote só.** `collections/arr` responde por 45 das
+   98 ocorrências, e é a reescrita do `Arr` — exatamente a superfície que a
+   tabela já classificou como irredutível, pelo mesmo motivo (`Arr::get` recebe
+   `mixed`). Não é reflexão nova em lugar novo; é mais do mesmo lugar.
+2. **`collections/arr` é o que a próxima auditoria olha primeiro**, e a pergunta
+   a fazer lá é uma só: `collections/arr` e `support/arr` são dois `Arr`? Se
+   forem, é a REGRA 9 e não esta ADR que decide, e a decisão é de quem escreve os
+   dois pacotes — não desta ADR, que não os toca.
+
+O que **não** mudou com a subida: `auth`, `routing`, `validation`, `queue`,
+`events`, `database`, `session`, `encryption`, `hashing`, `http` e `cache`
+continuam em **zero** arquivos não-teste com `reflect`. Foi remedido depois da
+última contagem, não herdado da primeira. É a frase que importa, e é a que se
+mantém.
 
 ---
 
@@ -277,15 +358,25 @@ quer, e num teste, que é onde ele cabe.
 - Os três diretórios continuam existindo, com `doc.go` e sem símbolo exportado.
   Quem procura acha a razão, e agora acha também o que escrever no lugar.
 - `docs/31:390` perde `->when()`/`->unless()`/`Conditionable` da lista de
-  rejeitados pela REGRA 9 e ganha a regra estreita da seção 2. `docs/13:125`, que
-  já dizia que `->when()` existe porque encadeamento fluente não aceita `if`,
-  estava certo e passa a ser o texto de referência.
+  rejeitados pela REGRA 9, e `docs/31:116` perde a linha de tabela que dava "`if`
+  existe em posição de statement" como motivo; as duas ganham a regra estreita da
+  seção 2. `docs/13:125`, que já dizia que `->when()` existe porque encadeamento
+  fluente não aceita `if`, estava certo e passa a ser o texto de referência.
+  `docs/13:28`, que diz `Conditionable` → "`if`" → "não existe", cai junto.
 - `query.Builder` ganha `When` e `Unless`. Três outros tipos fluentes ficam como
   pendência declarada, não como porta aberta: a regra diz quando entram.
 - A extensão de terceiro sobre `Collection` acaba, e isso é perda registrada. Um
   pacote como `spatie/laravel-collection-macros` não tem tradução para Go.
 - A contagem de `reflect` vira um número verificável, e a linha de comando para
-  refazê-la está no `hesape/reflection/doc.go`. Se ela subir, sobe visível.
+  refazê-la está no `hesape/reflection/doc.go`. Se ela subir, sobe visível — e
+  **subiu três vezes antes desta ADR fechar**: 4 arquivos e 12 pontos de manhã,
+  8 e 21 na auditoria linha a linha, 13 arquivos e 98 ocorrências na medição
+  final, com `collections/arr` respondendo por quase metade. O número na tabela
+  envelhece em horas; o comando não. É por isso que ele está no `doc.go`, e é por
+  isso que quem citar qualquer número desta ADR deve rodá-lo antes.
+- A frase que a subida **não** moveu é a única que decide alguma coisa: os onze
+  pacotes que autorizam, roteiam, despacham e persistem seguem em zero. Ela foi
+  remedida depois da última contagem, não herdada da primeira.
 
 ## Alternativa considerada
 
