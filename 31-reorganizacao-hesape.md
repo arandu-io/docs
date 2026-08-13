@@ -120,7 +120,7 @@ github.com/arandu-io/framework/
 | **Macroable** | o receptor de um método tem de ser declarado no mesmo pacote | nada |
 | **Reflection** | é o mecanismo que a tese rejeita | `aru/internal/typeinfo`, em tempo de build sobre `go/ast` |
 | **Remote** | apagado do Laravel na 5.1; sucessor fora de escopo | nada |
-| **Workbench** | é um gerador de console | `aru make:package` sobre `aru/internal/gen` |
+| **Workbench** | é um gerador de console | `aru make:package` sobre `aru/internal/gen` — **ainda não existe**, é o destino |
 
 ---
 
@@ -228,7 +228,7 @@ Toda linha de código Go que existe hoje aparece aqui. Um pacote sem linha é um
 | `aru/internal/gen/{spec,mail}.go` (~80 ln de string) | `hesape/str` | `Normalize`→`Snake`, `exported`→`Studly`, `Kebab`, `Humanise`→`Headline`, `upperFirst`→`UpperFirst`, `Module.Table`→`str.Plural` |
 | `aru/key.go:13` `appKeyLen` | **apagado** | importa `encryption.KeySize` e `encryption.GenerateKey` |
 | `aru/trace.go:63-66` | `config.String` | `APP_PORT` **apagado**: não existe em config nenhum nem no `.env.example` |
-| `aru/commands.go:75,89` | | `delegate("work")`/`delegate("routes")` **apagados**; os nomes do Registry são os do Laravel. Ganha `cache:clear`, `cache:forget`, `config:show`, `queue:failed`, `queue:retry`, `queue:forget`, `queue:flush`, `lang:publish`, `view:clear`, `make:notification`, `make:channel`, `make:test`, `make:package` |
+| `aru/commands.go:75,89` | | `delegate("work")`/`delegate("routes")` **apagados**; os nomes do Registry são os do Laravel. Ganha `cache:clear`, `cache:forget`, `config:show`, `queue:failed`, `queue:retry`, `queue:forget`, `queue:flush`, `lang:publish`, `view:clear`, `make:notification`, `make:channel`, `make:test`, `make:package` (este último ainda não existe) |
 | `aru/internal/gen/{templates,stubs,job,mail,command,listener,event}.go` | fica | **todos os templates mudam**: escrevem o caminho de import novo dentro do código do usuário |
 
 ### 3.3 `arandu-io/arandu` (esqueleto) e `arandu-io/examples`
@@ -375,7 +375,7 @@ Ordenado por dependência (camada), depois por quanto uma aplicação toca por d
 | `socialite` | `Provider`, `Manager`, `Config`, `User`, `Token`, `Endpoint`, `Mapper`, o state assinado, nove drivers, `Fake` | semanas |
 | `image` | `Image`, `Driver`, `Pipeline`, `Transformation`, `Std`, `Cover`, `Orient`, `Store`, `Respond`, limites de decodificação | semanas |
 | `arandutest` | `Boot`, `Harness`, `Application`, `AssertDatabaseHas/Missing/Count/Empty`, `Mailbox`, `QueueRecorder`, `MemoryStore`, `View`, `Artisan`, `Client.ActingAs`, `AssertAuthenticated`, `Response.Invalid` | semanas |
-| `aru make:package` | `func GeneratePackage(p Package) ([]File, error)` + `manifest.Write` | dias |
+| `aru make:package` (ainda não existe) | `func GeneratePackage(p Package) ([]File, error)` + `manifest.Write` | dias |
 
 ---
 
