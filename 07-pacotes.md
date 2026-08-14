@@ -91,7 +91,18 @@ crepúsculo, flâmula), nunca santos nem cargos religiosos. A regra é a mesma.
 | Fortify | auth headless, sem telas | — | é core: pacote `security/` | — |
 | Sanctum | tokens de API | — | decidido core e **não construído**: não existe `security/token.go`. Ver `06-escopo.md` | — |
 | Passport | servidor OAuth2 | — | deferido, ver `06-escopo.md` | — |
-| Socialite | login por provedor externo | **jopara** | mistura | C |
+| Socialite | login por provedor externo | **`hesape/oauth`** | — | ✔ |
+
+> *Corrigido em 14/08/2026.* Esta linha dava o nome **`jopara`** — guarani para
+> *mistura* — supondo que o equivalente do Socialite seria repositório próprio.
+> Não é: ele é um pacote dentro do `hesape`, e ali o padrão é nome funcional em
+> inglês, como `auth`, `cache`, `http` e `mail`. A ADR 0044 reserva o guarani
+> para ferramenta com nome próprio — `aru`, `kyse`, `hesape` —, e um componente
+> da coleção não é uma delas. `jopara` fica livre.
+>
+> `oauth` diz o protocolo, que é o que o pacote é. Foi pesado contra manter
+> `socialite`, e o que decidiu é que nome emprestado de produto não ensina nada
+> a quem nunca usou o produto.
 
 > Jetstream **não tem equivalente**. Está em manutenção estendida no Laravel; o
 > Breeze é o starter kit único recomendado. Seguimos o mesmo.
