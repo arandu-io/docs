@@ -12,7 +12,7 @@ mapeamento contra ele registrou a ausência como lacuna de segurança, não de
 paridade.
 
 O limitador global que existe não substitui, e o próprio arquivo diz por quê:
-`framework/httpx/middleware/ratelimit.go` já observa que limitar login por IP
+`framework/http/middleware/ratelimit.go` já observa que limitar login por IP
 sozinho não impede credential stuffing distribuído. O que estava montado nos dois
 bootstraps é 300/min compartilhado entre **todas** as rotas, com janela fixa por
 processo — então o orçamento multiplica pelo número de réplicas.
@@ -38,7 +38,7 @@ a tela. O `Authenticate` ganhou um parâmetro `client`, e é o único lugar por 
 a verificação de senha passa.
 
 **`SignInThrottle` é interface própria, não um alargamento de
-`middleware.Limiter`.** Não é preferência: `httpx` importa `security`, então
+`middleware.Limiter`.** Não é preferência: `http` importa `security`, então
 `security` nomear `middleware.Limiter` é ciclo de import.
 
 **A janela é fixa, e a ADR assume o custo.** Numa virada de janela cabem até dez

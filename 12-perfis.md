@@ -36,7 +36,7 @@ segunda emissão de queries, que é exatamente o assunto deste documento.
 Isto não muda, e é o que preserva a REGRA 9:
 
 - `security.Grant` e Policy — mesmo caminho obrigatório de autorização
-- contrato de módulo `Routes(r *httpx.Router)`
+- contrato de módulo `Routes(r *http.Router)`
 - validação, CSRF, sessão, rate limit, headers
 - Collector, página de erro, `aru doctor`
 - `kyse` + HTMX + Alpine na view, com o CSS Tailwind compilado e embutido

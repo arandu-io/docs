@@ -238,8 +238,8 @@ que significa que um teste passa exercitando uma API que produção não oferece
 | Contrato | Veredito | Go | Faltando |
 |---|---|---|---|
 | `Registrar` | PARCIAL | `routing.Router`, `routing.Resource[C]` — `routing/router.go` | `options`, `substituteBindings`, `substituteImplicitBindings` |
-| `ResponseFactory` | PARCIAL | `httpx.Context` — `httpx/context.go`; `filesystem.Send`; `httpx.Intended` | `make`, `noContent`, `jsonp`, `eventStream`, `stream`, `streamJson`, `streamDownload`, `redirectToAction`, `redirectGuest` |
-| `UrlGenerator` | PARCIAL | `support.UrlGenerator` (`To`, `Route`, `SignedRoute`, `Action`), `support.TemporarySignedRoute`, `routing.Routes.Route`/`Must`, `httpx.Context.FullURL`, `httpx.Back`, `view.Assets` | `secure`, `query`, `getRootControllerNamespace`, `setRootControllerNamespace` |
+| `ResponseFactory` | PARCIAL | `http.Context` — `http/context.go`; `filesystem.Send`; `http.Intended` | `make`, `noContent`, `jsonp`, `eventStream`, `stream`, `streamJson`, `streamDownload`, `redirectToAction`, `redirectGuest` |
+| `UrlGenerator` | PARCIAL | `support.UrlGenerator` (`To`, `Route`, `SignedRoute`, `Action`), `support.TemporarySignedRoute`, `routing.Routes.Route`/`Must`, `http.Context.FullURL`, `http.Back`, `view.Assets` | `secure`, `query`, `getRootControllerNamespace`, `setRootControllerNamespace` |
 | `UrlRoutable` | MISSING | — | `getRouteKey`, `getRouteKeyName`, `resolveRouteBinding`, `resolveChildRouteBinding` |
 | `BindingRegistrar` | MISSING | — | `bind`, `getBindingCallback` |
 
@@ -287,7 +287,7 @@ O diretório mais bem coberto que ainda tem furo.
 ## Http/ — 1 MISSING
 
 `hesape/http` é stub (só `data.go`, com helpers não exportados). O tráfego HTTP
-vive em `httpx` e `routing`.
+vive em `http` e `routing`.
 
 | Contrato | Veredito | Go | Faltando |
 |---|---|---|---|
@@ -303,7 +303,7 @@ vive em `httpx` e `routing`.
 
 | Contrato | Veredito | Go | Faltando |
 |---|---|---|---|
-| `Session` | PARCIAL | `session.Store[T]`, `session.CSRF`, `session.Flash`, `httpx.Intended` — `session/session.go` | `getName`, `setName`, `setId`, `save`, `exists`, `has`, `get`, `pull`, `put`, `remove`, `forget`, `flush`, `migrate`, `isStarted`, `getHandler`, `handlerNeedsRequest`, `setRequestOnHandler` — o `Record[T]` é tipado, então não há bag chave-valor |
+| `Session` | PARCIAL | `session.Store[T]`, `session.CSRF`, `session.Flash`, `http.Intended` — `session/session.go` | `getName`, `setName`, `setId`, `save`, `exists`, `has`, `get`, `pull`, `put`, `remove`, `forget`, `flush`, `migrate`, `isStarted`, `getHandler`, `handlerNeedsRequest`, `setRequestOnHandler` — o `Record[T]` é tipado, então não há bag chave-valor |
 | `Middleware/AuthenticatesSessions` | MISSING | — (`session/middleware` é stub) | marcador |
 
 ---

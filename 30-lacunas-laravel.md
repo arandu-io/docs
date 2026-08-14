@@ -139,7 +139,7 @@ problema que o keyset existe para não ter.
 **Aqui:** `storage` e `arandu-io/storage` existem. Não há caminho de `Request` a
 `Storage`, nem validação de tipo, nem limite de tamanho.
 
-**Falta:** `httpx.Context.File(name)`, validação no Form Request, e um
+**Falta:** `http.Context.File(name)`, validação no Form Request, e um
 componente de upload. É pequeno e é visível — todo CRUD real tem uma imagem.
 
 ### 3.4 Autorização na view

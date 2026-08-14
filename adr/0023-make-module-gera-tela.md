@@ -30,7 +30,7 @@ app/Services/PedidoService.go         database/migrations/<data>_create_pedidos_
 resources/views/pedidos/{index,show,create,edit}.kyse.go
 ```
 
-O controller implementa as sete interfaces de `httpx` e responde `ctx.View` com
+O controller implementa as sete interfaces de `http` e responde `ctx.View` com
 struct tipada por página. **Nenhum handler gerado responde JSON.**
 
 Três consequências que fecham porta:

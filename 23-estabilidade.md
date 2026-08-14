@@ -69,7 +69,7 @@ existem em `internal/doctor`, o que falta é uma regra que as use para isso.
 E houve o que depreciar. O levantamento de 07/08/2026 rodou `apidiff` par a par
 nas tags do `framework` e contou **seis mudanças incompatíveis já publicadas sem
 aviso nenhum** — entre elas `auth.New`, `config.Config.DatabaseURL`,
-`data.Wrap`, `middleware.Observe` e os cinco verbos do `httpx.Router`. Uma delas
+`data.Wrap`, `middleware.Observe` e os cinco verbos do `http.Router`. Uma delas
 se confere sem ferramenta alguma: `data.InTransaction(ctx)` na `v0.5.0` virou
 `data.InTransaction(ctx, db)` na `v0.13.2`, parâmetro novo, sem depreciação e
 sem nota.

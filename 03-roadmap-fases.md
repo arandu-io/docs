@@ -18,7 +18,7 @@ Entregas:
 
 - `kernel` — boot, registro de módulos, pipeline, shutdown gracioso, health
 - `config` — struct tipada, validação no boot, falha rápido
-- `httpx` — router sobre `http.ServeMux`, grupos, middleware, metadados de rota
+- `http` — router sobre `http.ServeMux`, grupos, middleware, metadados de rota
 - `security` — **Grant/Policy** (a peça central), argon2id, CSRF, sessão
 - `data` — contrato `Repository` exigindo Grant, `DB` instrumentado
 - `validation` — `Validate() Errors`, sem tags nem reflection
@@ -38,7 +38,7 @@ Critério de saída — **todos** obrigatórios:
 3. Um dos seus produtos atuais roda o login em cima do `auth` — **aberto**,
    depende do proprietário
 4. Um panic proposital em dev mostra queries e dumps do request na página —
-   **verificado** em `httpx/middleware/pipeline_test.go`
+   **verificado** em `http/middleware/pipeline_test.go`
 5. Nenhuma dependência de terceiro no core além de `golang.org/x/crypto` —
    **verificado**, e checado em CI. `golang.org/x/sys` entra transitivamente,
    exigido pelo próprio `x/crypto`

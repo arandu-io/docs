@@ -202,7 +202,7 @@ o comando; a tabela acima é uma fotografia, e envelhece.
 
 | Repositório | Espelha | Papel |
 |---|---|---|
-| `framework` | `laravel/framework` | a biblioteca: kernel, security, data, httpx, view |
+| `framework` | `laravel/framework` | a biblioteca: kernel, security, data, http, view |
 | `arandu` | `laravel/laravel` | o esqueleto de projeto que o `aru new` clona |
 | `aru` | `artisan` | a CLI: `new`, `make:*`, `migrate`, `doctor`, `view:build` |
 | `ui` | `laravel/ui` | o starter kit de auth, publicado no projeto (ADR 0026) |

@@ -28,12 +28,12 @@ shared data              →   valores no context
 ```
 
 O controller renderiza pelo **nome** da view — `"clientes.index"`, o mesmo ponto
-que o Laravel usa —, e o `httpx.Context` resolve contra o registro. Não existe
+que o Laravel usa —, e o `http.Context` resolve contra o registro. Não existe
 função exportada por página que o controller chame direto.
 
 *Corrigido em 07/08/2026:* este bloco dizia
 `views.ClientesIndex(...).Render(ctx, w)`. Essa era a forma do `templ`, que a ADR
-0020 descartou junto com o motor. O que existe em `framework/httpx/context.go` é
+0020 descartou junto com o motor. O que existe em `framework/http/context.go` é
 `func (c *Context) View(name string, data any) error` e o par
 `func (c *Context) Fragment(status int, name string, data any) error`; o
 esqueleto chama `ctx.View("home", views.HomeData{...})` e o `aru make:module`
@@ -79,7 +79,7 @@ O `checklist.sh` verifica a tabela contra `aru help`.
 
 | `artisan` | `aru` | nota |
 |---|---|---|
-| `make:controller` | `make:controller` | `--resource` gera as sete ações, por `httpx.Resource` |
+| `make:controller` | `make:controller` | `--resource` gera as sete ações, por `http.Resource` |
 | `make:model` | `make:model` | **o Model é struct de dados, não Active Record** — quem toca o banco é o Repository, e ele exige `security.Grant` (doc 01, REGRA 17). É a diferença que mais surpreende quem migra |
 | `make:migration` | `make:migration` | `--create=` e `--table=` como no artisan, mas **`--fields` é obrigatório** — `aru make:migration add_status --table=posts` sozinho é erro |
 | `make:middleware` | `make:middleware` | — |

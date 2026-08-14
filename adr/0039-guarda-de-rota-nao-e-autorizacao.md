@@ -9,6 +9,11 @@
 Laravel, e `grep -rn 'RequireAuth|RequireGuest|RequireRole'` sobre os quatro
 repositórios devolvia zero.
 
+> O caminho acima é o de então e fica como está: era esse o nome quando a
+> decisão foi tomada. Hoje o diretório é `framework/http/middleware/`, pela
+> [ADR 0047](0047-nome-de-pacote-que-colide-com-a-stdlib.md), executada em
+> 14/08/2026.
+
 Pior que a ausência: `examples/routes/web.go` e `arandu/routes/web.go`
 documentavam `r.Group("/admin", middleware.RequireRole("admin"))` em comentário,
 nos **dois repositórios publicados**, exatamente no arquivo que se abre para

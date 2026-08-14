@@ -37,7 +37,7 @@ WebSocket de **Broadcasting** como desenho.
 | **Filesystem** | `storage` | adapter |
 | **Foundation** | `kernel/` — equivalente direto | core |
 | **Hashing** | `security/password.go` (argon2id) | core |
-| **Http** | `net/http` + `httpx/` | stdlib + core |
+| **Http** | `net/http` + `http/` | stdlib + core |
 | **Image** | `disintegration/imaging` | terceiro |
 | **JsonSchema** | vira o schema da DSL da Fase 4 | Fase 4 |
 | **Log** | `observability/` (slog) | core |
@@ -45,12 +45,12 @@ WebSocket de **Broadcasting** como desenho.
 | **Mail** | `mail` | adapter |
 | **Notifications** | canal sobre `mail` e `ws` | deferido — gatilho: segundo canal além de e-mail (in-app ou push) pedido por cliente real |
 | **Pagination** | `data.Query` com cursor | core |
-| **Pipeline** | `httpx.Chain` — é o middleware | core |
+| **Pipeline** | `http.Chain` — é o middleware | core |
 | **Process** | `os/exec` | stdlib |
 | **Queue** | `queue` | adapter |
 | **Redis** | `kv` | adapter |
 | **Reflection** | proibido | não existe |
-| **Routing** | `httpx/router.go` | core |
+| **Routing** | `http/router.go` | core |
 | **Session** | `security/session.go` + `kv` | core + adapter |
 | **Support** (Str, Arr, Carbon, Number, Uri) | `strings`, `slices`, `time`, `net/url` | stdlib |
 | **Testing** | `testing` + `httptest` | stdlib |
