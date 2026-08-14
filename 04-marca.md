@@ -124,8 +124,9 @@ A fazer, e nesta ordem:
    compra de terceiro, não registro
 2. npm `arandu` e crates.io `arandu` — squatting defensivo, hoje
 3. ~~Org no GitHub: **`arandu-io`**~~ — **feito.** `@Arandu` e `Arandusoft`
-   estavam tomados; a org é `arandu-io`, e os dez repositórios estão publicados
-   nela. Módulo: `github.com/arandu-io/framework`
+   estavam tomados; a org é `arandu-io`, e os catorze repositórios vivem nela —
+   treze públicos e o `docs`, que é privado. Módulo:
+   `github.com/arandu-io/framework`
 4. ~~Fórmula do Homebrew: registrar como `aru`, não `arandu`~~ — **feito.** É
    `Formula/aru.rb`, em `arandu-io/homebrew-tap`, e ela compila do fonte em vez
    de baixar binário
@@ -152,3 +153,9 @@ criado em 09/02/2026 e `arandu.com` em 05/01/2004 — o RDAP não expõe o titul
 então de quem é o `.dev` não está verificado aqui, e o `.com` é anterior ao
 projeto por vinte e dois anos. Sobre o `.com` o que resta é comprar ou não
 comprar, que é outra pergunta e outro preço.
+
+*Corrigido em 14/08/2026:* o item 3 dizia "os dez repositórios estão publicados
+nela", e as duas metades estavam erradas. São catorze — `ui` (ADR 0026), `kyse`
+(ADR 0027), `mcp` (ADR 0030) e `hesape` (ADR 0049) entraram depois — e nem todos
+são públicos: `gh repo list arandu-io` devolve o `docs` como privado, além do
+`plans`, que não é produto e não entra na conta.

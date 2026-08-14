@@ -386,7 +386,13 @@ esqueleto, não no framework.**
 | views e componentes | `arandu/resources/views/` |
 | runtime de render e assets embutidos | `framework/view/` |
 
-Dez repositórios, não onze. A REGRA 3 continua valendo.
+A dissolução tirou um repositório da conta em vez de acrescentar: onze viraram
+dez. A REGRA 3 continua valendo, e hoje são **catorze** — `ui` (ADR 0026),
+`kyse` (ADR 0027), `mcp` (ADR 0030) e `hesape` (ADR 0049) entraram depois.
+
+*Corrigido em 14/08/2026:* esta linha dizia "Dez repositórios, não onze" no
+presente. Dez foi o número entre a ADR 0021 e a ADR 0026; a lista atual está em
+`05-repositorios.md`.
 
 ## O que a camada de view não toca
 

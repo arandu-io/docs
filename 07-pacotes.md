@@ -148,7 +148,7 @@ o **painel administrativo** (Nova), Fase 4, e é assim que aparece em
 infraestrutura, não pacote. Nomear o que não vai existir foi exatamente o que
 produziu a colisão. As três linhas restantes desta tabela também estão fora de
 escopo e mantêm o nome só como reserva documentada — a `06` reserva na org
-apenas os dez repositórios e o `taba`.
+apenas os catorze repositórios que existem e o `taba`.
 
 ## Negócio e administração
 
@@ -223,7 +223,12 @@ pacote da Fase 3.
 ## Triagem de escopo
 
 Este documento define **nomes**. O que de fato será construído, e em que ordem,
-está em `06-escopo.md` — dez repositórios até a Fase 3, não vinte e cinco.
+está em `06-escopo.md` — catorze repositórios, não vinte e cinco.
+
+*Corrigido em 14/08/2026:* esta linha e a nota de 07/08 acima diziam dez. Foram
+dez até a Fase 3; depois dela entraram `ui` (ADR 0026), `kyse` (ADR 0027), `mcp`
+(ADR 0030) e `hesape` (ADR 0049), e nenhum dos quatro chegou a esta página. A
+lista nominal está em `05-repositorios.md`.
 
 ## Vetos aplicados
 

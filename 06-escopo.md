@@ -173,6 +173,7 @@ Laravel LLC virou empresa de infraestrutura depois de o framework dominar.
 | Construir na Fase 1 | **5** — framework, arandu, aru, docs, examples |
 | Construir na Fase 2 | **3** — database, kv, homebrew-tap |
 | Construir na Fase 3 | **2** — queue, storage |
+| Autorizados depois da Fase 3 | **4** — ui (ADR 0026), kyse (ADR 0027), mcp (ADR 0030), hesape (ADR 0049) |
 | Core (sem repo) | 6 — quatro construídos, dois decididos e não construídos |
 | Não existe em Go | 5 |
 | Biblioteca de terceiro | 4 |
@@ -180,11 +181,18 @@ Laravel LLC virou empresa de infraestrutura depois de o framework dominar.
 | Fora de escopo | 4 |
 
 **Dez repositórios até a Fase 3**, contra 25 se o espelho fosse cego. E dos dez,
-quatro são obrigatórios para existir produto.
+quatro são obrigatórios para existir produto. Hoje a org tem **catorze**: os
+quatro da quarta linha entraram depois, cada um com a autorização que a REGRA 3
+exige.
 
 ## Reserva de nomes
 
-Reservar na org **só** os dez que vão existir até a Fase 3, mais `taba`,
-pelo risco de colisão futura. Os demais ficam documentados aqui
+Reservar na org **só** os catorze que existem, mais `taba`, pelo risco de
+colisão futura. Os demais ficam documentados aqui
 e reservados quando o gatilho acontecer — nome reservado sem repo vira lixo na
 org e confunde quem chega.
+
+*Corrigido em 14/08/2026:* o placar parava na Fase 3 e a reserva dizia dez, e as
+duas linhas eram lidas como o total da org. O `ui` e o `kyse` já faltavam antes
+do `mcp`, que existe desde 09/08/2026; o `hesape` entrou em 14/08/2026. A lista
+nominal está em `05-repositorios.md`.

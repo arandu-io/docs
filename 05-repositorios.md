@@ -28,11 +28,19 @@ brigar com a estrutura de pastas de projetos antigos.
 
 ## Mapa completo
 
-São **dez repositórios** até a Fase 3, e são estes: `framework`, `arandu`,
-`aru`, `database`, `kv`, `queue`, `storage`, `examples`, `homebrew-tap` e
-`docs`. A conta caiu de onze para dez quando o `porang` foi dissolvido
-(ADR 0021). São exatamente os dez que a org tem hoje: `gh repo list arandu-io`
-não devolve mais nada. O `website` vem depois, na Fase D.
+São **catorze repositórios** até a Fase 3, e são estes: `framework`, `arandu`,
+`aru`, `ui`, `kyse`, `hesape`, `mcp`, `database`, `kv`, `queue`, `storage`,
+`examples`, `homebrew-tap` e `docs`. O `website` vem depois, na Fase D.
+
+A conta chegou aqui em quatro passos, e cada um tem autorização registrada, que
+é o que a REGRA 3 exige: caiu de onze para dez quando o `porang` foi dissolvido
+(ADR 0021); subiu para onze com o `ui` (ADR 0026), doze com o `kyse` (ADR 0027),
+treze com o `mcp` (ADR 0030) e catorze com o `hesape` (ADR 0049).
+
+*Corrigido em 14/08/2026:* este parágrafo dizia dez e listava dez, o que já
+estava errado desde 09/08/2026 — o `mcp` existia, com `go.mod` próprio e ADR
+própria, e nunca entrou na conta. `docs/31-reorganizacao-hesape.md`, seção 7.2,
+item 7, tinha apontado a divergência sem que ela fosse fechada.
 
 *Corrigido em 07/08/2026:* esta frase terminava com "o `.github` guarda
 workflow, não código", e a lista do Núcleo trazia `arandu-io/.github` entre os
@@ -91,9 +99,9 @@ arandu-io/mail        interface + SMTP; submódulos ses, resend, postmark, mailg
 arandu-io/ws          coder/websocket e gobwas/ws
 ```
 
-Criar qualquer um dos dois é passar de dez para onze repositórios, e a REGRA 3
-exige autorização do proprietário antes — como a ADR 0016 registrou para `queue`
-e `storage`.
+Criar qualquer um dos dois é passar de catorze para quinze repositórios, e a
+REGRA 3 exige autorização do proprietário antes — como a ADR 0016 registrou para
+`queue` e `storage`.
 
 *Corrigido em 07/08/2026:* este bloco listava os seis num só lugar, como se os
 seis existissem, e dava `gcs` e `azure` como submódulos do `storage`. A árvore
@@ -220,6 +228,9 @@ repositório com quatro módulos — o contrato fica no core e cada driver tem o
 seu (ADR 0014)
 Fase 3: `queue` e `storage` — **feito**. São o nono e o décimo repositórios,
 autorizados pela ADR 0016; a REGRA 3 passa a valer com dez
+Depois da Fase 3: `ui` (ADR 0026), `kyse` (ADR 0027), `mcp` (ADR 0030) e
+`hesape` (ADR 0049) — quatro autorizações fora da ordem de fases, e a REGRA 3
+passa a valer com catorze
 Fase D: `website` (aplicacao Arandu, sobre o `kyse` e o `framework/view`)
 Fase 4+: `taba` (painel administrativo) e a camada de IA, ainda sem nome.
 Ver a triagem em `06-escopo.md`

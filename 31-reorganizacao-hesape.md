@@ -420,7 +420,9 @@ Ordenado por dependência (camada), depois por quanto uma aplicação toca por d
 
 ## 6. A ordem de execução
 
-Nove fases. Cada uma termina com `gofmt -l $(find . -name '*.go' -not -name '*.kyse.go') && go vet ./... && go test -race ./...` verde nos onze repositórios.
+Nove fases. Cada uma termina com `gofmt -l $(find . -name '*.go' -not -name '*.kyse.go') && go vet ./... && go test -race ./...` verde nos **doze** repositórios que têm código Go. Os outros dois dos catorze não entram no portão: `homebrew-tap` não tem arquivo `.go` e `docs` é markdown.
+
+*Corrigido em 14/08/2026:* esta linha dizia onze, que era o número em 10/08/2026, quando o documento foi escrito. O `hesape` virou repositório próprio pela ADR 0049 e entra no portão como os outros.
 
 ### Fase 0 — Consertos independentes. Nada se move.
 
@@ -555,7 +557,7 @@ Efeito colateral obrigatório: `docs/00:55`, `02`, `03:26`, `03:214`, `06:57`, `
 4. **O compilador kyse sair da `aru`** (ADR 0047).
 5. **A exceção da URL pré-assinada** (ADR 0048), ou a retirada do argumento de egresso do R2 de `docs/11:90-93`.
 6. **`jsonschema.Validate` vs `framework/validation`.** Não são a mesma coisa — uma checa struct/request contra strings de regra e produz frase para humano; a outra checa JSON decodificado de um modelo de linguagem contra um documento de schema, antes de qualquer handler. O Laravel também as separa (`Illuminate\JsonSchema` não tem validador; os testes dele usam `opis/json-schema`, que a CLAUDE.md:56 proíbe). Dois pacotes, nenhum implementado em termos do outro. Os resultados piores — `validation` ganhar `FromSchema`, ou `jsonschema` ganhar strings de regra — são a segunda forma que a REGRA 9 existe para impedir.
-7. **A contagem de repositórios.** CLAUDE.md:66 diz doze. `arandu-io/mcp` existe, tem `go.mod` próprio e foi autorizado pela ADR 0030 (09/08/2026), o que faria treze. A REGRA 3 conta repositórios; o número na regra e o número na árvore não batem.
+7. **A contagem de repositórios.** ~~CLAUDE.md:66 diz doze. `arandu-io/mcp` existe, tem `go.mod` próprio e foi autorizado pela ADR 0030 (09/08/2026), o que faria treze. A REGRA 3 conta repositórios; o número na regra e o número na árvore não batem.~~ **Fechado em 14/08/2026:** são catorze, com o `hesape` (ADR 0049). A REGRA 3 do `CLAUDE.md` e o `05-repositorios.md` passaram a listar os catorze nominalmente, e as demais páginas que ainda diziam dez foram corrigidas junto.
 8. **A duplicação `examples/config/` vs `arandu/config/`.** Byte a byte. Toda edição no esqueleto é duas edições enquanto durar.
 9. **`session.block` / a janela de lost-update.** Um `Put` de registro inteiro tipado tem essa janela. Não está decidido nem para um lado nem para o outro.
 10. **HTTP/1.1 vs HTTP/2 para o stream de broadcasting.** Ou o `Hub` recusa abrir stream sob HTTP/1.1 (e a coisa não funciona em desenvolvimento), ou abre e reintroduz o defeito que `reload.go:19-31` documenta. Antes da primeira linha.

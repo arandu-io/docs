@@ -198,13 +198,17 @@ e marca as Fases 1 e 3 como "espera pessoa". Citar o instrumento e afirmar o
 contrário do que ele responde é pior do que não citá-lo. O estado se lê rodando
 o comando; a tabela acima é uma fotografia, e envelhece.
 
-**Dez repositórios** na organização. O trio central espelha o Laravel:
+**Catorze repositórios** na organização. O trio central espelha o Laravel:
 
 | Repositório | Espelha | Papel |
 |---|---|---|
 | `framework` | `laravel/framework` | a biblioteca: kernel, security, data, httpx, view |
 | `arandu` | `laravel/laravel` | o esqueleto de projeto que o `aru new` clona |
 | `aru` | `artisan` | a CLI: `new`, `make:*`, `migrate`, `doctor`, `view:build` |
+| `ui` | `laravel/ui` | o starter kit de auth, publicado no projeto (ADR 0026) |
+| `kyse` | — | a biblioteca de componentes, importada e não copiada (ADR 0027) |
+| `hesape` | `illuminate/*` | a coleção de componentes que o `framework` importa (ADR 0049) |
+| `mcp` | `laravel/mcp` | servidor Model Context Protocol, com `Grant` em toda ferramenta (ADR 0030) |
 | `database` | — | `Open` e os compartimentos `pgx`, `mysql`, `sqlite` |
 | `kv` | — | cache, sessão, lock e rate limit sobre RESP |
 | `queue` | — | fila sobre a tabela `jobs`, e sobre RESP no submódulo |
@@ -217,5 +221,11 @@ O `porang` era o décimo primeiro e foi **dissolvido**: no Laravel a view mora n
 esqueleto, não no framework. As views foram para `arandu/resources/views/` e o
 runtime de render para `framework/view/` (ADR 0021).
 
-A REGRA 3 vale com dez. `queue` e `storage` foram autorizados pelo proprietário
-na Fase 3 (ADR 0016).
+A REGRA 3 vale com catorze, e cada passo acima de dez tem autorização registrada:
+`ui` (ADR 0026), `kyse` (ADR 0027), `mcp` (ADR 0030) e `hesape` (ADR 0049).
+`queue` e `storage` foram autorizados pelo proprietário na Fase 3 (ADR 0016).
+
+*Corrigido em 14/08/2026:* esta seção dizia dez e listava dez. Já estava errada
+antes do `hesape`: o `ui` e o `kyse` nunca entraram na tabela, e o `mcp` existe
+desde 09/08/2026 com `go.mod` próprio e ADR própria. A lista que vale é a de
+`05-repositorios.md`.

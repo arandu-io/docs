@@ -18,8 +18,14 @@ pressão.
   abaixo
 - versões suportadas para correção de segurança (doc 23)
 
-O `SECURITY.md` existe nos dez repositórios: `framework`, `aru`, `arandu`,
-`database`, `kv`, `queue`, `storage`, `examples`, `homebrew-tap` e `docs`.
+O `SECURITY.md` existe nos catorze repositórios: `framework`, `arandu`, `aru`,
+`ui`, `kyse`, `hesape`, `mcp`, `database`, `kv`, `queue`, `storage`, `examples`,
+`homebrew-tap` e `docs`. Não falta em nenhum — `ls arandu-io/*/SECURITY.md`
+devolve catorze arquivos.
+
+*Corrigido em 14/08/2026:* esta linha dizia dez e listava dez. Os quatro que
+faltavam — `ui`, `kyse`, `hesape` e `mcp` — têm o arquivo, e o que estava
+desatualizado era a lista, não o repositório.
 
 Issue pública sobre vulnerabilidade é fechada e movida para advisory privado,
 com agradecimento — não com bronca.
@@ -96,7 +102,7 @@ política que passa a valer no dia em que a registry existir.
 
 - Core com **uma** dependência direta, `golang.org/x/crypto` (ADR 0004), mais o
   `golang.org/x/sys` indireto que vem com ela — essa é a defesa principal
-- `govulncheck` na CI dos oito repositórios que têm código Go, reprovando a
+- `govulncheck` na CI dos doze repositórios que têm código Go, reprovando a
   execução — e só ela: nada bloqueia merge hoje, ver abaixo
 - `go.sum` verificado; nenhum `replace` apontando para fora em release
 - Assets vendorizados (HTMX, Alpine) em `framework/view/assets/`; o binário do
@@ -136,6 +142,16 @@ impede push direto em `main` com a CI vermelha — o que existe é a execução
 reprovando, que é visível, não impeditiva. Ligar proteção de branch com o
 `govulncheck` como check obrigatório é decisão do proprietário, e é o que faria a
 linha original virar verdade.
+
+*Atualizado em 14/08/2026:* os números daquela medição envelheceram, o raciocínio
+não. Os repositórios são catorze, e o `govulncheck` roda em **doze** deles, com
+as duas mesmas exceções: o `docs` não tem `.github/workflows/` e a CI do
+`homebrew-tap` é de fórmula, sem Go para analisar. Os outros dois achados
+continuam valendo, agora medidos sobre os catorze: não há `.github/dependabot.yml`
+em nenhum, e a proteção de branch segue desligada —
+`gh api repos/arandu-io/<repo>/branches/main/protection` devolve
+"Branch not protected" nos treze repositórios públicos. Ligá-la continua sendo
+decisão do proprietário.
 
 ## O `doctor` faz parte da resposta a incidente
 

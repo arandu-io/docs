@@ -77,6 +77,14 @@ não precisa ser relicenciável. Por isso: DCO.
    desde a ADR 0021 — procurando o arquivo nos dez repositórios, existe um só, o
    `framework/THIRD_PARTY.md`.
 
+   *Atualizado em 14/08/2026:* os repositórios são catorze, e o arquivo já não é
+   um. Existem dois, byte a byte idênticos: `framework/THIRD_PARTY.md` e
+   `hesape/view/THIRD_PARTY.md`, porque o `view/` inteiro — aviso, teste de
+   crédito e os seis arquivos de `view/assets/` — foi para o `hesape` (ADR 0049)
+   sem sair do `framework`. É a duplicação que a própria ADR 0049 chama de duas
+   árvores vivas: a correção feita em uma não chega à outra. Qual das duas fica
+   segue os assets embutidos, e isso é a transição que a ADR 0049 descreve.
+
 5. `THIRD_PARTY.md` no `arandu` — **não feito, e é furo aberto.** O
    `arandu/assets/app.css` é saída compilada do Tailwind: a primeira linha do
    arquivo é `/*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */`,

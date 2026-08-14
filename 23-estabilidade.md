@@ -88,6 +88,12 @@ arquivo existente. **Não existe `UPGRADE.md` em nenhum dos dez repositórios** 
 CHANGELOG. As seis quebras da seção anterior saíram sem nota de migração de
 espécie alguma.
 
+*Atualizado em 14/08/2026:* o arquivo passou a existir, em um só lugar. O
+`framework/UPGRADE.md` foi escrito em 08/08/2026, e é o único entre os catorze
+repositórios — `ls arandu-io/*/UPGRADE.md` devolve esse e nada mais. O CHANGELOG
+continua não existindo em nenhum: `find` por `CHANGELOG*` na árvore segue sem
+devolver nada.
+
 **`aru upgrade` — ainda não existe, e tem gatilho.** Ele rodaria as migrações
 mecânicas (renomear símbolo, mover pacote, ajustar assinatura) como um codemod.
 Não foi construído porque o framework está em `v0.x` e ainda não houve uma
