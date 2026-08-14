@@ -1,6 +1,24 @@
 # ADR 0047 — Nome de pacote que colide com a biblioteca padrão
 
-**Status:** Aceita. Data: 10/08/2026.
+**Status:** Aceita e **executada em 14/08/2026**. Data da decisão: 10/08/2026.
+
+`framework/httpx` é `framework/http`, e o renomeio foi atômico nos oito
+repositórios que o citavam — `framework`, `arandu`, `examples`, `aru`, `ui`,
+`kv`, `queue` e `mcp`. Nenhum identificador exportado mudou: só o caminho.
+Zero ocorrências de `httpx` restaram no código, e nenhuma casca ficou para trás,
+que é o que esta ADR exige ao dizer que o renomeio é atômico.
+
+Duas armadilhas que só apareceram na execução, registradas para o próximo
+renomeio de pacote:
+
+- **No `aru` e no `ui`, a maioria das ocorrências vive dentro de string de
+  gerador** — os templates e os `.golden`. O `go build` fica verde enquanto elas
+  envelhecem, e quem descobre é o projeto que o gerador produz.
+- **O apelido se decide pelo arquivo emitido, não pelo arquivo que emite.** O
+  gerador importa `net/http`; o controller que ele escreve pode não importar. Ler
+  os imports do gerador põe apelido em arquivo que não tem contra o que apelidar.
+
+`arandutest` continua fora do espelho, pela exceção que esta ADR já declara.
 
 ## Contexto
 
