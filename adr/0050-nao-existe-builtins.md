@@ -82,14 +82,44 @@ pergunta *"de onde vem este comando?"* se responde lendo um arquivo.
 É a mesma decisão do `bootstrap/app.go`, pela mesma razão que a ADR 0001 dá: o
 *composition root* é visível, e o que o compilador verifica é o que roda.
 
+## Onde o `artisan` entra, porque é a primeira pergunta
+
+O `aru` **é** o `artisan`, e o `switch` do esqueleto é a outra ponta dele. As
+duas coisas não competem: são os dois lados da mesma chamada.
+
+`aru/delegate.go:26` roda `go run . <subcomando>` no projeto, e o comentário
+dele diz a razão em uma frase: *"serve, migrate and routes all need the list of
+registered modules, and that list only exists inside the application"*. Os
+módulos são fiados à mão em `bootstrap/app.go`, sem container e sem carga de
+plugin. Uma CLI compilada separadamente não tem como conhecê-los — então ela
+roda o projeto.
+
+A correspondência é exata, e foi conferida: dos onze casos do `switch`, **dez**
+são precisamente os que `aru/commands.go` delega:
+
+```
+aru migrate   →   go run . migrate   →   case "migrate":
+```
+
+`serve`, `migrate`, `migrate:rollback`, `migrate:status`, `migrate:fresh`,
+`schedule:list`, `schedule:run`, `work`, `routes` e `db:seed`. O décimo primeiro
+é `Version`, que o binário responde sem que ninguém peça pela CLI.
+
+Isso é o que fecha o argumento contra o `Builtins`. Ele existiria para o
+framework entregar comandos ao binário do projeto — mas o que chega ao binário
+já chega, pela delegação, e o que decide **quais** comandos existem é o
+`switch`, que é do projeto. Um `Builtins` no meio seria uma terceira lista entre
+duas que já se correspondem uma a uma, e a primeira vez que as três
+divergissem, `aru migrate` responderia *"unknown command"* num projeto que tem
+`migrate`.
+
 ## O que esta ADR não decide
 
-**O `aru` continua sendo a CLI.** Nada aqui muda o que
-`github.com/arandu-io/aru` oferece — `aru new`, `aru make:*`, `aru doctor`,
-`aru view:build`. A [ADR 0006](0006-cli-em-modulo-separado.md) já separou as
-duas coisas: a `aru` é um binário próprio, e o que ela precisa do projeto ela
-obtém delegando ao binário do projeto. Esta ADR é sobre o binário do projeto, e
-não sobre a ferramenta.
+**O que a `aru` faz sozinha continua dela.** `aru new`, `aru make:*`,
+`aru doctor`, `aru view:build`, `aru key:generate`, `aru font:add` e
+`aru build` não passam pelo projeto: são a ferramenta agindo sobre os arquivos.
+A [ADR 0006](0006-cli-em-modulo-separado.md) já separou as duas metades, e esta
+ADR é sobre a que roda dentro do binário.
 
 **O gerador pode gerar o `case`.** Se um dia `aru make:command` existir, o que
 ele faz é escrever um `case` no `switch` e o arquivo do comando ao lado — a
