@@ -28,14 +28,17 @@ brigar com a estrutura de pastas de projetos antigos.
 
 ## Mapa completo
 
-São **catorze repositórios** até a Fase 3, e são estes: `framework`, `arandu`,
-`aru`, `ui`, `kyse`, `hesape`, `mcp`, `database`, `kv`, `queue`, `storage`,
-`examples`, `homebrew-tap` e `docs`. O `website` vem depois, na Fase D.
+São **catorze repositórios**, e são estes: `framework`, `arandu`, `aru`, `ui`,
+`kyse`, `hesape`, `mcp`, `database`, `kv`, `queue`, `storage`, `examples`,
+`homebrew-tap` e `docs`. O `website` vem depois, na Fase D.
 
-A conta chegou aqui em quatro passos, e cada um tem autorização registrada, que
-é o que a REGRA 3 exige: caiu de onze para dez quando o `porang` foi dissolvido
-(ADR 0021); subiu para onze com o `ui` (ADR 0026), doze com o `kyse` (ADR 0027),
-treze com o `mcp` (ADR 0030) e catorze com o `hesape` (ADR 0049).
+Dez chegaram até a Fase 3. Os quatro últimos foram autorizados **depois** dela,
+cada um com ADR: `ui` (ADR 0026), `kyse` (ADR 0027), `mcp` (ADR 0030) e `hesape`
+(ADR 0049). Antes disso a conta tinha caído de onze para dez, quando o `porang`
+foi dissolvido (ADR 0021).
+
+Treze são públicos; o `docs` é privado. `gh repo list arandu-io` devolve quinze,
+contando o `plans`, que não é produto e não conta (REGRA 3).
 
 *Corrigido em 14/08/2026:* este parágrafo dizia dez e listava dez, o que já
 estava errado desde 09/08/2026 — o `mcp` existia, com `go.mod` próprio e ADR
