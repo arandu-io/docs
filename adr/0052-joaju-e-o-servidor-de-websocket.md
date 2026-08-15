@@ -84,9 +84,19 @@ nosso a nomear se o cliente é vendorizado.
 
 ## O que fica decidido junto, para não voltar como pergunta
 
-**Escala por Redis pub/sub, como o Reverb.** `hesape/redis` existe, e
-`docs/31:527` já registra o que falta: ele **não tem `Publish` nem `Subscribe`**
-— verificado, zero ocorrências. É pré-requisito, e é do `joaju` construir.
+**Escala por Redis pub/sub, como o Reverb, e o pré-requisito não existe.**
+
+Esta ADR dizia, na primeira versão, que `hesape/redis` **não tem `Publish` nem
+`Subscribe`** — repetindo `docs/31:527`, que afirma "verificado, zero
+ocorrências". **As duas afirmações são falsas.** Os três estão escritos:
+
+	redis/connections/commands.go:506       Publish(ctx, channel, message) (int64, error)
+	redis/connections/subscriptions.go:27   Subscribe(ctx, channels, callback) error
+	redis/connections/subscriptions.go:37   PSubscribe(ctx, channels, callback) error
+
+A escala horizontal é possível hoje, sem trabalho anterior. A correção fica
+escrita em vez de o parágrafo ser apagado, porque a afirmação errada foi copiada
+de um documento para outro e a próxima cópia sairia do mesmo lugar.
 
 **Não há event loop a escolher.** O `ext-uv` do Reverb existe porque PHP não tem
 concorrência; o `stream_select` dele trava em 1.024 conexões. Em Go uma goroutine

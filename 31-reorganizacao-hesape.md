@@ -526,7 +526,10 @@ Efeito colateral obrigatório: `docs/00:55`, `02`, `03:26`, `03:214`, `06:57`, `
 
 `arandutest` primeiro (tudo o mais precisa de teste), depois `bus`, `notifications`, `socialite`, `image`, `broadcasting`.
 
-`broadcasting` é o último e tem dois bloqueios anteriores: `kv` precisa ganhar `Publish`/`Subscribe` (não tem — verificado, zero ocorrências), e a decisão HTTP/1.1 vs HTTP/2 tem de ser tomada **antes da primeira linha**. `framework/kernel/reload.go:15-50` é um post-mortem escrito neste repositório desse mesmo mecanismo quebrando: um `EventSource` aberto gasta uma das seis conexões que o HTTP/1.1 dá por origem, e `aru dev` serve HTTP/1.1 em texto claro.
+`broadcasting` é o último e tem dois bloqueios anteriores: ~~`kv` precisa ganhar `Publish`/`Subscribe` (não tem — verificado, zero
+ocorrências)~~ **Falso, corrigido em 14/08/2026:** `hesape/redis/connections`
+tem os três — `Publish` (`commands.go:506`), `Subscribe` e `PSubscribe`
+(`subscriptions.go:27,37`), e a decisão HTTP/1.1 vs HTTP/2 tem de ser tomada **antes da primeira linha**. `framework/kernel/reload.go:15-50` é um post-mortem escrito neste repositório desse mesmo mecanismo quebrando: um `EventSource` aberto gasta uma das seis conexões que o HTTP/1.1 dá por origem, e `aru dev` serve HTTP/1.1 em texto claro.
 
 ---
 
