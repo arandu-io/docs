@@ -119,8 +119,38 @@ crepúsculo, flâmula), nunca santos nem cargos religiosos. A regra é a mesma.
 | Laravel | Função | Arandu | Significado | St |
 |---|---|---|---|---|
 | Horizon | dashboard de filas | **potiron** | potirõ, trabalho coletivo | ? |
-| Reverb | servidor de websocket | **uirapuru** | pássaro cujo canto se propaga | C |
-| Echo | cliente JS de broadcasting | **sabia** | pássaro que responde o canto | C |
+| Reverb | servidor de websocket | **joaju** | união, conexão, ligação | C |
+| Echo | cliente JS de broadcasting | — | ver a nota abaixo |  |
+
+> *Corrigido em 14/08/2026.* O nome era **`uirapuru`** — *pássaro cujo canto se
+> propaga* — pareado com **`sabiá`**, *o que responde o canto*. O par era bonito
+> e descrevia a coisa errada: canto que se propaga é **broadcast**, que é
+> unidirecional. Um WebSocket é conexão bidirecional e permanente, e é isso que
+> `joaju` nomeia. O nome descreve o mecanismo em vez do efeito, e `uirapuru`
+> volta a ficar livre.
+>
+> **Os cinco filtros, na ordem da REGRA 4:**
+>
+> 1. **Gíria e palavrão em pt-BR** — sem leitura ruim conhecida. **Não avaliado
+>    por quem tem o ouvido**, e foi este filtro, e não a etimologia, que reprovou
+>    `karai`, `kuatia` e `heka`.
+> 2. **Categoria vetada** — substantivo comum. Não é divindade, ofício religioso,
+>    etnônimo nem termo de disputa política. Passa.
+> 3. **Leitura em inglês** — não forma palavra. Passa, ao contrário de `hesape`,
+>    que soa *"he's ape"* (ADR 0043).
+> 4. **Etimologia atestada** — guarani, de `jo-` (recíproco) + `aju`: união,
+>    conexão. Confirmado pelo proprietário em 14/08/2026.
+> 5. **Colisão** — `github.com/arandu-io/joaju` livre (404). `joaju.io` e
+>    `joaju.dev` livres; `joaju.com` registrado. **Existem outros usos:**
+>    `github.com/joaju` é uma organização vazia, e há uma **Joaju Software**
+>    (`JoajuSoftware`), além de oito repositórios com o nome. Nenhum é Go e
+>    nenhum ocupa o nosso caminho de módulo — mas o nome não é exclusivo, e isso
+>    fica escrito em vez de descoberto depois.
+>
+> **`sabiá` fica sem par, e isso é decisão em aberto.** Ele nomeava o cliente
+> JavaScript do Echo, e a REGRA 13 proíbe Node no projeto — `docs/31:398` já
+> lista `laravel-echo` e `pusher-js` entre os recusados. O cliente do `joaju`, se
+> existir, é Go ou HTMX, e o nome dele é outra conversa.
 
 ## Observabilidade
 

@@ -147,7 +147,7 @@ distribuir; antes disso é infraestrutura sem conteúdo.
 | Nome | Função | Gatilho para construir |
 |---|---|---|
 | *a definir* | busca full-text | quando full-text do Postgres não bastar para um cliente real |
-| `uirapuru` / `sabia` | websocket | quando SSE do HTMX não bastar. SSE cobre a maioria dos casos |
+| `joaju` | websocket | quando SSE do HTMX não bastar. SSE cobre a maioria dos casos |
 | `potiron` | dashboard de filas | depois de existir fila em produção |
 | `taba` | painel administrativo | Fase 4. É o único dos "pagos" que faz sentido |
 | *a definir* | camada de IA | Fase 4, depende de tudo acima. Nomear no gatilho |

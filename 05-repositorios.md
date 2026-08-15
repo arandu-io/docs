@@ -131,7 +131,7 @@ Nomes definidos em `docs/07-pacotes.md`. Os que continuam no mapa:
 
 ```
 arandu-io/moitara    registry de módulos — ver 18-marketplace.md
-arandu-io/uirapuru   servidor websocket (Reverb) — gatilho: SSE não bastar
+arandu-io/joaju      servidor websocket (Reverb) — gatilho: SSE não bastar
 arandu-io/potiron    dashboard de filas (Horizon) — depois de fila em produção
 arandu-io/taba       painel administrativo — pago (Nova), Fase 4
 ```

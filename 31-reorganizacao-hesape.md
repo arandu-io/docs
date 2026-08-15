@@ -411,7 +411,7 @@ Ordenado por dependência (camada), depois por quanto uma aplicação toca por d
 
 | Item | Gatilho | Fonte |
 |---|---|---|
-| WebSocket (`uirapuru`) | quando o SSE do HTMX não bastar | `docs/06-escopo.md:150` |
+| WebSocket (`joaju`) | quando o SSE do HTMX não bastar | `docs/06-escopo.md:150` |
 | Reverb / protocolo Pusher | idem | `docs/packages/reverb.md:11` |
 | `jsonschema.Parse` | o primeiro consumidor que precise ler um schema que não escreveu | — |
 | tradução (o pacote existe; os idiomas não) | primeiro cliente fora do par pt-BR/en | `docs/13:57` |
