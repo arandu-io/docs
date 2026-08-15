@@ -20,7 +20,7 @@ WebSocket de **Broadcasting** como desenho.
 | Illuminate | Arandu | Onde |
 |---|---|---|
 | **Auth** | `security/` — Grant, Policy, Subject | core |
-| **Broadcasting** | SSE no core e WebSocket no `ws`. **Nenhum dos dois existe.** O `ws` está decidido e **sem gatilho** — ADR 0016, "com demanda"; o gatilho que os docs 05 e 06 registram é do `uirapuru`, e é "quando o SSE do HTMX não bastar" | core + adapter |
+| **Broadcasting** | SSE no core e WebSocket no `ws`. **Nenhum dos dois existe.** O `ws` está decidido e **sem gatilho** — ADR 0016, "com demanda"; o gatilho que os docs 05 e 06 registram é do `joaju`, e é "quando o SSE do HTMX não bastar" | core + adapter |
 | **Bus** | não há bus separado: job é job; o pacote é o `queue` | adapter |
 | **Cache** | `kv` | adapter |
 | **Collections** | `slices`, `maps`, genéricos | stdlib |
@@ -74,7 +74,7 @@ embute exatamente três arquivos — `htmx.min.js`, `alpine.min.js` e `app.css` 
 e a extensão SSE do HTMX não está entre eles. Como a CSP é `script-src 'self'`,
 não há como puxá-la de CDN. O documento passa a registrar a ausência em vez
 de contar com o mecanismo — sem inventar gatilho, porque o registro já tem os
-seus: o `ws` está "com demanda" (ADR 0016) e o `uirapuru` espera o SSE do HTMX
+seus: o `ws` está "com demanda" (ADR 0016) e o `joaju` espera o SSE do HTMX
 não bastar (docs 05 e 06).
 
 ## O placar
