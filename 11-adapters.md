@@ -43,7 +43,7 @@ Matriz de drivers é o caso em que multi-módulo paga o próprio custo.
 | `storage` | interface + disco local, zero dependência | `s3` | sim; `gcs` e `azure` não existem |
 | `queue` | fila sobre a tabela da própria aplicação; nenhum client | `kv` (driver RESP) | sim; `nats`, `sqs` e `rabbitmq` não existem |
 | `mail` | interface + SMTP (`net/smtp`) | `ses`, `resend`, `postmark`, `mailgun` | **não** — decidido e sem gatilho |
-| `ws` | `coder/websocket` e `gobwas/ws` | nenhum | **não** — decidido e sem gatilho |
+| `ws` | **fork do `gorilla/websocket`** em `arandu-io/joaju` | nenhum | **autorizado** — ADR 0052 |
 
 *Corrigido em 07/08/2026:* a linha do `queue` dizia núcleo "interface + driver
 sobre `kv` e sobre `database`", com `nats`, `sqs` e `rabbitmq` como submódulos.
@@ -116,7 +116,17 @@ Ressalvas que o `kv` não pode ignorar:
 **Consequência para o core: nada em `kv` pode depender de RedisJSON, RediSearch
 ou Lua avançado.** Se depender, o Dragonfly deixa de ser drop-in.
 
-### WebSocket — dois drivers, uma interface
+### WebSocket — **revogado pela ADR 0052**
+
+> **Revogado em 14/08/2026.** A escolha abaixo era de biblioteca **para
+> consumir**, e o critério "idiomático, próximo da stdlib" valia para isso. O
+> que se decidiu depois é outra coisa: um servidor de WebSocket próprio,
+> `arandu-io/joaju`, sobre um **fork do `gorilla/websocket`**. Para uma base que
+> se mantém, o critério passa a ser adoção e estabilidade de API, e é o Gorilla
+> que as tem. Ver [ADR 0052](adr/0052-joaju-e-o-servidor-de-websocket.md).
+>
+> O parágrafo seguinte sobre Socket.IO e µWebSockets.js **continua valendo
+> inteiro**: são Node, e a ADR 0052 não os reabre.
 
 `coder/websocket` como padrão (idiomático, próximo da stdlib) e `gobwas/ws` para
 alta concorrência (zero-copy, epoll). Mesma API, in-process, sem Node.

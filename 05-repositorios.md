@@ -28,13 +28,13 @@ brigar com a estrutura de pastas de projetos antigos.
 
 ## Mapa completo
 
-São **catorze repositórios**, e são estes: `framework`, `arandu`, `aru`, `ui`,
-`kyse`, `hesape`, `mcp`, `database`, `kv`, `queue`, `storage`, `examples`,
-`homebrew-tap` e `docs`. O `website` vem depois, na Fase D.
+São **quinze repositórios**, e são estes: `framework`, `arandu`, `aru`, `ui`,
+`kyse`, `hesape`, `mcp`, `joaju`, `database`, `kv`, `queue`, `storage`,
+`examples`, `homebrew-tap` e `docs`. O `website` vem depois, na Fase D.
 
 Dez chegaram até a Fase 3. Os quatro últimos foram autorizados **depois** dela,
-cada um com ADR: `ui` (ADR 0026), `kyse` (ADR 0027), `mcp` (ADR 0030) e `hesape`
-(ADR 0049). Antes disso a conta tinha caído de onze para dez, quando o `porang`
+cada um com ADR: `ui` (ADR 0026), `kyse` (ADR 0027), `mcp` (ADR 0030), `hesape`
+(ADR 0049) e `joaju` (ADR 0052). Antes disso a conta tinha caído de onze para dez, quando o `porang`
 foi dissolvido (ADR 0021).
 
 Treze são públicos; o `docs` é privado. `gh repo list arandu-io` devolve quinze,
@@ -131,7 +131,7 @@ Nomes definidos em `docs/07-pacotes.md`. Os que continuam no mapa:
 
 ```
 arandu-io/moitara    registry de módulos — ver 18-marketplace.md
-arandu-io/joaju      servidor websocket (Reverb) — gatilho: SSE não bastar
+arandu-io/joaju      servidor websocket (Reverb) — AUTORIZADO, ADR 0052
 arandu-io/potiron    dashboard de filas (Horizon) — depois de fila em produção
 arandu-io/taba       painel administrativo — pago (Nova), Fase 4
 ```
