@@ -34,6 +34,8 @@ import sys
 # ("[label]: target") are matched separately because they anchor at the line.
 INLINE = re.compile(r'!?\[(?P<text>[^\]]*)\]\((?P<url>[^)\s]+)(?:\s+"[^"]*")?\)')
 REFDEF = re.compile(r'^\s{0,3}\[(?P<text>[^\]]+)\]:\s*(?P<url>\S+)')
+# Markdown allows html, and the README uses it for the logo and the badges.
+HTML = re.compile(r'<(?:img|a)\s[^>]*?(?:src|href)\s*=\s*"(?P<url>[^"]+)"')
 EXTERNAL = re.compile(r'^(https?:|mailto:|tel:|ftp:)')
 CODE_SPAN = re.compile(r'`[^`]*`')
 FENCE = re.compile(r'^\s*(```|~~~)')
@@ -93,6 +95,7 @@ def scan(files, tracked):
             line = strip_code(raw)
 
             found = [m.group('url') for m in INLINE.finditer(line)]
+            found += [m.group('url') for m in HTML.finditer(line)]
             definition = REFDEF.match(line)
             if definition:
                 found.append(definition.group('url'))
