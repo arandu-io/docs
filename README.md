@@ -15,7 +15,7 @@
 ## About this record
 
 Not a usage guide — that is the next phase, and it will be an Arandu
-application. This is the record: twenty-nine numbered documents and the
+application. This is the record: thirty-two numbered documents and the fifty-two
 architecture decision records behind them.
 
 An ADR is ten lines and captures the *why*, which is the part that cannot be
@@ -45,8 +45,8 @@ next phase, and it will be an Arandu application.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Before opening a pull request, the three
-commands at the top of that file have to pass, and CI runs exactly them.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Before opening a pull request, the check
+at the top of that file has to pass, and CI runs exactly it.
 
 ## Security Vulnerabilities
 
