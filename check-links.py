@@ -123,10 +123,7 @@ def scan(files, tracked):
                 if not any(c in tracked for c in candidates):
                     pointers.append((path, number, named, guess(named, tracked)))
             for m in SHORTHAND.finditer(raw):
-                named = m.group(0)
-                if POINTER.search(raw[m.start():m.start() + len(named) + 40]):
-                    continue  # already counted as a full path
-                pointers.append((path, number, named,
+                pointers.append((path, number, m.group(0),
                                  guess(m.group(1) + '-', tracked)))
     return checked, broken, pointers
 
