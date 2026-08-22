@@ -18,8 +18,10 @@ Not a usage guide — that is the next phase, and it will be an Arandu
 application. This is the record: thirty-two numbered documents and the fifty-two
 architecture decision records behind them.
 
-An ADR is ten lines and captures the *why*, which is the part that cannot be
-reconstructed from the code afterwards. One is written whenever a decision
+An ADR captures the *why*, which is the part that cannot be reconstructed from
+the code afterwards. Length follows the argument rather than a template:
+fifteen lines where the decision was easy, four hundred and sixty-seven where
+it was not, seventy-eight in the middle. One is written whenever a decision
 closes a door: no dependency injection container, no runtime reflection, no
 Active Record, no Node in the build, no second way to reach the database.
 
@@ -46,7 +48,8 @@ next phase, and it will be an Arandu application.
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Before opening a pull request, the check
-at the top of that file has to pass, and CI runs exactly it.
+at the top of that file has to pass. CI runs it, and one check the script does
+not make on its own: that `_archive/` was not edited.
 
 ## Security Vulnerabilities
 
