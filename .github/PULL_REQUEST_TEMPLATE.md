@@ -14,16 +14,14 @@ a patch that quietly works around it.
 
 ## Verification
 
-Run this before opening. CI runs the same thing, and a formatting difference is
-a failure rather than a comment.
+Run this before opening. CI runs the same thing, and a link that does not
+resolve is a failure rather than a comment.
 
 ```
-gofmt -l .        # no output
-go vet ./...
-go test -race ./...
+python3 check-links.py
 ```
 
 - [ ] Every commit carries a `Signed-off-by` line (`git commit -s`)
-- [ ] No new dependency, or this pull request argues for the one it adds
+- [ ] Nothing under `_archive/` was edited: it is the record as it was archived
 - [ ] No AI attribution in any commit message: no `Co-Authored-By` for an
       assistant, no "generated with" footer

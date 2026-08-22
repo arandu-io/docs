@@ -20,25 +20,21 @@ before their first patch.
 ## Before you open a pull request
 
 ```
-gofmt -l $(find . -name '*.go' -not -path '*/testdata/*' -not -name '*.kyse.go')   # no output
-go vet ./...
-go test -race ./...
+python3 check-links.py
 ```
 
-Both filters earn their place, and CI runs this exact `find`:
+There is no Go here and no build, so the Go commands the other repositories run
+at this point do not apply: `find` matches nothing and `go vet` has no module to
+look at. What breaks in a repository made of markdown is a reference, and that
+is what the script reads — every link and every heading anchor, with the line
+number of any that does not resolve. It needs the standard library and nothing
+else.
 
-  - a `.kyse.go` file is a view template that a build tag keeps out of the
-    compiler, and `gofmt` is the one tool in the chain that ignores build tags —
-    so a plain `gofmt -l .` reports a parse error on every view in the skeleton
-    repositories and looks like a broken checkout
-  - `testdata/` holds fixtures that are invalid on purpose. `aru` keeps a policy
-    file with a missing brace so that `aru doctor` has broken code to find, and
-    `gofmt` reports it every time
-
-CI runs exactly this, plus a check that no new dependency entered the core: the
-framework depends on the standard library and `golang.org/x/crypto`, and nothing
-else. A pull request that adds a dependency there needs to argue for it first,
-in an issue.
+CI runs it, and one check the script does not make on its own: that `_archive/`
+was not edited. The numbered documents, the ADRs and the package notes in there
+are the record as it stood when it was archived. A decision that has changed is
+corrected in the note that supersedes it, never in the archived copy — deleting
+an archived file is allowed, editing one is not.
 
 ## Where a test goes
 
@@ -57,7 +53,7 @@ Which package the test declares is a real choice, and it answers one question:
 Prefer the first. Take the second only when you use it -- `plans/testpackages.go`
 in the arandu-io working tree checks exactly that, by intersecting the
 identifiers a test names with what its package declares unexported, and the
-checklist runs it across every repository.
+checklist runs it across every Go repository in the project.
 
 A `package main` has no external form: it cannot be imported, so its tests are
 internal and that is the end of it.

@@ -1,0 +1,68 @@
+name: ci
+
+# There is no Go here, and no build. What a machine can still check in a
+# repository that is only markdown is that the files agree with each other:
+# the links resolve, and the archive stayed archived.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # python3 is on the runner already. The script uses the standard library
+      # only, so there is nothing to install and nothing to pin.
+      - name: links resolve
+        run: python3 check-links.py
+
+  frozen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The comparison needs the commit the push or the pull request
+          # started from. A shallow checkout does not have it, and the step
+          # would then find no change and pass -- which is the failure mode
+          # this job exists to avoid.
+          fetch-depth: 0
+
+      # _archive/ holds the numbered documents, the old ADRs and the package
+      # notes as they stood when they were archived. They are frozen: a
+      # correction to one of them is a correction to the record of a decision
+      # that was already taken, and the note that supersedes it lives in the
+      # vault instead.
+      #
+      # Deleting one is allowed and removing the whole directory is planned, so
+      # this looks for a file that was edited or renamed, not for one that went
+      # away.
+      - name: _archive/ was not edited
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "$BASE" ] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            echo "no base commit to compare against; nothing to check."
+            exit 0
+          fi
+
+          edited="$(git diff --name-only --diff-filter=MR "$BASE" "$HEAD" -- _archive/)"
+          if [ -n "$edited" ]; then
+            echo "::error::these archived files were edited:"
+            echo "$edited"
+            echo
+            echo "_archive/ is the record as it stood when it was archived."
+            echo "Correct the note that supersedes the document instead, and"
+            echo "leave the archived copy saying what it said."
+            exit 1
+          fi
+          echo "_archive/ untouched."

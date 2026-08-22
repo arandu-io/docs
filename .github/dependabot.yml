@@ -2,9 +2,9 @@
 # repository, and there is no npm entry anywhere in this project -- nothing in
 # any of these repositories installs Node.
 #
-# There is no workflow here yet either, so this entry watches nothing today. It
-# is declared anyway: the day a workflow lands, the pin is already covered
-# rather than covered later by somebody who remembers.
+# It was declared before there was a workflow to watch, so that the pins would
+# be covered the day one landed rather than covered later by somebody who
+# remembers. Two have landed since: release.yml and ci.yml.
 version: 2
 updates:
   - package-ecosystem: github-actions
