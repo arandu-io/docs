@@ -16,7 +16,7 @@ jobs:
   links:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # python3 is on the runner already. The script uses the standard library
       # only, so there is nothing to install and nothing to pin.
@@ -26,7 +26,7 @@ jobs:
   frozen:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # The comparison needs the commit the push or the pull request
           # started from. A shallow checkout does not have it, and the step
