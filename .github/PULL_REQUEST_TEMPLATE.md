@@ -18,7 +18,8 @@ Run this before opening. CI runs the same thing, and a link that does not
 resolve is a failure rather than a comment.
 
 ```
-python3 check-links.py
+GOWORK=off go test -race ./...
+GOWORK=off go run ./cmd/check-links
 ```
 
 - [ ] Every commit carries a `Signed-off-by` line (`git commit -s`)

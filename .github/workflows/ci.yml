@@ -1,8 +1,8 @@
 name: ci
 
-# There is no Go here, and no build. What a machine can still check in a
-# repository that is only markdown is that the files agree with each other:
-# the links resolve, and the archive stayed archived.
+# The repository is documentation plus the standard-library Go checker that
+# verifies it. CI tests that checker, resolves the links, and keeps the archive
+# frozen.
 
 on:
   push:
@@ -18,10 +18,15 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # python3 is on the runner already. The script uses the standard library
-      # only, so there is nothing to install and nothing to pin.
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: checker tests pass
+        run: GOWORK=off go test -race ./...
+
       - name: links resolve
-        run: python3 check-links.py
+        run: GOWORK=off go run ./cmd/check-links
 
   frozen:
     runs-on: ubuntu-latest

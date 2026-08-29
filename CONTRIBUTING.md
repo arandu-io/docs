@@ -20,18 +20,18 @@ before their first patch.
 ## Before you open a pull request
 
 ```
-python3 check-links.py
+GOWORK=off go test -race ./...
+GOWORK=off go run ./cmd/check-links
 ```
 
-There is no Go here and no build, so the Go commands the other repositories run
-at this point do not apply: `find` matches nothing and `go vet` has no module to
-look at. What breaks in a repository made of markdown is a reference, and that
-is what the script reads — every link and every heading anchor, with the line
-number of any that does not resolve. It needs the standard library and nothing
-else.
+There is no product build here. The small standard-library Go command reads
+every link and every heading anchor, and reports the line number of anything
+that does not resolve. Its package tests exercise the same public entry point
+the command uses.
 
-CI runs it, and one check the script does not make on its own: that `_archive/`
-was not edited. The numbered documents, the ADRs and the package notes in there
+CI runs both commands and one check the link checker does not make on its own:
+that `_archive/` was not edited. The numbered documents, the ADRs and the
+package notes in there
 are the record as it stood when it was archived. A decision that has changed is
 corrected in the note that supersedes it, never in the archived copy — deleting
 an archived file is allowed, editing one is not.
