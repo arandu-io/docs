@@ -18,15 +18,38 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          # go.mod declares the minimum language version. CI uses the current
+          # stable patch release so vulnerability scanning does not fail on a
+          # standard-library issue already fixed in a later patch.
+          go-version: stable
 
-      - name: checker tests pass
+      - name: gofmt
+        run: |
+          unformatted=$(find . -name '*.go' -exec gofmt -l {} +)
+          if [ -n "$unformatted" ]; then
+            echo "not gofmt'd:"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      - name: build
+        run: GOWORK=off go build ./...
+
+      - name: vet
+        run: GOWORK=off go vet ./...
+
+      - name: test
         run: GOWORK=off go test -race ./...
 
       - name: links resolve
         run: GOWORK=off go run ./cmd/check-links
+
+      - name: govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          GOWORK=off govulncheck ./...
 
   frozen:
     runs-on: ubuntu-latest
