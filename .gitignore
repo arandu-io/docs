@@ -3,7 +3,3 @@
 # um arquivo por repositorio ja divergiu, e o hook de commit-msg em .githooks/
 # e a camada que de fato reprova atribuicao de IA.
 .claude/
-
-# check-links.py is run, not imported, so this appears only when somebody
-# imports it -- which is what reading its numbers from a shell does.
-__pycache__/

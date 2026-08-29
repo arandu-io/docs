@@ -222,8 +222,8 @@ func shorthandBoundary(line string, start, end int) bool {
 }
 
 func isWord(char rune) bool {
-	// Python's Unicode-aware \w means letters, numbers, and underscore for the
-	// repository names and headings this checker accepts.
+	// The former checker's Unicode-aware word class meant letters, numbers, and
+	// underscore for the repository names and headings this checker accepts.
 	return unicode.IsLetter(char) || unicode.IsNumber(char) || char == '_'
 }
 
