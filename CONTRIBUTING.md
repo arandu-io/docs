@@ -20,19 +20,28 @@ before their first patch.
 ## Before you open a pull request
 
 ```
+gofmt -l $(find . -name '*.go' -not -path '*/testdata/*' -not -name '*.kyse.go')
+GOWORK=off go build ./...
+GOWORK=off go vet ./...
 GOWORK=off go test -race ./...
 GOWORK=off go run ./cmd/check-links
 ```
 
-There is no product build here. The small standard-library Go command reads
-every link and every heading anchor, and reports the line number of anything
-that does not resolve. Its package tests exercise the same public entry point
-the command uses.
+The first line prints nothing when the tree is formatted. This repository does
+not currently contain a `*.kyse.go` source or a Go fixture under `testdata/`, so
+the two exclusions do not change the files CI formats. Keeping them makes this
+the same safe command used across the project: Kyse sources and intentionally
+invalid fixtures must not be passed to `gofmt`.
 
-CI runs both commands and one check the link checker does not make on its own:
-that `_archive/` was not edited. The numbered documents, the ADRs and the
-package notes in there
-are the record as it stood when it was archived. A decision that has changed is
+There is no product build here. The small standard-library Go command is what
+`go build` verifies; it reads every link and every heading anchor, and reports
+the line number of anything that does not resolve. Its package tests exercise
+the same public entry point the command uses.
+
+CI runs the five checks above, scans the Go code with `govulncheck`, and makes
+one check the link checker does not make on its own: that `_archive/` was not
+edited. The numbered documents, the ADRs and the package notes in there are the
+record as it stood when it was archived. A decision that has changed is
 corrected in the note that supersedes it, never in the archived copy — deleting
 an archived file is allowed, editing one is not.
 
