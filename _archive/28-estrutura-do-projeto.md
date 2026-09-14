@@ -49,7 +49,7 @@ meu-app/
 ├── database/
 │   ├── factories/UserFactory.go
 │   ├── migrations/migrations.go
-│   └── seeders/{DatabaseSeeder,AdminSeeder,seeders}.go
+│   └── seeders/{DatabaseSeeder,UserSeeder,seeders}.go
 │
 ├── resources/
 │   ├── css/app.css
