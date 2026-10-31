@@ -24,7 +24,7 @@ O software pertence à **pessoa jurídica**, que é quem o desenvolve:
 | Nome fantasia | HYZIS - Desenvolvimento Digital |
 | CNPJ | 57.283.262/0001-28 (matriz) |
 | Sede | Rua Bom Pastor, 529, sala 03 — Ipiranga, São Paulo/SP, 04203-050 |
-| Contato | contact@hyz.is |
+| Contato | ajuda@hyz.is |
 
 No `LICENSE.md` vai só a razão social. CNPJ e endereço ficam aqui: um aviso de
 copyright é para dizer quem detém o direito, e todo dado a mais nele é uma linha
