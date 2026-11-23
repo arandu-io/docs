@@ -26,7 +26,32 @@ var (
 	fence      = regexp.MustCompile("^\\s*(?:```|~~~)")
 	pointer    = regexp.MustCompile(`(?:[\p{L}\p{N}_.-]+/)*[\p{L}\p{N}_.-]+\.md`)
 	shorthand  = regexp.MustCompile(`docs/(\d{2})`)
+	anchorName = regexp.MustCompile(`<a\s+(?:name|id)\s*=\s*"([^"]+)"\s*>`)
 )
+
+// versionPrefix starts every link between usage pages. The site replaces
+// {{version}} with the version it serves, so the checker resolves the rest as a
+// page of the same language.
+const versionPrefix = "/docs/{{version}}/"
+
+// languages are the directories that hold the usage documentation, one per
+// language with the same page names in each.
+var languages = []string{"en", "pt", "es"}
+
+// languageOf returns the usage-documentation language a file belongs to, or
+// the empty string for every other file.
+func languageOf(path string) string {
+	first, _, found := strings.Cut(path, "/")
+	if !found {
+		return ""
+	}
+	for _, language := range languages {
+		if first == language {
+			return language
+		}
+	}
+	return ""
+}
 
 type brokenLink struct {
 	path   string
@@ -98,16 +123,31 @@ func Run(dir string, args []string, stdout, stderr io.Writer) int {
 				return strings.Repeat(" ", len(match))
 			})
 			for _, url := range linkURLs(line) {
-				if isExternal(url) || strings.HasPrefix(url, "#") {
+				if isExternal(url) {
+					continue
+				}
+				language := languageOf(path)
+				if language != "" && strings.HasPrefix(url, "/") && !strings.HasPrefix(url, versionPrefix) {
+					checked++
+					broken = append(broken, brokenLink{path, number + 1, url, "site link without " + versionPrefix})
+					continue
+				}
+				if strings.HasPrefix(url, "#") && language == "" {
 					continue
 				}
 				target, fragment, _ := strings.Cut(url, "#")
 				target, _, _ = strings.Cut(target, "?")
-				if target == "" {
+				if target == "" && language == "" {
 					continue
 				}
 				checked++
 				resolved := filepath.Clean(filepath.Join(directory, filepath.FromSlash(target)))
+				if target == "" {
+					resolved = path
+				}
+				if strings.HasPrefix(url, versionPrefix) {
+					resolved = language + "/" + strings.TrimPrefix(target, versionPrefix) + ".md"
+				}
 				resolved = filepath.ToSlash(resolved)
 				if !tracked[resolved] {
 					broken = append(broken, brokenLink{path, number + 1, url, "no such file"})
@@ -126,7 +166,7 @@ func Run(dir string, args []string, stdout, stderr io.Writer) int {
 					}
 				}
 			}
-			for _, match := range pointer.FindAllStringIndex(raw, -1) {
+			for _, match := range pointerMatches(path, raw) {
 				if !pointerBoundary(raw, match[0], match[1]) {
 					continue
 				}
@@ -142,7 +182,7 @@ func Run(dir string, args []string, stdout, stderr io.Writer) int {
 					path: path, line: number + 1, name: named, moved: guess(named, tracked),
 				})
 			}
-			for _, match := range shorthand.FindAllStringSubmatchIndex(raw, -1) {
+			for _, match := range shorthandMatches(path, raw) {
 				if !shorthandBoundary(raw, match[0], match[1]) {
 					continue
 				}
@@ -190,6 +230,23 @@ func Run(dir string, args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintln(stdout, "every markdown link resolves.")
 	}
 	return 0
+}
+
+// pointerMatches finds the file names a line mentions. The usage pages name
+// files of the projects they describe, such as UPGRADE.md, so only the
+// repository's own records are checked for pointers.
+func pointerMatches(path, line string) [][]int {
+	if languageOf(path) != "" {
+		return nil
+	}
+	return pointer.FindAllStringIndex(line, -1)
+}
+
+func shorthandMatches(path, line string) [][]int {
+	if languageOf(path) != "" {
+		return nil
+	}
+	return shorthand.FindAllStringSubmatchIndex(line, -1)
 }
 
 func pointerBoundary(line string, start, end int) bool {
@@ -319,6 +376,9 @@ func headings(path string) (map[string]bool, error) {
 	}
 	result := make(map[string]bool)
 	for _, line := range lines {
+		for _, named := range anchorName.FindAllStringSubmatch(line, -1) {
+			result[strings.ToLower(named[1])] = true
+		}
 		match := heading.FindStringSubmatch(line)
 		if match == nil {
 			continue

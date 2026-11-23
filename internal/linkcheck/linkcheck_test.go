@@ -182,3 +182,48 @@ func git(t *testing.T, dir string, args ...string) {
 		t.Fatalf("git %v: %v\n%s", args, err, output)
 	}
 }
+
+func TestRunResolvesUsageLinksWithinTheSameLanguage(t *testing.T) {
+	repo := trackedRepository(t, map[string]string{
+		"en/http/routing.md": "# Routing\n\n- [Intro](#intro)\n\n<a name=\"intro\"></a>\n## Intro\n\n" +
+			"[Controllers](/docs/{{version}}/http/controllers#actions)\nSee `UPGRADE.md` of each module.\n",
+		"en/http/controllers.md": "# Controllers\n\n<a name=\"actions\"></a>\n## Actions\n",
+		"pt/http/routing.md":     "# Rotas\n\n[Controllers](/docs/{{version}}/http/controllers)\n",
+		"pt/http/controllers.md": "# Controllers\n",
+	})
+
+	var stdout, stderr bytes.Buffer
+	code := linkcheck.Run(repo, nil, &stdout, &stderr)
+
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0; stdout = %q stderr = %q", code, stdout.String(), stderr.String())
+	}
+}
+
+func TestRunReportsBrokenUsageLinks(t *testing.T) {
+	repo := trackedRepository(t, map[string]string{
+		"en/http/routing.md": "# Routing\n\n- [Missing](#missing)\n\n" +
+			"[Gone](/docs/{{version}}/http/gone)\n" +
+			"[Anchor](/docs/{{version}}/http/controllers#nowhere)\n" +
+			"[Bare](/docs/http/controllers)\n",
+		"en/http/controllers.md": "# Controllers\n",
+		"pt/http/controllers.md": "# Controllers\n",
+	})
+
+	var stdout, stderr bytes.Buffer
+	code := linkcheck.Run(repo, []string{"--quiet"}, &stdout, &stderr)
+
+	if code != 1 {
+		t.Fatalf("exit code = %d, want 1; stdout = %q", code, stdout.String())
+	}
+	for _, want := range []string{
+		"en/http/routing.md:3: no such heading: #missing",
+		"en/http/routing.md:5: no such file: /docs/{{version}}/http/gone",
+		"en/http/routing.md:6: no such heading: /docs/{{version}}/http/controllers#nowhere",
+		"en/http/routing.md:7: site link without /docs/{{version}}/: /docs/http/controllers",
+	} {
+		if !bytes.Contains(stdout.Bytes(), []byte(want)) {
+			t.Errorf("stdout lacks %q:\n%s", want, stdout.String())
+		}
+	}
+}
