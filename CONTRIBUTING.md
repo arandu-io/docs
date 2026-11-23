@@ -25,6 +25,7 @@ GOWORK=off go build ./...
 GOWORK=off go vet ./...
 GOWORK=off go test -race ./...
 GOWORK=off go run ./cmd/check-links
+GOWORK=off go run ./cmd/prove-examples
 ```
 
 The first line prints nothing when the tree is formatted. This repository does
@@ -38,12 +39,41 @@ There is no product build here. The small standard-library Go command is what
 the line number of anything that does not resolve. Its package tests exercise
 the same public entry point the command uses.
 
-CI runs the five checks above, scans the Go code with `govulncheck`, and makes
+CI runs the six checks above, scans the Go code with `govulncheck`, and makes
 one check the link checker does not make on its own: that `_archive/` was not
 edited. The numbered documents, the ADRs and the package notes in there are the
 record as it stood when it was archived. A decision that has changed is
 corrected in the note that supersedes it, never in the archived copy — deleting
 an archived file is allowed, editing one is not.
+
+## Writing a usage page
+
+The pages live in `en/`, `pt/` and `es/`, one file per page under the same path
+in each language, and `en/documentation.md` and its `pt/` and `es/` twins list
+them in reading order.
+The format is the one of `laravel/docs`:
+
+- one `# Title`, then the section list as `- [Heading](#anchor)`;
+- each section is `<a name="anchor"></a>` followed by `## Heading`, and the
+  anchor is the same in every language;
+- a link to another page is `/docs/{{version}}/<group>/<page>#anchor`, and an
+  image is `images/<file>`;
+- a note is `> [!NOTE]` and a warning `> [!WARNING]`;
+- no raw HTML, no script and no inline style;
+- a release is written as `:frameworkVersion`, `:hesapeVersion`, `:kyseVersion`
+  and so on, and the site replaces it with the tag it publishes. Never type a
+  version number into a page.
+
+A Go block fenced as `go example` is proved. It holds package-level
+declarations or a whole file, never loose statements, and it has no import
+block: the packages come from the table in `internal/examples/wrap.go`, where
+`http` is `net/http`, `fhttp` the framework's and `hhttp` Hesape's. A block that
+needs the generated code of an application stays a plain `go` block, and it is
+counted as illustrative. The `pt/` and `es/` pages repeat the code of the
+English page, fence included; `prove-examples` refuses a page where they differ.
+
+`versions.json` names the tags the examples are proved against. Move it in the
+same change that corrects a page for a new release.
 
 ## Where a test goes
 
