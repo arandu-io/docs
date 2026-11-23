@@ -52,7 +52,7 @@ func OpenInvoices(ctx context.Context, db *database.DB, grant security.Grant) (m
 <a name="filter-and-order-with-allowlists"></a>
 ## Filtre e ordene com listas de valores permitidos
 
-Valores passados a Where são parâmetros vinculados. Nomes de colunas, direções de ordenação, expressões selecionadas e fragmentos brutos fazem parte da estrutura SQL e não ficam seguros com um placeholder de valor. Traduza a escolha da requisição por um mapa fixo, como `map[string]``string{"newest": "created_at", "total": "total"}`; rejeite chaves ausentes antes de chamar `OrderBy` ou Select.
+Valores passados a Where são parâmetros vinculados. Nomes de colunas, direções de ordenação, expressões selecionadas e fragmentos brutos fazem parte da estrutura SQL e não ficam seguros com um placeholder de valor. Traduza a escolha da requisição por um mapa fixo, como `map[string]string{"newest": "created_at", "total": "total"}`; rejeite chaves ausentes antes de chamar `OrderBy` ou Select.
 
 Componha os predicados adicionais antes da operação terminal e mantenha valores separados de identificadores. Use uma ordenação secundária estável quando dois registros puderem compartilhar o valor da coluna solicitada. Limit restringe a coleção retornada, mas não substitui os limites da camada de requisição quando o chamador escolhe o tamanho.
 

@@ -35,7 +35,7 @@ Use `@csrf` em formulários e chame funções de componentes tipados nas posiç�
 A interpolação escapada é o padrão, e o escape segue a posição: um valor dentro de ypy-vals ou ypy-headers é escapado como JSON, então não fecha uma string nem acrescenta chaves ao que a requisição envia. O conjunto fechado de diretivas fornece controle de fluxo, um layout com seções nomeadas, um campo CSRF e declarações `@go`. Registrar diretivas em runtime, localizar serviços nos templates e referenciar componentes por nomes em strings não são pontos de extensão.
 
 - Use `{{ expression }}` para texto e atributos escapados.
-- Use `{`!! expression `!!}` apenas para um valor `template.HTML`; qualquer outro tipo falha o build na linha da view.
+- Use `{!! expression !!}` apenas para um valor `template.HTML`; qualquer outro tipo falha o build na linha da view.
 - Use `@if` e `@foreach` para controle de fluxo compilado.
 - Use `@extends`, `@section` e `@yield` para um único contrato de layout.
 - Use `@go` para tipos de dados da página e declarações locais.

@@ -52,7 +52,7 @@ func OpenInvoices(ctx context.Context, db *database.DB, grant security.Grant) (m
 <a name="filter-and-order-with-allowlists"></a>
 ## Filter and order with allowlists
 
-Values passed to Where are bindings. Column names, sort directions, selected expressions, and raw fragments are SQL structure and cannot be made safe by a value placeholder. Translate a request choice through a fixed map such as `map[string]``string{"newest": "created_at", "total": "total"}`; reject a key the map does not contain before calling `OrderBy` or Select.
+Values passed to Where are bindings. Column names, sort directions, selected expressions, and raw fragments are SQL structure and cannot be made safe by a value placeholder. Translate a request choice through a fixed map such as `map[string]string{"newest": "created_at", "total": "total"}`; reject a key the map does not contain before calling `OrderBy` or Select.
 
 Compose additional predicates before the terminal and keep values separate from identifiers. Use a stable secondary ordering when two rows may share the requested column. Limit bounds the returned collection; it does not replace request-layer bounds when the caller is allowed to choose a size.
 

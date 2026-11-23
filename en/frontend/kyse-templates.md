@@ -35,7 +35,7 @@ Use `@csrf` in a form and call typed component functions from trusted raw-output
 Escaped interpolation is the default, and the escape follows the position: a value inside ypy-vals or ypy-headers is escaped as JSON, so it cannot close a string or add keys to what the request sends. The closed directive set supplies control flow, one layout and named sections, a CSRF field, and `@go` declarations. Runtime directive registration, service lookup inside templates, and string-named components are not extension points.
 
 - Use `{{ expression }}` for escaped text and attributes.
-- Use `{`!! expression `!!}` only for a `template.HTML` value; any other type fails the build at the view line.
+- Use `{!! expression !!}` only for a `template.HTML` value; any other type fails the build at the view line.
 - Use `@if` and `@foreach` for compiled control flow.
 - Use `@extends`, `@section`, and `@yield` for one layout contract.
 - Use `@go` for page data types and local declarations.
