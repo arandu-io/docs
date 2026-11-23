@@ -1,0 +1,66 @@
+# Servidor `WebSocket` Joaju
+
+- [Un servidor `WebSocket` protegido por la Policy de la aplicación](#a-websocket-server-behind-application-policy)
+- [Elige un proceso o varias instancias conectadas mediante relay](#choose-one-process-or-a-relayed-fleet)
+- [Ejecuta el proceso standalone publicado](#run-the-released-standalone-process)
+- [Conecte, suscriba, publique y observe](#connect-subscribe-publish-and-observe)
+- [Limite clientes malformados y tráfico excesivo](#bound-malformed-and-noisy-clients)
+- [Todo nombre de canal proviene de un Grant](#every-channel-name-comes-from-a-grant)
+- [Verifique las llamadas a las policies antes de afirmar entrega entre instancias](#verify-policy-calls-before-claiming-fleet-delivery)
+- [Define explícitamente la degradación cuando el bus no esté disponible](#degrade-explicitly-when-the-bus-is-unavailable)
+- [Protocolo, transporte y aplicación siguen separados](#protocol-transport-and-application-remain-separate)
+
+> [!WARNING]
+> **Limitaciones actuales.** El servidor, el protocolo y el cliente del navegador se prueban con el recorrido y los tests de extremo a extremo del propio Joaju. Ninguna aplicación publicada del conjunto de trabajo lo monta, así que pruebe el handler montado y sus tres policies en la aplicación que lo sirve.
+
+<a name="a-websocket-server-behind-application-policy"></a>
+## Un servidor `WebSocket` protegido por la Policy de la aplicación
+
+Joaju implementa el protocolo de cable de Pusher como un `http.Handler`. La aplicación lo monta detrás de la autenticación de subject y proporciona tres policies: Connect decide si un subject puede mantener un socket, Subscribe decide si ese subject puede llegar a cada canal, y Operate decide quién puede llamar a la API HTTP. El propio servidor no inventa una identidad.
+
+<a name="choose-one-process-or-a-relayed-fleet"></a>
+## Elige un proceso o varias instancias conectadas mediante relay
+
+Un `ServerConfig` exige id y clave de la aplicación, Broker, `ConnectPolicy`, `SubscriptionPolicy` y Protocol. `ServerConfig.Operate`, una `OperationPolicy` consultada sobre `joaju.Operate`, es opcional, y nil rechaza toda ruta de la API HTTP con 403; una aplicación que publica a través de la API escribe una que permite su backend y nunca a un usuario común. El recorrido y los tests de extremo a extremo del propio Joaju cubren un proceso con el broker en memoria. Las API publicadas de relay y de pub/sub RESP existen para una flota, pero ningún consumidor publicado prueba todavía su cableado en la aplicación ni su comportamiento entre instancias; esta guía no presenta la entrega con varias réplicas como un camino de despliegue establecido.
+
+<a name="run-the-released-standalone-process"></a>
+## Ejecuta el proceso standalone publicado
+
+El comando independiente sirve como endpoint del protocolo en un solo proceso. Proporcione los cuatro valores sin un valor predeterminado seguro. El comando autentica el protocolo de la aplicación, no a las personas; monte un handler cuando las decisiones sobre canales privados deban usar el Subject autenticado por la propia aplicación.
+
+```bash
+JOAJU_APP_ID=app JOAJU_APP_KEY=key JOAJU_APP_SECRET=secret JOAJU_TENANT=acme \
+  go run github.com/arandu-io/joaju/cmd/joaju@:joajuVersion
+```
+
+<a name="connect-subscribe-publish-and-observe"></a>
+## Conecte, suscriba, publique y observe
+
+El cliente del navegador se conecta, autoriza suscripciones privadas o de presencia y se vuelve a suscribir después de un backoff de reconexión acotado. Las rutas de la API publican eventos y consultan cantidades de canales o usuarios una vez que la policy Operate permite a quien llama; sus rutas POST responden 415 a un cuerpo cuyo Content-Type no es application/json, antes de leerlo. Observer recibe eventos de ciclo de vida completados sin obtener el poder de rechazarlos, manteniendo métricas y logging separados de la política de acceso.
+
+<a name="bound-malformed-and-noisy-clients"></a>
+## Limite clientes malformados y tráfico excesivo
+
+`NewServer` rechaza configuración obligatoria ausente y ajustes acotados inválidos. `MaxMessageSize` y `MaxBodySize` limitan la entrada, `OutboundQueue` y `WriteTimeout` limitan consumidores lentos y `MaxMessagesPerSecond` puede medir cada socket después de medir el tráfico. `MaxConnections` menor que cero selecciona explícitamente una cantidad ilimitada de conexiones; no es un fallo de validación. Una suscripción rechazada nunca debe crear ni exponer el canal nombrado.
+
+El comando independiente limita cada socket a 100 frames por segundo, salvo que `JOAJU_MAX_MESSAGES_PER_SECOND` diga otra cosa, con 0 para ningún límite, y rechaza un socket con 429 cuando su dirección de cliente ya mantiene `JOAJU_MAX_CONNECTIONS_PER_ADDRESS` sockets, 256 por defecto. La dirección es el par TCP, salvo que ese par sea un proxy que `JOAJU_TRUSTED_PROXIES` lista, que es loopback y los rangos privados cuando no está definido y nadie cuando vale none; entonces X-Forwarded-For se lee desde la derecha. Un proxy en una dirección pública debe listarse, o cada visitante cuenta como ese proxy.
+
+<a name="every-channel-name-comes-from-a-grant"></a>
+## Todo nombre de canal proviene de un Grant
+
+`NewConnection` y `NewChannelName` exigen un Grant, del que deriva el prefijo de tenant. Un nombre enviado por el cliente con el separador se rechaza en vez de aceptarse como un canal ya prefijado. TLS corresponde al proxy inverso y la política de origen del handshake debe coincidir con los orígenes confiables del despliegue.
+
+<a name="verify-policy-calls-before-claiming-fleet-delivery"></a>
+## Verifique las llamadas a las policies antes de afirmar entrega entre instancias
+
+El consumidor en proceso debe probar que Connect se ejecuta antes del upgrade, que Subscribe se ejecuta para cada ruta y suscripción que toca un canal, que una llamada a la API HTTP sin policy Operate responde 403 y que el tenant A no puede nombrar el canal del tenant B. El soporte de flota todavía no es un contrato de despliegue soportado: antes de depender de él, publique en una instancia, verifique que un socket en otra recibe el evento y consulte métricas de ambos lados.
+
+<a name="degrade-explicitly-when-the-bus-is-unavailable"></a>
+## Define explícitamente la degradación cuando el bus no esté disponible
+
+La API de relay publicada puede devolver métricas con las respuestas recibidas antes del timeout, pero la aplicación de primera parte aún no ha demostrado el contrato de recuperación entre instancias. Un despliegue que la adopte debe alertar sobre errores del bus, definir si continúa el servicio local, restablecer la conexión y volver a probar la entrega entre instancias antes de considerar recuperado el conjunto.
+
+<a name="protocol-transport-and-application-remain-separate"></a>
+## Protocolo, transporte y aplicación siguen separados
+
+Protocol controla la semántica de frames y rutas HTTP, el transporte `WebSocket` controla upgrades y plazos, Broker controla el estado de canales y Relay la propagación entre instancias. `HesapeBroadcaster` adapta el contrato de broadcasting de Hesape al mismo Broker o Carrier de Joaju; no elude las policies de conexión y suscripción de Joaju. El middleware de autenticación proporciona Subject y las policies de auth emiten Grants. Mantener visibles esos límites permite ejecutar el mismo servidor montado o independiente sin fingir que ambos despliegues tienen el mismo comportamiento de identidad.

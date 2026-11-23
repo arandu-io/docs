@@ -1,0 +1,53 @@
+# Collections
+
+- [Use a collection when the operation is the vocabulary](#use-a-collection-when-the-operation-is-the-vocabulary)
+- [Build, transform, and finish typed values](#build-transform-and-finish-typed-values)
+- [Laziness and maps change the cost model](#laziness-and-maps-change-the-cost-model)
+
+> [!WARNING]
+> **Current limitations.** The generic collection and array helpers are released and tested, but no tagged first-party application consumer uses them. Prefer ordinary slices unless the documented operation removes repeated application code, and verify the chosen helper in the consuming application.
+
+<a name="use-a-collection-when-the-operation-is-the-vocabulary"></a>
+## Use a collection when the operation is the vocabulary
+
+`collections.Collection[T]` is a typed slice with named transformations. It is useful when a chain of filtering, grouping, or reduction reads more clearly than local loops. Ordinary indexing, a short loop, and standard-library sorting remain the first choice when they are clearer.
+
+<a name="build-transform-and-finish-typed-values"></a>
+## Build, transform, and finish typed values
+
+Collect, Make, Empty, Range, and Wrap construct values. Filter, Reject, First, Sole, Take, Skip, and Slice select them. Map, `FlatMap`, `GroupBy`, `KeyBy`, and `MapWithKeys` transform them; Reduce, Percentage, Count, Join, and Implode finish a calculation. Sorting, uniqueness, difference, and intersection stay in memory and make no database or authorization promise.
+
+Type-changing operations such as `Map[T,U]` are package functions because Go methods cannot introduce a second type parameter. Mutating operations such as Push, Pop, and Splice use pointer receivers, so a fluent-looking call is not automatically an independent copy.
+
+| Surface | Released contract |
+| --- | --- |
+| Construction | Collect, Make, Empty, Range, Wrap, `FromJSON` |
+| Selection | Filter, Reject, First, Sole, Take, Skip, Slice |
+| Transformation | Map, `FlatMap`, `GroupBy`, `KeyBy`, `MapWithKeys` |
+| Aggregation | Reduce, Percentage, Count, Join, Implode |
+| Lazy work | `RangeLazy`, `MapLazy`, Take, Remember, All |
+
+```go example
+func LargeAmounts() (collections.Collection[string], int) {
+	amounts := collections.Collect([]int{125, 200, 75, 200})
+	large := amounts.Filter(func(value, _ int) bool { return value >= 200 })
+	labels := collections.Map(large, func(value, _ int) string {
+		return strconv.Itoa(value)
+	})
+	total := collections.Reduce(amounts, func(sum, value, _ int) int {
+		return sum + value
+	}, 0)
+	return labels, total
+}
+```
+
+<a name="laziness-and-maps-change-the-cost-model"></a>
+## Laziness and maps change the cost model
+
+A lazy collection defers work until it is walked; Remember memoizes what has been pulled. It does not add I/O cancellation, so a blocking producer still needs context-aware code. Map helpers define order only where their result contract says so.
+
+collections/arr contains typed access and presentation helpers in Hesape :hesapeVersion. Prefer a local loop when it is shorter, and verify a chosen helper in the consuming application because the tagged ecosystem has no first-party application journey for these generic collections.
+
+- [Collections API](https://pkg.go.dev/github.com/arandu-io/hesape/collections)
+- [Array helpers](https://pkg.go.dev/github.com/arandu-io/hesape/collections/arr)
+- [Concurrency](/docs/{{version}}/architecture/concurrency)
