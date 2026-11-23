@@ -1,12 +1,13 @@
 name: ci
 
-# The repository is documentation plus the standard-library Go checker that
-# verifies it. CI tests that checker, resolves the links, and keeps the archive
-# frozen.
+# The repository is the usage documentation, the standard-library Go commands
+# that verify it, and the archive of decisions. CI tests those commands,
+# resolves the links, compiles every Go example against the published tags, and
+# keeps the archive frozen.
 
 on:
   push:
-    branches: [main]
+    branches: [main, "0.x"]
   pull_request:
 
 permissions:
@@ -50,6 +51,23 @@ jobs:
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@latest
           GOWORK=off govulncheck ./...
+
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: stable
+
+      # Every fenced block marked "go example" in en/ is written into a module
+      # that requires the tags in versions.json, then vetted and built, and
+      # tested when it declares a test. The pt/ and es/ pages must carry the
+      # same anchors and the same blocks. An example that does not compile
+      # fails the job with the Markdown file and line.
+      - name: examples compile against the published tags
+        run: GOWORK=off go run ./cmd/prove-examples
 
   frozen:
     runs-on: ubuntu-latest

@@ -1,0 +1,28 @@
+name: examples-latest
+
+# The examples are proved against the tags in versions.json on every push. This
+# run proves them against the newest tag of every module, once a day and on
+# demand, so a change in the framework, Hesape or Kyse that breaks
+# a page fails here the day it is published, and the page is corrected in the
+# same change that moves the pin.
+
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  latest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: stable
+
+      - name: examples compile against the newest tags
+        run: GOWORK=off go run ./cmd/prove-examples -latest
