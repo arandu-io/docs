@@ -1,6 +1,7 @@
 # Tokens de API
 
 - [`TokenGuard` autentica uma credencial apresentada](#tokenguard-authenticates-one-presented-credential)
+- [Resolva bearer tokens com `RequireToken`](#resolve-bearer-tokens-with-requiretoken)
 - [Assuma emissão, armazenamento e adapter de requisição](#own-issuance-storage-and-the-request-adapter)
 - [Autentique um bearer token previamente provisionado](#authenticate-a-pre-provisioned-bearer-token)
 - [Leia credenciais apenas de headers](#read-credentials-from-headers-only)
@@ -9,16 +10,19 @@
 - [Teste o que o guard faz e o que não faz](#test-what-the-guard-does-and-what-it-does-not-do)
 - [Use sessões no navegador e construa o ciclo de vida separadamente](#use-sessions-for-browsers-and-build-lifecycle-separately)
 
-> [!WARNING]
-> **Limitações atuais.** `TokenGuard` autentica bearer ou token de entrada, mas não fornece expiração, escopos, rotação ou revogação. Em modo hash, use apenas requisição até User ou Check: Validate envia token bruto. User reduz erros do provedor a nil e `SetRequest` não limpa usuário em cache; construa um guard por requisição e preserve erros operacionais em fronteira própria quando o protocolo exigir distinção.
-
 <a name="tokenguard-authenticates-one-presented-credential"></a>
 ## `TokenGuard` autentica uma credencial apresentada
 
 `auth.TokenGuard` publicado lê um bearer token, consulta `UserProvider` da aplicação pela conta correspondente e a expõe pelo contrato Guard. Não tem sessão e comprova a credencial novamente em cada requisição.
 
-> [!WARNING]
-> Este não é um sistema de emissão ou ciclo de vida. O guard publicado não define expiração, escopos, rotação, revogação, models de token, rotas de gestão nem armazenamento de primeira parte. O token é aceito enquanto o provedor mantiver valor correspondente.
+`TokenGuard` é um guard, não um sistema de tokens. Ele não define expiração, escopos, rotação nem revogação, e um token aceito continua aceito enquanto o provedor mantiver um valor correspondente. A aplicação emite, armazena e revoga os próprios tokens.
+
+<a name="resolve-bearer-tokens-with-requiretoken"></a>
+## Resolva bearer tokens com `RequireToken`
+
+Para um grupo de rotas de API, `middleware.RequireToken`, de `github.com/arandu-io/hesape/http/middleware`, lê o bearer token do header Authorization e entrega ao `TokenResolver` da aplicação apenas o seu digest SHA-256, como `middleware.DigestToken` o calcula. Token ausente, token desconhecido e token que o resolvedor informa como `ErrUnknownToken` (nunca emitido, revogado, expirado) recebem o mesmo 401. Qualquer outro erro do resolvedor é uma falha em responder e termina em 500, para que uma queda do armazenamento não diga a um cliente com token válido que ele foi retirado. A rota nunca lê a query string, um cookie nem a sessão.
+
+Uma requisição aprovada leva o `auth.Subject` resolvido no contexto, exatamente como atrás de `RequireAuth`, e a Policy continua decidindo cada registro. O `PersonalAccessTokenService` do esqueleto é o lado da emissão: mostra o token uma única vez e guarda só o digest, aceita uma expiração opcional, revoga um token ou todos os tokens de uma conta (todos, quando a conta é encerrada ou a senha é redefinida) e resolve um digest para o Subject atual da conta.
 
 <a name="own-issuance-storage-and-the-request-adapter"></a>
 ## Assuma emissão, armazenamento e adapter de requisição
@@ -69,21 +73,19 @@ func Authenticate(w stdhttp.ResponseWriter, r *stdhttp.Request, users auth.UserP
 
 `GetTokenForRequest` prefere Authorization: Bearer e usa senha HTTP Basic como fallback. Ignora query e corpo para manter credenciais fora de URLs, histórico, referrer e logs comuns. Crie `TokenGuard` novo por requisição. Em :hesapeVersion, `SetRequest` troca a requisição mas não limpa usuário em cache de User; não é seguro reutilizá-lo após resolução.
 
-> [!WARNING]
-> O fallback de senha Basic não pode ser desligado por opção de `TokenGuard`. Se o endpoint aceitar apenas bearer, recuse autorização não Bearer antes de invocar o guard.
+O fallback de senha Basic não pode ser desligado por opção de `TokenGuard`. Se o endpoint aceitar apenas bearer, recuse autorização não Bearer antes de invocar o guard, ou use `RequireToken`, que lê só o esquema Bearer.
 
 <a name="unknown-tokens-remain-ordinary-401-responses"></a>
 ## Tokens desconhecidos permanecem respostas 401 normais
 
 Tokens ausentes, malformados, desconhecidos e desabilitados geram a mesma resposta não autenticada. Em :hesapeVersion, User também reduz erros de `RetrieveByCredentials` a nil: a rota falha fechada como 401 em indisponibilidade do provedor, mas não a distingue de token desconhecido. Registre a falha no provedor ou use uma fronteira própria que preserve erro quando o protocolo precisar de status operacional. Nunca registre o token apresentado.
 
-> [!WARNING]
-> No Hesape :hesapeVersion, `TokenGuard.Validate` não aplica SHA-256 configurado com hash=true, embora User aplique. Não use nem documente Validate como equivalente a User nesse modo. O teste publicado comprova hashing apenas por User e Check.
+No Hesape :hesapeVersion, `TokenGuard.Validate` não aplica o SHA-256 configurado com hash=true, embora User aplique. Não use Validate como equivalente a User nesse modo. O teste publicado comprova hashing apenas por User e Check.
 
 <a name="a-permanent-credential-needs-an-application-kill-switch"></a>
 ## Credencial permanente exige um mecanismo de revogação da aplicação
 
-Digest impede que vazamento do banco revele imediatamente o token, mas não fornece expiração nem revogação. O provedor deve recusar registros desabilitados e vincular token ao tenant e conta esperados. Use TLS, não exponha tokens em URLs ou logs, consulte digest por índice e rotacione criando credencial nova antes de remover a antiga.
+Digest impede que vazamento do banco revele imediatamente o token, mas sozinho não fornece expiração nem revogação; o serviço de tokens do esqueleto acrescenta uma expiração opcional e apaga a linha ao revogar. O provedor deve recusar registros desabilitados e vincular token ao tenant e conta esperados. Use TLS, não exponha tokens em URLs ou logs, consulte digest por índice e rotacione criando credencial nova antes de remover a antiga.
 
 Não confunda autenticação com autorização. Converta a conta autenticada em Subject e execute a mesma Policy usada por requisições autenticadas por sessão.
 

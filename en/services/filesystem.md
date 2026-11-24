@@ -8,9 +8,6 @@
 - [Disk operations and adapter capability](#disk-operations-and-adapter-capability)
 - [Storage is not the application's plain filesystem](#storage-is-not-the-application-s-plain-filesystem)
 
-> [!WARNING]
-> **Current limitations.** `foundation.NewDrivers` builds `drivers.Disks` from `FILESYSTEM_DISK`, local, r2, or s3, so every tagged application receives the tenant-scoped Disk; the skeleton's example resource stores no file, and no tagged first-party journey uploads and serves one. Verify Put, Get, and Serve in the consuming application before treating it as an application service.
-
 <a name="a-disk-owns-tenancy-before-an-adapter-sees-a-path"></a>
 ## A Disk owns tenancy before an adapter sees a path
 

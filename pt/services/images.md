@@ -8,13 +8,10 @@
 - [Fronteira do componente de imagens publicado](#released-image-component-boundary)
 - [Armazene os bytes gerados por um contrato de filesystem](#store-generated-bytes-through-a-filesystem-contract)
 
-> [!WARNING]
-> **Limitações atuais.** Limites de decodificação e transformações com contexto estão publicados, mas nenhum fluxo de upload de primeira parte consome o pipeline. Valide tipo de mídia e bytes antes de decodificar e armazene resultados apenas por disco com escopo de tenant.
-
 <a name="decode-only-after-byte-and-pixel-limits-are-known"></a>
 ## Decodifique só após conhecer limites de bytes e pixels
 
-O componente de imagens publicado decodifica, transforma e codifica formatos comuns por opções tipadas. Nenhum consumidor atual em tag o conecta; este guia limitado documenta a fronteira do pacote e exige que cada aplicação comprove juntos upload, limites, armazenamento e entrega.
+O componente de imagens publicado decodifica, transforma e codifica formatos comuns por opções tipadas. O esqueleto não o conecta; cada aplicação liga por conta própria upload, limites, armazenamento e entrega, e comprova os quatro juntos.
 
 <a name="inspect-decode-transform-and-encode-one-image"></a>
 ## Inspecione, decodifique, transforme e codifique uma imagem

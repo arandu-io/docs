@@ -52,13 +52,12 @@ Use `--views` only to republish the screens: it leaves the published controllers
 The publisher refuses a non-project root, invalid module path, unsupported positional arguments, and an old Aru floor before writing. Existing non-coupled files remain unless forced, but a successful write still needs the printed wiring, view generation, migration, and tests.
 
 > [!WARNING]
-> Custom blocks are position-matched and templates currently expect one per file. Code outside those markers can be replaced; dry-run and version-control diff are mandatory before a republish.
+> Custom blocks are position-matched and templates expect one per file. Code outside those markers can be replaced; dry-run and version-control diff are mandatory before a republish.
 
 <a name="generated-screens-do-not-become-authorization"></a>
 ## Generated screens do not become authorization
 
-> [!WARNING]
-> The kit covers login, registration, verification, reset, confirmation, and two-factor screens, but the project owns whether registration is open, policy, tenant resolution, password rules, mail, session backend, and CSRF order. Preserve final-session creation only after required factors.
+The kit covers login, registration, verification, reset, confirmation, and two-factor screens, but the project owns whether registration is open, policy, tenant resolution, password rules, mail, session backend, and CSRF order. Preserve final-session creation only after required factors.
 
 Published routes and forms are not permission. Keep Rotate, one-time purposes, recent-password middleware, and server-side Grant checks intact when editing.
 

@@ -10,9 +10,6 @@
 - [Restore service before choosing a schema-down action](#restore-service-before-choosing-a-schema-down-action)
 - [Coordinate schema, deployment, and seed data](#coordinate-schema-deployment-and-seed-data)
 
-> [!WARNING]
-> **Current limitations.** Migrations and the registry are released as an explicit pipeline path, but generated identity and application ordering still require review. Inspect the exact plan and rollback behavior for the deployed dialect, and never run schema changes during request-process boot.
-
 <a name="a-migration-is-registered-go-code-with-immutable-identity"></a>
 ## A migration is registered Go code with immutable identity
 
@@ -64,7 +61,7 @@ Generate a migration, inspect status and pretend output, apply normally or in st
 ShouldRun=false is skipped and not recorded, so it is reconsidered later. Transactional DDL varies by grammar and `OutsideTransaction` may leave partial schema. Rollback preflights the batch; an undeclared missing Down refuses before work, while an explicit Irreversible migration remains applied and recorded.
 
 > [!WARNING]
-> Hesape :hesapeVersion does not report an irreversible migration as reverted and does not delete its repository row. A runtime Down failure can still stop after earlier reversible entries already completed.
+> A Down that fails at runtime can stop the rollback after earlier reversible entries have already completed.
 
 <a name="separate-deployment-authority-from-request-authority"></a>
 ## Separate deployment authority from request authority

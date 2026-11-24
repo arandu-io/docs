@@ -8,9 +8,6 @@
 - [Interfaces obligatorias y opcionales](#required-and-optional-interfaces)
 - [Coloca las primitivas en componentes y el estado junto a su responsable](#put-primitives-in-components-and-state-with-its-owner)
 
-> [!WARNING]
-> **Limitaciones actuales.** El esqueleto de paquete está publicado y tiene pruebas propias, pero ninguna aplicación independiente con tag lo importa. Trata sus interfaces de módulo, Policy, resource, migración y ruta como un punto de partida verificado y añade un flujo de prueba en la aplicación consumidora antes de afirmar que existe integración.
-
 <a name="a-package-is-a-go-module-with-an-explicit-entry-point"></a>
 ## Un paquete es un módulo Go con un punto de entrada explícito
 

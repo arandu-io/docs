@@ -8,9 +8,6 @@
 - [Fronteiras do repositório e armazenamento](#repository-and-store-boundaries)
 - [Servidor compatível com o protocolo é escolha de implantação](#a-protocol-compatible-server-is-a-deployment-choice)
 
-> [!WARNING]
-> **Limitações atuais.** `foundation.NewDrivers` constrói `drivers.Store`, o `cache.Repository` com escopo de tenant sobre o store que `CACHE_STORE` nomeia, e o esqueleto publicado entrega o store subjacente aos códigos de uso único e ao segundo fator em vez de fazer cache pelo repositório. Teste o namespace baseado em Grant na aplicação que faz cache por ele.
-
 <a name="the-application-uses-a-tenant-scoped-repository"></a>
 ## A aplicação usa um repositório com escopo de tenant
 

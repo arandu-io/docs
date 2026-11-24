@@ -9,9 +9,6 @@
 - [Capture o contrato MIME exato](#capture-the-exact-mime-contract)
 - [Use e-mail dentro de fluxos da aplicação vinculados a um propósito](#use-mail-inside-purpose-bound-application-flows)
 
-> [!WARNING]
-> **Limitações atuais.** O componente de e-mail do Hesape e a ponte do framework renderizam e entregam as mensagens documentadas. Armazenamento de anexos e autorização assíncrona não estão completos de ponta a ponta; anexe apenas dados já autorizados e enfileire e-mails com proveniência confiável persistida.
-
 <a name="a-mailable-owns-representation-and-the-transport-owns-delivery"></a>
 ## O mailable possui a representação; o transporte possui a entrega
 
@@ -66,8 +63,7 @@ Enfileire a entrega pela rede quando a resposta não precisa esperar, preserve t
 
 Renderização, validação de endereço, abertura ou leitura de anexos, TLS, autenticação, recusa do provedor e timeout precisam de evidência operacional própria. Não marque mensagens de verificação ou recuperação como enviadas se apenas sua construção teve sucesso.
 
-> [!WARNING]
-> A integração publicada não torna automaticamente seguros todos os caminhos de anexo ou Grant. Abra anexos dentro da entrega autorizada, limite bytes e faça handlers de fila reconstruírem a policy atual sem confiar nos caminhos do payload.
+Abra os anexos dentro da entrega autorizada, limite os bytes e faça os handlers de fila reconstruírem a policy atual sem confiar nos caminhos do payload.
 
 <a name="mail-is-an-external-disclosure-boundary"></a>
 ## E-mail é uma fronteira de divulgação externa

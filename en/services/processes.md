@@ -8,13 +8,10 @@
 - [Released process component boundary](#released-process-component-boundary)
 - [Prefer Go APIs and reserve processes for real tools](#prefer-go-apis-and-reserve-processes-for-real-tools)
 
-> [!WARNING]
-> **Current limitations.** The process API is released and tested but has no first-party application consumer. Never interpolate untrusted input into a shell; pass an executable and arguments explicitly, set a context deadline, and bound captured output.
-
 <a name="execute-an-argument-vector-never-a-shell-sentence"></a>
 ## Execute an argument vector, never a shell sentence
 
-The released process component wraps `os/exec` with context, argument vectors, working directory, inherited-plus-overridden environment, captured output, and exit information. No current tagged application consumes it, so this limited guide also exposes that stdout and stderr are retained without a byte ceiling.
+The released process component wraps `os/exec` with context, argument vectors, working directory, inherited-plus-overridden environment, captured output, and exit information. Stdout and stderr are retained without a byte ceiling.
 
 <a name="run-one-bounded-child-process"></a>
 ## Run one bounded child process

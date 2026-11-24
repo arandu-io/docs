@@ -8,9 +8,6 @@
 - [Operaciones del traductor](#translator-operations)
 - [Las rutas y el texto tienen contratos de idioma distintos](#routes-and-prose-have-separate-language-contracts)
 
-> [!WARNING]
-> **Limitaciones actuales.** La carga de traducciones, el fallback, `NewFromDirectory` y el `WithTranslator` del builder están publicados y probados, pero el esqueleto publicado no trae catálogo y no llama a `WithTranslator`. Registre el catálogo y el locale de la petición explícitamente y después verifique el camino completo de la aplicación.
-
 <a name="one-translator-one-locale-decision-per-request"></a>
 ## Un traductor, una decisión de idioma por petición
 
@@ -19,7 +16,7 @@ Translator carga frases por clave desde rutas registradas y mantiene grupos en c
 <a name="register-catalogues-and-resolve-a-key"></a>
 ## Registre catálogos y resuelva una clave
 
-Construya el traductor una vez a partir del directorio de catálogos con `translation.NewFromDirectory`, nombrando el locale de respuesta y el de fallback, y entréguelo al builder con `WithTranslator`. Cada petición lleva entonces el catálogo junto al nombre de la aplicación, de modo que `view.Page` responde Translator y Locale y un componente dibuja sus propias palabras en el idioma de la petición. Get comprueba la cadena de fallback configurada; cuando ni el catálogo pedido ni el de fallback resuelven el elemento, se ejecuta el handler de clave ausente y se devuelve la propia clave sin resolver.
+Construya el traductor una vez a partir del directorio de catálogos con `translation.NewFromDirectory`, nombrando el locale de respuesta y el de fallback, y entréguelo al builder con `WithTranslator`. Cada petición lleva entonces el catálogo junto al nombre de la aplicación, de modo que `view.Page` responde Translator y Locale y un componente dibuja sus propias palabras en el idioma de la petición. Get comprueba la cadena de fallback configurada; cuando ni el catálogo pedido ni el de fallback resuelven el elemento, se ejecuta el handler de clave ausente y se devuelve la propia clave sin resolver. El esqueleto ya lo hace: su catálogo es `lang/en.json`, y `bootstrap/app.go` entrega el traductor al builder con `WithTranslator`.
 
 ```go example
 func WithTranslations(drivers *foundation.Drivers) (*foundation.Application, error) {

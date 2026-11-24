@@ -9,9 +9,6 @@
 - [Execute cada seeder duas vezes num banco não vazio](#run-every-seeder-twice-on-a-non-empty-database)
 - [Use factories para os dados e serviços para as políticas](#use-factories-for-data-shape-and-services-for-policy)
 
-> [!WARNING]
-> **Limitações atuais.** Registro e execução de seeders estão publicados, mas persistência de factories não é caminho uniformemente verificado. Faça seed por chamadas explícitas de model ou repositório e torne repetição segura no ambiente onde executa.
-
 <a name="seeders-are-explicit-named-application-operations"></a>
 ## Seeders são operações explícitas da aplicação, identificadas por nome
 
@@ -41,9 +38,9 @@ aru db:seed UserSeeder -e you@example.com -p '<choose-a-password>' -r admin
 <a name="create-bootstrap-accounts-through-application-services"></a>
 ## Crie contas iniciais pelos serviços da aplicação
 
-A raiz do starter fica vazia por padrão: migrar ou executar `aru db:seed` nunca cria uma conta. Quando uma aplicação precisar de um usuário de bootstrap ou recuperação, execute `UserSeeder` pelo nome com e-mail e senha explícitos; adicione `-r` admin somente quando essa função for intencional. A policy da aplicação e o hashing permanecem no caminho normal do serviço.
+A raiz do starter não cria conta alguma: migrar ou executar `aru db:seed` nunca cria, e em desenvolvimento ela popula as notas de exemplo, cujos autores não têm senha utilizável. Quando uma aplicação precisar de um usuário de bootstrap ou recuperação, execute `UserSeeder` pelo nome com e-mail e senha explícitos; adicione `-r` admin somente quando essa função for intencional. A policy da aplicação e o hashing permanecem no caminho normal do serviço.
 
-- Mantenha `DatabaseSeeder` vazio até que a aplicação adicione dados deliberadamente.
+- Mantenha contas fora de `DatabaseSeeder` até que a aplicação as adicione deliberadamente.
 - Execute `UserSeeder` pelo nome para criar uma conta.
 - Adicione `-r` admin somente como uma decisão explícita de autorização.
 - Não altere os papéis existentes em uma recuperação apenas de senha.

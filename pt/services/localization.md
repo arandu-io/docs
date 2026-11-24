@@ -8,9 +8,6 @@
 - [Operações do tradutor](#translator-operations)
 - [Rotas e texto possuem contratos de idioma distintos](#routes-and-prose-have-separate-language-contracts)
 
-> [!WARNING]
-> **Limitações atuais.** O carregamento de traduções, o fallback, `NewFromDirectory` e o `WithTranslator` do builder estão publicados e testados, mas o esqueleto publicado não traz catálogo e não chama `WithTranslator`. Registre o catálogo e o locale da requisição explicitamente e depois verifique o caminho completo da aplicação.
-
 <a name="one-translator-one-locale-decision-per-request"></a>
 ## Um tradutor, uma decisão de idioma por requisição
 
@@ -19,7 +16,7 @@ Translator carrega frases por chave de caminhos registrados e mantém grupos em 
 <a name="register-catalogues-and-resolve-a-key"></a>
 ## Registre catálogos e resolva uma chave
 
-Construa o tradutor uma vez a partir do diretório de catálogos com `translation.NewFromDirectory`, nomeando o locale de resposta e o de fallback, e entregue-o ao builder com `WithTranslator`. Toda requisição passa então a levar o catálogo ao lado do nome da aplicação, de modo que `view.Page` responde Translator e Locale e um componente desenha as próprias palavras no idioma da requisição. Get verifica a cadeia de fallback configurada; quando nem o catálogo pedido nem o de fallback resolvem o item, o handler de chave ausente roda e a própria chave não resolvida é devolvida.
+Construa o tradutor uma vez a partir do diretório de catálogos com `translation.NewFromDirectory`, nomeando o locale de resposta e o de fallback, e entregue-o ao builder com `WithTranslator`. Toda requisição passa então a levar o catálogo ao lado do nome da aplicação, de modo que `view.Page` responde Translator e Locale e um componente desenha as próprias palavras no idioma da requisição. Get verifica a cadeia de fallback configurada; quando nem o catálogo pedido nem o de fallback resolvem o item, o handler de chave ausente roda e a própria chave não resolvida é devolvida. O esqueleto já faz isso: o catálogo dele é `lang/en.json`, e o `bootstrap/app.go` entrega o tradutor ao builder com `WithTranslator`.
 
 ```go example
 func WithTranslations(drivers *foundation.Drivers) (*foundation.Application, error) {

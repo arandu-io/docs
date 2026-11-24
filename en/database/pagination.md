@@ -8,9 +8,6 @@
 - [Three terminal shapes](#three-terminal-shapes)
 - [Pagination is part of the response contract](#pagination-is-part-of-the-response-contract)
 
-> [!WARNING]
-> **Current limitations.** Cursor signing, expiry, and deterministic ordering are released, but no direct first-party application journey consumes this pagination path. Keep the ordering unique and test cursor expiry at the application boundary.
-
 <a name="a-paginator-answers-navigation-not-only-rows"></a>
 ## A paginator answers navigation, not only rows
 

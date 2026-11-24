@@ -17,7 +17,7 @@ O Arandu tem dois caminhos de entrega de código-fonte. `aru new` cria a aplica�
 <a name="create-a-project-and-pin-the-publisher"></a>
 ## Crie um projeto e fixe a versão do publicador
 
-Instale aru, Git e Go. `aru new` cria um projeto, remove o histórico do esqueleto, escreve um ambiente privado com segredos novos e tenta compilar as views. Faça commit ou backup do projeto antes de executar o publicador UI com tag fixa e confira se `arandu.toml` declara a versão mínima de aru suportada.
+Instale aru, Git e Go. `aru new` cria um projeto, remove o histórico do esqueleto, escreve um ambiente privado com segredos novos e tenta compilar as views. Faça commit ou backup do projeto antes de executar o publicador UI com tag fixa e confira se `arandu.toml` declara a versão mínima de aru suportada. O `aru new` :aruVersion cria o projeto a partir do esqueleto imutável :aranduVersion e não tem flag para escolher outro; confira o `go.mod` dessa tag e o projeto gerado antes de considerar a base reproduzível.
 
 - Registre ou verifique o commit do projeto inicial.
 - Use uma tag exata do publicador UI.
@@ -51,14 +51,10 @@ Fixe o publicador na automação e preserve as mudanças da aplicação dentro d
 
 O publicador rejeita uma raiz que não seja de projeto, caminho de módulo inválido, argumentos inesperados e versão mínima da aru antiga antes de escrever. Uma falha sequencial do sistema de arquivos ainda pode deixar uma publicação parcial; o controle de versão e a repetição da mesma tag fixa permitem recuperá-la.
 
-> [!WARNING]
-> `aru new` :aruVersion seleciona o esqueleto imutável :aranduVersion e não oferece uma flag para substituí-lo. Confira o `go.mod` dessa tag e o projeto gerado antes de considerar a base reproduzível.
-
 <a name="recheck-the-published-identity-flow-as-application-code"></a>
 ## Confira novamente o fluxo de identidade publicado como código da aplicação
 
-> [!WARNING]
-> O kit fornece os fluxos de transporte, mas o projeto é responsável por Policy, resolução de tenant, regras de senha, e-mail, sessão, CSRF e disponibilidade do cadastro. Ao editar, preserve a rotação de sessão, os códigos vinculados à finalidade, a conclusão dos fatores e as verificações de senha recente.
+O kit fornece os fluxos de transporte, mas o projeto é responsável por Policy, resolução de tenant, regras de senha, e-mail, sessão, CSRF e disponibilidade do cadastro. Ao editar, preserve a rotação de sessão, os códigos vinculados à finalidade, a conclusão dos fatores e as verificações de senha recente.
 
 Telas e rotas geradas não autorizam o acesso aos dados da aplicação. Toda operação ainda passa pelo serviço e pela Policy da aplicação.
 

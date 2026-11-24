@@ -8,9 +8,6 @@
 - [Los DTO y `JsonResource` tienen contratos diferentes](#dtos-and-jsonresource-have-different-contracts)
 - [Los logs necesitan una representación segura propia](#logging-needs-its-own-safe-representation)
 
-> [!WARNING]
-> **Limitaciones actuales.** Existen representación de model publicada y DTO oficial con campos permitidos, pero ningún recorrido etiquetado demuestra `ToArray` o `ToJSON` del model como contrato público. Prefiera un DTO o `JsonResource` explícito y pruebe sus claves exactas.
-
 <a name="default-json-is-convenient-and-intentionally-not-the-api"></a>
 ## El JSON predeterminado es práctico, pero no define la API
 

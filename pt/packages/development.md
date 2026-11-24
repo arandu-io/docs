@@ -8,9 +8,6 @@
 - [Interfaces obrigatórias e opcionais](#required-and-optional-interfaces)
 - [Coloque primitivas em componentes e o estado junto de seu responsável](#put-primitives-in-components-and-state-with-its-owner)
 
-> [!WARNING]
-> **Limitações atuais.** O esqueleto de pacote está publicado e tem testes próprios, mas nenhuma aplicação independente com tag o importa. Trate suas interfaces de módulo, Policy, resource, migration e rota como um ponto de partida verificado e acrescente um fluxo de teste na aplicação consumidora antes de afirmar que há integração.
-
 <a name="a-package-is-a-go-module-with-an-explicit-entry-point"></a>
 ## Um pacote é um módulo Go com ponto de entrada explícito
 

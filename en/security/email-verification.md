@@ -57,8 +57,7 @@ Reissue after an address change, supersede former codes according to the store c
 
 Unknown, altered, expired, already consumed, wrong-purpose, and wrong-tenant codes all fail without exposing which account exists. One purpose and subject may present twenty wrong codes in twenty-four hours across every code issued; after that Consume refuses every code with `ErrTooManyFailures` until the window closes, and issuing a new code does not reset the count. The screens of ui :uiVersion answer that refusal with "too many attempts, try again later" rather than calling the code invalid. A mail outage is separate from an invalid POST; a database failure after Consume needs an idempotent repair path.
 
-> [!WARNING]
-> Do not mark verified from an account id alone. The released POST flow relies on the one-time store, purpose, and captured-address boundary.
+Do not mark verified from an account id alone. The released POST flow relies on the one-time store, purpose, and captured-address boundary.
 
 <a name="verification-is-not-account-linking"></a>
 ## Verification is not account linking

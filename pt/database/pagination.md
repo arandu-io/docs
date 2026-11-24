@@ -8,9 +8,6 @@
 - [Três formatos de operações terminais](#three-terminal-shapes)
 - [Paginação faz parte do contrato de resposta](#pagination-is-part-of-the-response-contract)
 
-> [!WARNING]
-> **Limitações atuais.** Assinatura e expiração de cursores e ordem determinística estão publicadas, mas nenhum fluxo direto de primeira parte consome essa paginação. Mantenha ordem única e teste expiração na fronteira da aplicação.
-
 <a name="a-paginator-answers-navigation-not-only-rows"></a>
 ## Um paginador fornece navegação, não apenas registros
 

@@ -52,13 +52,12 @@ Use `--views` solo para republicar las pantallas: deja intactos los controllers 
 El publicador rechaza raíz sin proyecto, ruta de módulo inválida, argumentos posicionales no compatibles y versión mínima antigua de Aru antes de escribir. Los archivos existentes no acoplados permanecen salvo force; una escritura correcta aún exige composición impresa, generación de vistas, migración y pruebas.
 
 > [!WARNING]
-> Los bloques personalizados se corresponden por posición y los templates esperan actualmente uno por archivo. El código fuera de los marcadores puede sustituirse; dry-run y diff versionado son obligatorios antes de republicar.
+> Los bloques personalizados se corresponden por posición y los templates esperan uno por archivo. El código fuera de los marcadores puede sustituirse; dry-run y diff versionado son obligatorios antes de republicar.
 
 <a name="generated-screens-do-not-become-authorization"></a>
 ## Las pantallas generadas no se vuelven autorización
 
-> [!WARNING]
-> El kit incluye pantallas de login, registro, verificación, recuperación, confirmación y dos factores. El proyecto decide apertura de registro, policy, resolución de tenant, reglas de contraseña, correo, backend de sesión y orden CSRF. Cree la sesión final solo tras los factores exigidos.
+El kit incluye pantallas de login, registro, verificación, recuperación, confirmación y dos factores. El proyecto decide apertura de registro, policy, resolución de tenant, reglas de contraseña, correo, backend de sesión y orden CSRF. Cree la sesión final solo tras los factores exigidos.
 
 Las rutas y formularios publicados no son permiso. Preserve Rotate, propósitos de un solo uso, middleware de contraseña reciente y verificaciones de Grant en servidor al editar.
 

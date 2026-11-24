@@ -8,13 +8,10 @@
 - [Superfície publicada do cliente HTTP](#released-http-client-surface)
 - [Instrumente a chamada e mantenha a política da aplicação fora dela](#instrument-the-call-and-keep-application-policy-outside-it)
 
-> [!WARNING]
-> **Limitações atuais.** O cliente propaga contexto e restringe tentativas a requisições seguras, mas nenhum fluxo atual de primeira parte exercita todos os verbos. `Batch.Send` também não tem cobertura comportamental completa; prefira requisição única até verificar essa fronteira.
-
 <a name="every-outbound-request-begins-with-context-and-a-deadline"></a>
 ## Toda requisição externa começa com contexto e prazo
 
-O cliente HTTP do Hesape envolve `net/http` com verbos conscientes de contexto, opções de requisição, decodificação e middleware. O componente está publicado, mas não há consumidor atual de primeira parte em tag; este guia se limita ao contrato verificado do pacote, sem prometer composição padrão no esqueleto.
+O cliente HTTP do Hesape envolve `net/http` com verbos conscientes de contexto, opções de requisição, decodificação e middleware. O `NewsletterClient` de exemplo do esqueleto é construído sobre ele, com uma Factory criada no próprio cliente; o starter não compõe um cliente compartilhado, então cada aplicação constrói o seu.
 
 <a name="send-one-bounded-json-request"></a>
 ## Envie uma requisição JSON limitada
@@ -42,7 +39,7 @@ func PostPayload(ctx context.Context, endpoint string, payload map[string]any) e
 <a name="add-headers-retries-and-decoding-deliberately"></a>
 ## Adicione headers, tentativas e decodificação deliberadamente
 
-Configure URL base e headers imutáveis na construção, adicione autorização específica sem registrá-la, propague contexto, limite corpos de resposta e repita apenas operações idempotentes ou com chave explícita de idempotência, usando backoff limitado.
+Configure URL base e headers imutáveis na construção, adicione autorização específica sem registrá-la, propague contexto, limite corpos de resposta e repita apenas operações idempotentes ou com chave explícita de idempotência, usando backoff limitado. `Batch.Send` não tem testes próprios neste release; prefira o caminho de requisição única.
 
 - Use contexto em todo verbo.
 - Defina prazos para cliente e operação.

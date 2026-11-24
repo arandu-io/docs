@@ -8,9 +8,6 @@
 - [DTOs and `JsonResource` have different contracts](#dtos-and-jsonresource-have-different-contracts)
 - [Logging needs its own safe representation](#logging-needs-its-own-safe-representation)
 
-> [!WARNING]
-> **Current limitations.** The released model representation and an official allowlisted DTO exist, but no tagged application journey proves model `ToArray` or `ToJSON` as a public response contract. Prefer an explicit DTO or `JsonResource` and test its exact keys.
-
 <a name="default-json-is-convenient-and-intentionally-not-the-api"></a>
 ## Default JSON is convenient and intentionally not the API
 

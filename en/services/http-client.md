@@ -8,13 +8,10 @@
 - [Released HTTP client surface](#released-http-client-surface)
 - [Instrument the call and keep application policy outside it](#instrument-the-call-and-keep-application-policy-outside-it)
 
-> [!WARNING]
-> **Current limitations.** The client propagates context and limits retries to safe requests, but no first-party application journey currently exercises every verb. `Batch.Send` also lacks complete behavioral coverage; prefer the single-request path until that edge is verified.
-
 <a name="every-outbound-request-begins-with-context-and-a-deadline"></a>
 ## Every outbound request begins with context and a deadline
 
-The Hesape HTTP client wraps `net/http` with context-aware verbs, request options, response decoding, and middleware. The component is released but has no current tagged first-party application consumer, so this guide is limited to the verified package contract rather than claiming default starter wiring.
+The Hesape HTTP client wraps `net/http` with context-aware verbs, request options, response decoding, and middleware. The skeleton's example `NewsletterClient` is built on it, with a Factory constructed in the client itself; the starter wires no shared client, so each application builds its own.
 
 <a name="send-one-bounded-json-request"></a>
 ## Send one bounded JSON request
@@ -42,7 +39,7 @@ func PostPayload(ctx context.Context, endpoint string, payload map[string]any) e
 <a name="add-headers-retries-and-decoding-deliberately"></a>
 ## Add headers, retries, and decoding deliberately
 
-Configure base URL and immutable headers at construction, add request-specific authorization without logging it, propagate context, bound response bodies, and retry only idempotent or explicitly idempotency-keyed operations with capped backoff.
+Configure base URL and immutable headers at construction, add request-specific authorization without logging it, propagate context, bound response bodies, and retry only idempotent or explicitly idempotency-keyed operations with capped backoff. `Batch.Send` has no tests of its own in this release, so prefer the single-request path.
 
 - Use context on every verb.
 - Set client and operation deadlines.

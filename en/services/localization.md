@@ -8,9 +8,6 @@
 - [Translator operations](#translator-operations)
 - [Routes and prose have separate language contracts](#routes-and-prose-have-separate-language-contracts)
 
-> [!WARNING]
-> **Current limitations.** Translation loading, fallback, `NewFromDirectory`, and the builder's `WithTranslator` are released and tested, but the tagged skeleton ships no catalogue and does not call `WithTranslator`. Register the catalogue and the request locale explicitly, then verify the complete application path.
-
 <a name="one-translator-one-locale-decision-per-request"></a>
 ## One translator, one locale decision per request
 
@@ -19,7 +16,7 @@ Translator loads keyed sentences from registered paths and caches groups safely 
 <a name="register-catalogues-and-resolve-a-key"></a>
 ## Register catalogues and resolve a key
 
-Build the translator once from the catalogue directory with `translation.NewFromDirectory`, naming the locale to answer in and the fallback, and hand it to the builder with `WithTranslator`. Every request then carries the catalogue beside the application name, so `view.Page` answers Translator and Locale and a component draws its own words in the request's language. Get checks the configured fallback chain; when neither the requested nor fallback catalogue resolves the item, the missing-key handler runs and the unresolved key itself is returned.
+Build the translator once from the catalogue directory with `translation.NewFromDirectory`, naming the locale to answer in and the fallback, and hand it to the builder with `WithTranslator`. Every request then carries the catalogue beside the application name, so `view.Page` answers Translator and Locale and a component draws its own words in the request's language. Get checks the configured fallback chain; when neither the requested nor fallback catalogue resolves the item, the missing-key handler runs and the unresolved key itself is returned. The skeleton already does this: its catalogue is `lang/en.json`, and `bootstrap/app.go` hands the translator to the builder with `WithTranslator`.
 
 ```go example
 func WithTranslations(drivers *foundation.Drivers) (*foundation.Application, error) {

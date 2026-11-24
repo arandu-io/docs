@@ -17,7 +17,7 @@ Arandu tiene dos vías de entrega de código fuente. `aru new` crea la aplicaci�
 <a name="create-a-project-and-pin-the-publisher"></a>
 ## Crea un proyecto y fija la versión del publicador
 
-Instala aru, Git y Go. `aru new` crea un proyecto, elimina el historial del esqueleto, escribe un entorno privado con secretos nuevos e intenta compilar las vistas. Haz un commit o una copia de seguridad del proyecto antes de ejecutar el publicador UI con tag fija y comprueba que `arandu.toml` declare la versión mínima de aru soportada.
+Instala aru, Git y Go. `aru new` crea un proyecto, elimina el historial del esqueleto, escribe un entorno privado con secretos nuevos e intenta compilar las vistas. Haz un commit o una copia de seguridad del proyecto antes de ejecutar el publicador UI con tag fija y comprueba que `arandu.toml` declare la versión mínima de aru soportada. `aru new` :aruVersion crea el proyecto a partir del esqueleto inmutable :aranduVersion y no tiene flag para elegir otro; comprueba el `go.mod` de esa tag y el proyecto generado antes de considerar reproducible la base.
 
 - Registra o verifica el commit del proyecto inicial.
 - Usa una tag exacta del publicador UI.
@@ -51,14 +51,10 @@ Fije el publicador en la automatización y conserve los cambios de la aplicació
 
 El publicador rechaza una raíz que no sea de proyecto, una ruta de módulo inválida, argumentos inesperados y una versión mínima antigua de aru antes de escribir. Un fallo secuencial del sistema de archivos aún puede dejar una publicación parcial; el control de versiones y la repetición de la misma tag fija permiten recuperarla.
 
-> [!WARNING]
-> `aru new` :aruVersion selecciona el esqueleto inmutable :aranduVersion y no ofrece una flag para sustituirlo. Comprueba el `go.mod` de esa tag y el proyecto generado antes de considerar reproducible la base.
-
 <a name="recheck-the-published-identity-flow-as-application-code"></a>
 ## Vuelve a comprobar el flujo de identidad publicado como código de la aplicación
 
-> [!WARNING]
-> El kit proporciona los flujos de transporte, pero el proyecto es responsable de Policy, resolución de tenant, reglas de contraseña, correo, sesión, CSRF y disponibilidad del registro. Al editar, conserva la rotación de sesión, los códigos vinculados a su finalidad, la finalización de factores y las comprobaciones de contraseña reciente.
+El kit proporciona los flujos de transporte, pero el proyecto es responsable de Policy, resolución de tenant, reglas de contraseña, correo, sesión, CSRF y disponibilidad del registro. Al editar, conserva la rotación de sesión, los códigos vinculados a su finalidad, la finalización de factores y las comprobaciones de contraseña reciente.
 
 Las pantallas y rutas generadas no autorizan el acceso a los datos de la aplicación. Toda operación sigue pasando por el servicio y la Policy de la aplicación.
 

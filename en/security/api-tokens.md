@@ -1,6 +1,7 @@
 # API tokens
 
 - [`TokenGuard` authenticates one presented credential](#tokenguard-authenticates-one-presented-credential)
+- [Resolve bearer tokens with `RequireToken`](#resolve-bearer-tokens-with-requiretoken)
 - [Own issuance, storage, and the request adapter](#own-issuance-storage-and-the-request-adapter)
 - [Authenticate a pre-provisioned bearer token](#authenticate-a-pre-provisioned-bearer-token)
 - [Read credentials from headers only](#read-credentials-from-headers-only)
@@ -9,16 +10,19 @@
 - [Test what the guard does and what it does not do](#test-what-the-guard-does-and-what-it-does-not-do)
 - [Use sessions for browsers and build lifecycle separately](#use-sessions-for-browsers-and-build-lifecycle-separately)
 
-> [!WARNING]
-> **Current limitations.** `TokenGuard` authenticates a bearer or input token, but it does not provide expiry, scopes, rotation, or revocation. In hash mode, use the request-to-User or Check path only: Validate sends the raw token. User also collapses provider errors to nil and `SetRequest` does not clear its cached user, so construct one guard per request and preserve operational lookup errors in an application seam when the protocol must distinguish them.
-
 <a name="tokenguard-authenticates-one-presented-credential"></a>
 ## `TokenGuard` authenticates one presented credential
 
 The released `auth.TokenGuard` reads a bearer token, asks an application-owned `UserProvider` for the matching account, and exposes that account through the Guard contract. It has no session and proves the credential again on every request.
 
-> [!WARNING]
-> This is explicitly not an issuing or lifecycle system. The released guard does not define expiration, scopes, rotation, revocation, token models, management routes, or a first-party application store. A token remains acceptable for as long as the provider keeps a matching value.
+`TokenGuard` is a guard, not a token system. It does not define expiration, scopes, rotation, or revocation, and a token it accepts stays acceptable for as long as the provider keeps a matching value. The application issues, stores, and revokes its tokens.
+
+<a name="resolve-bearer-tokens-with-requiretoken"></a>
+## Resolve bearer tokens with `RequireToken`
+
+For an API route group, `middleware.RequireToken` from `github.com/arandu-io/hesape/http/middleware` reads the bearer token from the Authorization header and hands the application's `TokenResolver` only its SHA-256 digest, as `middleware.DigestToken` computes it. A missing token, an unknown one, and one the resolver reports as `ErrUnknownToken` (never issued, revoked, expired) all get the same 401. Any other resolver error is a failure to answer and ends as a 500, so a store outage does not tell a client with a good token that it was taken away. The route never reads the query string, a cookie, or the session.
+
+A request that passes carries the resolved `auth.Subject` on its context, exactly as behind `RequireAuth`, and the Policy still decides every record. The skeleton's `PersonalAccessTokenService` is the issuing side: it shows a token once and stores only its digest, accepts an optional expiry, revokes one token or all of an account's tokens (all of them when the account is closed or its password is reset), and resolves a digest to the account's current Subject.
 
 <a name="own-issuance-storage-and-the-request-adapter"></a>
 ## Own issuance, storage, and the request adapter
@@ -69,21 +73,19 @@ func Authenticate(w stdhttp.ResponseWriter, r *stdhttp.Request, users auth.UserP
 
 `GetTokenForRequest` prefers Authorization: Bearer and falls back to the HTTP Basic password. It deliberately ignores query strings and request bodies, keeping credentials out of URLs, browser history, referrer headers, and ordinary access logs. Construct a new `TokenGuard` for every request. In :hesapeVersion, `SetRequest` replaces the request but does not clear the user already cached by User, so it is not a safe rebind after resolution.
 
-> [!WARNING]
-> The Basic-password fallback cannot be disabled by a `TokenGuard` option. If the endpoint must accept bearer credentials only, reject non-Bearer authorization before invoking the guard.
+The Basic-password fallback cannot be disabled by a `TokenGuard` option. If the endpoint must accept bearer credentials only, reject non-Bearer authorization before invoking the guard, or use `RequireToken`, which reads the Bearer scheme only.
 
 <a name="unknown-tokens-remain-ordinary-401-responses"></a>
 ## Unknown tokens remain ordinary 401 responses
 
 Missing, malformed, unknown, and disabled tokens produce the same unauthenticated response. In :hesapeVersion, User also collapses every `RetrieveByCredentials` error to nil, so the shown route fails closed as 401 during a provider outage but cannot distinguish that outage from an unknown token. Record the lookup failure inside the provider, or use an application-owned authentication seam that preserves the error when the protocol must return an operational status. Never log the presented token while diagnosing a lookup.
 
-> [!WARNING]
-> In Hesape :hesapeVersion, `TokenGuard.Validate` does not apply the configured SHA-256 transformation when hash=true, although User does. Do not use or document Validate as equivalent to User in hashed mode. The released test proves hashing only through User and Check.
+In Hesape :hesapeVersion, `TokenGuard.Validate` does not apply the configured SHA-256 transformation when hash=true, although User does. Do not use Validate as equivalent to User in hashed mode. The released test proves hashing only through User and Check.
 
 <a name="a-permanent-credential-needs-an-application-kill-switch"></a>
 ## A permanent credential needs an application kill switch
 
-A digest protects a database disclosure from immediately revealing the wire token, but it does not provide expiry or revocation semantics. The provider should refuse disabled records and bind every token to the expected tenant and account. Use TLS, keep tokens out of URLs and logs, compare the stored digest through indexed lookup, and rotate by creating a new credential before removing the old one.
+A digest protects a database disclosure from immediately revealing the wire token, but it does not provide expiry or revocation semantics by itself; the skeleton's token service adds an optional expiry and deletes the row on revoke. The provider should refuse disabled records and bind every token to the expected tenant and account. Use TLS, keep tokens out of URLs and logs, compare the stored digest through indexed lookup, and rotate by creating a new credential before removing the old one.
 
 Do not interpret authentication as authorization. Convert the authenticated account into the application's Subject and run the same Policy that a session-authenticated request uses.
 
