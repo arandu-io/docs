@@ -6,9 +6,6 @@
 - [Prove the generated project, not just the download](#prove-the-generated-project-not-just-the-download)
 - [Continue from the composition root](#continue-from-the-composition-root)
 
-> [!WARNING]
-> **Current limitations.** The released `aru new` command requires Git and network access, shallow-clones the immutable skeleton :aranduVersion, and treats the generated-view build as best effort. Verify the generated module graph before production use, and run migrations as an explicit pipeline step.
-
 <a name="install-one-cli-build-one-ordinary-go-program"></a>
 ## Install one CLI, build one ordinary Go program
 
@@ -25,10 +22,7 @@ aru version
 ```
 
 > [!NOTE]
-> The tag pins the CLI source, and the linker flag stamps the version that the CLI reports and compares with a project's required floor. A plain `go install` at this tag reports dev because the Go tool does not apply release linker flags. Aru :aruVersion independently pins the project skeleton to :aranduVersion.
-
-> [!WARNING]
-> `aru new` in :aruVersion requires Git and network access and shallow-clones the immutable skeleton :aranduVersion with a single branch. It exposes no skeleton-version flag; verify the generated `go.mod` before continuing when an exact project baseline matters.
+> The tag pins the CLI source, and the linker flag stamps the version that the CLI reports and compares with a project's required floor. A plain `go install` at this tag reports dev because the Go tool does not apply release linker flags. `aru new` creates the project from the latest skeleton release, :aranduVersion.
 
 <a name="create-and-run-a-local-project"></a>
 ## Create and run a local project
@@ -45,8 +39,8 @@ aru dev
 > [!NOTE]
 > The first server boot needs no seed. When you want an admin, run the named seeder with explicit credentials, `aru db:seed UserSeeder -e you@example.com -p '<password>' -r` admin: `DatabaseSeeder` creates no account, and the credentials belong to the command you run, not to the environment or the source.
 
-> [!WARNING]
-> `aru new` deliberately does not run `go mod tidy` or start the server. A failed view build is reported as a warning and the project remains on disk; run `aru view:build` before building rather than assuming generated views exist.
+> [!NOTE]
+> `aru new` does not run `go mod tidy` or start the server. If compiling the views fails, the project is still created and the command tells you to run `aru view:build`.
 
 <a name="prove-the-generated-project-not-just-the-download"></a>
 ## Prove the generated project, not just the download

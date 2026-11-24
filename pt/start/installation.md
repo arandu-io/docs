@@ -6,9 +6,6 @@
 - [Verifique o projeto gerado, não apenas o download](#prove-the-generated-project-not-just-the-download)
 - [Continue pela raiz de composição](#continue-from-the-composition-root)
 
-> [!WARNING]
-> **Limitações atuais.** O comando `aru new` publicado exige Git e acesso à rede, faz um clone superficial do esqueleto imutável :aranduVersion e tenta compilar as views sem interromper a criação se essa etapa falhar. Confira as dependências do projeto gerado antes de usá-lo em produção e execute as migrations em uma etapa explícita do pipeline.
-
 <a name="install-one-cli-build-one-ordinary-go-program"></a>
 ## Instale uma CLI e compile um programa Go comum
 
@@ -25,10 +22,7 @@ aru version
 ```
 
 > [!NOTE]
-> A tag fixa o código-fonte da CLI, e a flag do linker define a versão que a CLI informa e compara com a versão mínima exigida pelo projeto. Um `go install` simples nessa tag informa dev, pois a ferramenta Go não aplica as flags de release do linker. Separadamente, a aru :aruVersion fixa o esqueleto do projeto na :aranduVersion.
-
-> [!WARNING]
-> O `aru new` da :aruVersion exige Git e acesso à rede e faz um clone superficial do esqueleto imutável :aranduVersion com uma única branch. Não há flag para escolher a versão do esqueleto; confira o `go.mod` gerado antes de continuar quando precisar de uma base exata.
+> A tag fixa o código-fonte da CLI, e a flag do linker define a versão que a CLI informa e compara com a versão mínima exigida pelo projeto. Um `go install` simples nessa tag informa dev, pois a ferramenta Go não aplica as flags de release do linker. O `aru new` cria o projeto a partir da versão mais recente do esqueleto, a :aranduVersion.
 
 <a name="create-and-run-a-local-project"></a>
 ## Crie e execute um projeto local
@@ -45,8 +39,8 @@ aru dev
 > [!NOTE]
 > A primeira inicialização do servidor não precisa de seed. Para criar um administrador, rode o seeder nomeado com credenciais explícitas, `aru db:seed UserSeeder -e you@example.com -p '<password>' -r` admin: `DatabaseSeeder` não cria nenhuma conta, e as credenciais pertencem ao comando que você roda, não ao ambiente nem ao código.
 
-> [!WARNING]
-> O `aru new` não executa `go mod tidy` nem inicia o servidor, por decisão de projeto. Uma falha na compilação das views gera um aviso e o projeto permanece no disco; execute `aru view:build` antes do build, sem presumir que as views geradas já existem.
+> [!NOTE]
+> O `aru new` não executa `go mod tidy` nem inicia o servidor. Se a compilação das views falhar, o projeto é criado mesmo assim, e o comando indica que você rode `aru view:build`.
 
 <a name="prove-the-generated-project-not-just-the-download"></a>
 ## Verifique o projeto gerado, não apenas o download
