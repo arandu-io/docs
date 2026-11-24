@@ -37,8 +37,7 @@ func WithPipeline(drivers *foundation.Drivers) *foundation.ApplicationBuilder {
 }
 ```
 
-> [!NOTE]
-> `TrustProxies` lê X-Forwarded-For só de um par que `TRUSTED_PROXIES` lista, percorrendo o cabeçalho da direita e pulando saltos confiáveis, de modo que um valor que o cliente escreveu à esquerda nunca vira o seu endereço. Tudo o que deriva identidade ou limite do endereço do cliente roda depois dele: `BeforeThrottle`, o Throttle global e Append.
+`TrustProxies` lê X-Forwarded-For só de um par que `TRUSTED_PROXIES` lista, percorrendo o cabeçalho da direita e pulando saltos confiáveis, de modo que um valor que o cliente escreveu à esquerda nunca vira o seu endereço. Tudo o que deriva identidade ou limite do endereço do cliente roda depois dele: `BeforeThrottle`, o Throttle global e Append.
 
 <a name="choose-the-narrowest-middleware-scope"></a>
 ## Escolha o menor escopo de middleware

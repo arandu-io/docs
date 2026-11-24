@@ -37,8 +37,7 @@ func WithPipeline(drivers *foundation.Drivers) *foundation.ApplicationBuilder {
 }
 ```
 
-> [!NOTE]
-> `TrustProxies` reads X-Forwarded-For only from a peer `TRUSTED_PROXIES` lists, walking the header from the right and skipping trusted hops, so a value a client wrote at the left never becomes its address. Everything that derives identity or a limit from the client address runs after it: `BeforeThrottle`, the global Throttle, and Append.
+`TrustProxies` reads X-Forwarded-For only from a peer `TRUSTED_PROXIES` lists, walking the header from the right and skipping trusted hops, so a value a client wrote at the left never becomes its address. Everything that derives identity or a limit from the client address runs after it: `BeforeThrottle`, the global Throttle, and Append.
 
 <a name="choose-the-narrowest-middleware-scope"></a>
 ## Choose the narrowest middleware scope

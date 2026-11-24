@@ -35,7 +35,7 @@ Use `@csrf` in a form and call typed component functions from trusted raw-output
 Escaped interpolation is the default, and the escape follows the position: a value inside ypy-vals or ypy-headers is escaped as JSON, so it cannot close a string or add keys to what the request sends. The closed directive set supplies control flow, one layout and named sections, a CSRF field, and `@go` declarations. Runtime directive registration, service lookup inside templates, and string-named components are not extension points.
 
 - Use `{{ expression }}` for escaped text and attributes.
-- Use `{!! expression !!}` only for a `template.HTML` value; any other type fails the build at the view line.
+- Use `{!! expression !!}` only for a `template.HTML` value, a function that returns one, or a string literal written in the view; a string field or variable fails the build at the view line.
 - Use `@if` and `@foreach` for compiled control flow.
 - Use `@extends`, `@section`, and `@yield` for one layout contract.
 - Use `@go` for page data types and local declarations.
@@ -46,7 +46,7 @@ Escaped interpolation is the default, and the escape follows the position: a val
 Raw output bypasses escaping, so never convert request, database, Markdown, or translated text to `template.HTML` merely to render markup. Layout and page data must agree, every browser form needs CSRF, and generated Go must never become the edited source. An attribute whose name is interpolated fails the build, because the escape of a value is chosen from the attribute's name and a name that is data could be onclick or href. A name the view layer refuses, written in a component's Attrs or `Parts[...]`.Attrs, such as `ypy-*`, `on*`, style, class, role, `aria-*`, or an address, panics with a `*components.RefusedAttribute` naming the part, the attribute, and the reason, instead of drawing an empty component.
 
 > [!WARNING]
-> A typed component may return trusted HTML; arbitrary caller content does not. Raw output accepts only `template.HTML`, so a string from a request, the database, or a catalogue stops the build instead of reaching the page as markup, and a component whose value is refused at render time renders nothing rather than a broken element. Review every raw-output expression as a security boundary and preserve ordinary escaped interpolation for user-controlled strings.
+> A typed component may return trusted HTML; arbitrary caller content does not. Raw output takes a `template.HTML` value, a function that returns one, or a string literal written in the view, so a string field or variable from a request, the database, or a catalogue stops the build instead of reaching the page as markup. Converting it to `template.HTML` to silence the error turns visitor text into markup. A component whose value is refused at render time renders nothing rather than a broken element. Review every raw-output expression as a security boundary and preserve ordinary escaped interpolation for user-controlled strings.
 
 <a name="compile-source-and-inspect-behavior"></a>
 ## Compile source and inspect behavior

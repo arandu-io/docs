@@ -57,7 +57,7 @@ func Enqueue(ctx context.Context, drivers *foundation.Drivers, grant auth.Grant,
 <a name="set-lease-and-retry-policy-from-handler-behavior"></a>
 ## Defina reserva e tentativas conforme o comportamento do handler
 
-`queue:work` constrói seu worker a partir de `Settings.Queue`: `QUEUE_DEFAULT` nomeia a fila, `QUEUE_WORKERS` a concorrência, `QUEUE_RETRY_AFTER` o lease em segundos e `QUEUE_MAX_ATTEMPTS` as tentativas, e `--queue` e `--workers` sobrescrevem os dois primeiros numa invocação. Uma variável não definida mantém o padrão do próprio componente de fila: quatro workers e um lease de cinco minutos, com backoff exponencial limitado entre as tentativas.
+`queue:work` constrói seu worker a partir de `Settings.Queue`: `QUEUE_DEFAULT` nomeia a fila, `QUEUE_WORKERS` a concorrência, `QUEUE_RETRY_AFTER` o lease em segundos e `QUEUE_MAX_ATTEMPTS` as tentativas, e `--queue` e `--workers` sobrescrevem os dois primeiros numa invocação. Uma variável não definida mantém o padrão do próprio componente de fila: quatro workers, um lease de cinco minutos, cinco tentativas e uma espera entre elas que dobra a partir de dois segundos e para de crescer em uma hora. O contexto do handler é cancelado depois de um lease, então um handler que retorna quando o contexto termina devolve o job antes que outro worker possa pegá-lo.
 
 - Limite a concorrência conforme as dependências.
 - Defina a reserva acima da duração máxima do handler.
@@ -70,7 +70,7 @@ func Enqueue(ctx context.Context, drivers *foundation.Drivers, grant auth.Grant,
 Um erro retornado consome uma tentativa e libera o job depois do backoff; trabalho esgotado é estacionado. `ErrManuallyFailed` estaciona uma falha permanente na hora, e um panic é recuperado, registrado com a pilha e estacionado na primeira entrega. O worker reporta um job de um batch ou de uma chain depois que ele roda, então um handler que ainda chama `bus.Handled` o conta duas vezes e empurra o próximo elo da chain duas vezes. Payloads com falha continuam sendo dados de cliente protegidos por tenant.
 
 > [!WARNING]
-> Uma reserva mais curta que a duração do handler permite entregas duplicadas simultâneas. Aumentar as tentativas não torna seguro um efeito externo sem idempotência.
+> Um handler que ignora o seu contexto continua rodando depois que o lease termina, e outro worker pode pegar o mesmo job. Aumentar as tentativas não torna seguro um efeito externo sem idempotência.
 
 <a name="never-rebuild-authority-from-the-payload"></a>
 ## Nunca reconstrua autoridade a partir do payload

@@ -54,7 +54,7 @@ Read slow and N+1 findings before the raw timeline, inspect SQL origin and durat
 <a name="know-why-a-request-has-no-record"></a>
 ## Know why a request has no record
 
-No record can mean tracing was disabled, the header was absent, middleware lost the Collector, another replica served the request, or the bounded ring evicted it. An uninstrumented dependency remains unattributed, and protected or absent records deliberately answer 404. The recorder is local memory and disappears on restart. Tracing one production request does not collect other requests and does not replace a durable telemetry backend.
+No record can mean tracing was disabled, the header was absent, middleware lost the Collector, another replica served the request, or the bounded ring evicted it. An uninstrumented dependency remains unattributed, and protected or absent records deliberately answer 404. The recorder is local memory and disappears on restart. Tracing one production request does not collect other requests. Arandu ships no telemetry exporter: durable traces and metrics belong to a backend you run beside the application, and the structured logs carry `request_id` and tenant so the two can be correlated.
 
 <a name="minimize-the-diagnostic-data-window"></a>
 ## Minimize the diagnostic data window

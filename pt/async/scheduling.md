@@ -47,7 +47,7 @@ func Tasks(d *foundation.Drivers) []foundation.Task {
 <a name="inspect-and-invoke-the-registered-schedule"></a>
 ## Inspecione e execute a agenda registrada
 
-`aru schedule:list` informa id, cron, escopo, singleton, próxima execução, última execução e último erro. `schedule:run` usa o mesmo caminho de Grant, lock e instrumentação; uma execução manual por tenant exige `--tenant`.
+`aru schedule:list` informa id, cron, escopo, singleton, próxima execução, última execução e último erro. `schedule:run` usa o mesmo caminho de Grant, lock e instrumentação; uma execução manual por tenant exige `--tenant`, e a execução manual de um singleton usa a mesma reivindicação, então uma segunda no mesmo minuto UTC não faz nada.
 
 - Inspecione o registro antes de esperar pelo cron.
 - Execute uma tarefa manualmente para um tenant selecionado.
@@ -57,10 +57,7 @@ func Tasks(d *foundation.Drivers) []foundation.Task {
 <a name="treat-a-missing-lock-as-a-deployment-defect"></a>
 ## Trate a ausência de lock como defeito de implantação
 
-Os processos que servem verificam perto de cada minuto. Sem um store compartilhado, `drivers.Locks` é nil e toda réplica pode executar um singleton. As chaves de lock cobrem tarefa, tenant e minuto durante o timeout; uma tarefa por tenant sem `WithTenants` não roda, e o agendador relata isso em vez de pular em silêncio.
-
-> [!WARNING]
-> O agendador não tem orçamento de tentativas. Uma tarefa que executa um efeito externo diretamente pode perder ou repetir trabalho; enfileire um job durável e idempotente.
+Os processos que servem verificam perto de cada minuto. Sem um store compartilhado, `drivers.Locks` é nil e toda réplica pode executar um singleton. Um singleton reivindica a sua tarefa, o tenant e o minuto UTC (`sched:<tenant>:<id>:<minuto>`) e nunca libera a reivindicação: ela expira depois de uma hora, ou depois do timeout se for maior, então uma execução que falha não é repetida por outra réplica no mesmo minuto. Uma tarefa por tenant sem `WithTenants` não roda, e o agendador relata isso em vez de pular em silêncio. Uma execução que falha não é repetida, então uma tarefa que executa um efeito externo diretamente pode perder esse trabalho; enfileire um job durável e idempotente.
 
 <a name="global-tasks-cannot-touch-tenant-data"></a>
 ## Tarefas Global não podem acessar dados de tenant

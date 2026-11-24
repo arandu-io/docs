@@ -47,7 +47,7 @@ func Tasks(d *foundation.Drivers) []foundation.Task {
 <a name="inspect-and-invoke-the-registered-schedule"></a>
 ## Inspect and invoke the registered schedule
 
-`aru schedule:list` reports id, cron, scope, singleton, next, last, and last error. `schedule:run` invokes the same Grant, lock, and instrumentation path; a per-tenant manual run requires `--tenant`.
+`aru schedule:list` reports id, cron, scope, singleton, next, last, and last error. `schedule:run` invokes the same Grant, lock, and instrumentation path; a per-tenant manual run requires `--tenant`, and a manual run of a singleton takes the same claim, so a second one in the same UTC minute does nothing.
 
 - Inspect registration before waiting for cron.
 - Run one task manually for a selected tenant.
@@ -57,10 +57,7 @@ func Tasks(d *foundation.Drivers) []foundation.Task {
 <a name="treat-a-missing-lock-as-a-deployment-defect"></a>
 ## Treat a missing lock as a deployment defect
 
-Serving processes check near each minute. Without a shared store `drivers.Locks` is nil, and every replica can run a singleton. Lock keys cover task, tenant, and minute for the timeout; a per-tenant task with no `WithTenants` does not run, and the scheduler reports that rather than skipping in silence.
-
-> [!WARNING]
-> The scheduler has no retry budget. A task that performs an external side effect directly can lose work or repeat it; enqueue a durable idempotent job instead.
+Serving processes check near each minute. Without a shared store `drivers.Locks` is nil, and every replica can run a singleton. A singleton claims its task, tenant, and UTC minute (`sched:<tenant>:<id>:<minute>`) and never releases the claim: it expires after an hour, or after the timeout if that is longer, so a run that fails is not repeated by another replica in the same minute. A per-tenant task with no `WithTenants` does not run, and the scheduler reports that rather than skipping in silence. A failed run is not retried, so a task that performs an external side effect directly can lose that work; enqueue a durable idempotent job instead.
 
 <a name="global-tasks-cannot-touch-tenant-data"></a>
 ## Global tasks cannot touch tenant data

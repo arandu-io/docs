@@ -35,7 +35,7 @@ Use `@csrf` em formulários e chame funções de componentes tipados nas posiç�
 A interpolação escapada é o padrão, e o escape segue a posição: um valor dentro de ypy-vals ou ypy-headers é escapado como JSON, então não fecha uma string nem acrescenta chaves ao que a requisição envia. O conjunto fechado de diretivas fornece controle de fluxo, um layout com seções nomeadas, um campo CSRF e declarações `@go`. Registrar diretivas em runtime, localizar serviços nos templates e referenciar componentes por nomes em strings não são pontos de extensão.
 
 - Use `{{ expression }}` para texto e atributos escapados.
-- Use `{!! expression !!}` apenas para um valor `template.HTML`; qualquer outro tipo falha o build na linha da view.
+- Use `{!! expression !!}` apenas para um valor `template.HTML`, uma função que retorna um ou um literal de string escrito na view; um campo ou variável string falha o build na linha da view.
 - Use `@if` e `@foreach` para controle de fluxo compilado.
 - Use `@extends`, `@section` e `@yield` para um único contrato de layout.
 - Use `@go` para tipos de dados da página e declarações locais.
@@ -46,7 +46,7 @@ A interpolação escapada é o padrão, e o escape segue a posição: um valor d
 A saída crua pula o escape, então nunca converta texto de requisição, banco de dados, Markdown ou tradução em `template.HTML` só para renderizar marcação. Layout e dados da página precisam concordar, todo formulário de navegador precisa de CSRF, e o Go gerado nunca pode virar a fonte editada. Um atributo cujo nome é interpolado reprova o build, porque o escape de um valor é escolhido pelo nome do atributo e um nome que é dado poderia ser onclick ou href. Um nome que a camada de views recusa, escrito em Attrs ou `Parts[...]`.Attrs de um componente, como `ypy-*`, `on*`, style, class, role, `aria-*` ou um endereço, entra em panic com um `*components.RefusedAttribute` que nomeia a parte, o atributo e o motivo, em vez de desenhar um componente vazio.
 
 > [!WARNING]
-> Um componente tipado pode retornar HTML confiável; conteúdo arbitrário de quem o chama, não. A saída sem escape aceita apenas `template.HTML`, então uma string vinda de uma requisição, do banco de dados ou de um catálogo interrompe o build em vez de chegar à página como marcação, e um componente cujo valor é recusado na renderização não renderiza nada, em vez de um elemento quebrado. Revise cada expressão de saída sem escape como um limite de segurança e preserve a interpolação escapada comum para strings controladas pelo usuário.
+> Um componente tipado pode retornar HTML confiável; conteúdo arbitrário de quem o chama, não. A saída sem escape aceita um valor `template.HTML`, uma função que retorna um ou um literal de string escrito na view, então um campo ou variável string vindo de uma requisição, do banco de dados ou de um catálogo interrompe o build em vez de chegar à página como marcação. Converter esse valor em `template.HTML` para calar o erro transforma o texto do visitante em marcação. Um componente cujo valor é recusado na renderização não renderiza nada, em vez de um elemento quebrado. Revise cada expressão de saída sem escape como um limite de segurança e preserve a interpolação escapada comum para strings controladas pelo usuário.
 
 <a name="compile-source-and-inspect-behavior"></a>
 ## Compile os fontes e inspecione o comportamento

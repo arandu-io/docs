@@ -57,7 +57,7 @@ func Enqueue(ctx context.Context, drivers *foundation.Drivers, grant auth.Grant,
 <a name="set-lease-and-retry-policy-from-handler-behavior"></a>
 ## Set lease and retry policy from handler behavior
 
-`queue:work` builds its worker from `Settings.Queue`: `QUEUE_DEFAULT` names the queue, `QUEUE_WORKERS` the concurrency, `QUEUE_RETRY_AFTER` the lease in seconds, and `QUEUE_MAX_ATTEMPTS` the tries, and `--queue` and `--workers` override the first two for one invocation. An unset variable keeps the queue component's own default: four workers and a five-minute lease, with capped exponential backoff between tries.
+`queue:work` builds its worker from `Settings.Queue`: `QUEUE_DEFAULT` names the queue, `QUEUE_WORKERS` the concurrency, `QUEUE_RETRY_AFTER` the lease in seconds, and `QUEUE_MAX_ATTEMPTS` the tries, and `--queue` and `--workers` override the first two for one invocation. An unset variable keeps the queue component's own default: four workers, a five-minute lease, five tries, and a wait between tries that doubles from two seconds and stops growing at one hour. A handler's context is cancelled after one lease, so a handler that returns when its context ends hands the job back before another worker can take it.
 
 - Bound concurrency by dependencies.
 - Set lease above maximum handler duration.
@@ -70,7 +70,7 @@ func Enqueue(ctx context.Context, drivers *foundation.Drivers, grant auth.Grant,
 A returned error consumes an attempt and releases after backoff; exhausted work parks. `ErrManuallyFailed` parks a permanent failure immediately, and a panic is recovered, recorded with stack, and parked on first delivery. The worker reports a job of a batch or a chain after it runs, so a handler that still calls `bus.Handled` counts it twice and pushes the chain's next link twice. Failed payloads remain tenant-protected customer data.
 
 > [!WARNING]
-> A lease shorter than handler duration makes duplicate concurrent delivery possible. Increasing attempts does not make a non-idempotent external side effect safe.
+> A handler that ignores its context keeps running after the lease ends, and another worker can take the same job. Increasing attempts does not make a non-idempotent external side effect safe.
 
 <a name="never-rebuild-authority-from-the-payload"></a>
 ## Never rebuild authority from the payload

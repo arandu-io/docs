@@ -54,7 +54,7 @@ Lea los hallazgos de lentitud y N+1 antes de la timeline sin procesar. Inspeccio
 <a name="know-why-a-request-has-no-record"></a>
 ## Entienda por qué una petición no tiene registro
 
-La ausencia de registro puede indicar tracing desactivado, header ausente, pérdida del Collector en middleware, atención por otra réplica o descarte por el búfer circular limitado. Las dependencias no instrumentadas quedan sin atribución; los registros protegidos o ausentes devuelven 404 deliberadamente. El recorder usa memoria local y desaparece al reiniciar. Rastrear una petición de producción no recoge otras peticiones ni sustituye un backend duradero de telemetría.
+La ausencia de registro puede indicar tracing desactivado, header ausente, pérdida del Collector en middleware, atención por otra réplica o descarte por el búfer circular limitado. Las dependencias no instrumentadas quedan sin atribución; los registros protegidos o ausentes devuelven 404 deliberadamente. El recorder usa memoria local y desaparece al reiniciar. Rastrear una petición de producción no recoge otras peticiones. Arandu no incluye un exportador de telemetría: las trazas y métricas duraderas pertenecen a un backend que usted mantiene junto a la aplicación, y los logs estructurados llevan `request_id` y tenant para correlacionar ambos.
 
 <a name="minimize-the-diagnostic-data-window"></a>
 ## Minimice la ventana de datos diagnósticos

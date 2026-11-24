@@ -18,7 +18,7 @@ Joaju implements the Pusher wire protocol as an `http.Handler`. The application 
 <a name="choose-one-process-or-a-relayed-fleet"></a>
 ## Choose one process or a relayed fleet
 
-A `ServerConfig` requires application id and key, Broker, `ConnectPolicy`, `SubscriptionPolicy`, and Protocol. `ServerConfig.Operate`, an `OperationPolicy` asked about `joaju.Operate`, is optional, and nil refuses every HTTP API route with 403; an application that publishes through the API writes one that allows its backend and never an ordinary user. Joaju's own journey and end-to-end tests cover one process with the memory broker. Released relay and RESP pub/sub APIs exist for a fleet, but no tagged consumer proves their application wiring and cross-instance behavior yet; this guide does not present multi-replica delivery as an established deployment path.
+A `ServerConfig` requires application id and key, Broker, `ConnectPolicy`, `SubscriptionPolicy`, and Protocol. `ServerConfig.Operate`, an `OperationPolicy` asked about `joaju.Operate`, is optional, and nil refuses every HTTP API route with 403; an application that publishes through the API writes one that allows its backend and never an ordinary user. Joaju's own journey and end-to-end tests cover one process with the memory broker. A fleet adds a `Relay`: build it with `joaju.NewRelay(ctx, instanceID, bus, logger)` over the RESP connection of the `github.com/arandu-io/joaju/redis` module (`redis.NewBus`), wrap the Broker with `joaju.RelayedBroker(base, relay)`, give the Protocol that same value, and set `ServerConfig.Relay`; `NewServer` refuses a Relay whose Broker was not wrapped. Each instance needs its own `InstanceID`, such as the hostname or pod name, because an instance drops every relayed message that carries its own id. The standalone command builds its server without a Relay, so a fleet mounts the handler in the application. Joaju's tests cover delivery to the other instances exactly once and inside the tenant, metrics answered across instances, and recovery after an outage, on an in-memory bus, and the RESP bus against a live server under the `integration` build tag.
 
 <a name="run-the-released-standalone-process"></a>
 ## Run the released standalone process
@@ -50,12 +50,12 @@ The standalone command meters every socket at 100 frames a second unless `JOAJU_
 <a name="verify-policy-calls-before-claiming-fleet-delivery"></a>
 ## Verify policy calls before claiming fleet delivery
 
-The in-process consumer must prove that Connect runs before upgrade, Subscribe runs for every route and subscription touching a channel, an HTTP API call without an Operate policy answers 403, and tenant A cannot name tenant B's channel. Fleet support is not yet a supported deployment contract: before relying on it, publish on one instance, assert a socket on another receives the event, and query metrics from both sides.
+The in-process consumer must prove that Connect runs before upgrade, Subscribe runs for every route and subscription touching a channel, an HTTP API call without an Operate policy answers 403, and tenant A cannot name tenant B's channel. For a fleet, add the cross-instance check to the application's own tests: publish on one instance, assert a socket on another receives the event, and query metrics from both sides.
 
 <a name="degrade-explicitly-when-the-bus-is-unavailable"></a>
 ## Degrade explicitly when the bus is unavailable
 
-The released relay API can answer metrics with responses that arrive before its timeout, but the first-party application has not established the fleet recovery contract. A deployment that adopts it must alert on bus errors, define whether local service continues, restore connectivity, and re-run cross-instance delivery before considering the fleet recovered.
+When Redis cannot be reached, the Relay keeps serving the sockets its own instance holds: `Join` and `Publish` still succeed, and an event reaches only this instance until the bus answers again, because nothing is queued for the others. It writes one error line when the outage begins and one info line when it ends, reopens its subscriptions every second, and `Relay.Degraded()` answers true until a publish succeeds or a message arrives; wire it to the readiness check and alert on the error line. The metrics routes wait `ServerConfig.MetricsTimeout` for the other instances, 500 ms by default, and answer with the numbers that arrived. After restoring Redis, repeat the cross-instance delivery check.
 
 <a name="protocol-transport-and-application-remain-separate"></a>
 ## Protocol, transport, and application remain separate

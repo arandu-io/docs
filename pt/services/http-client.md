@@ -39,7 +39,7 @@ func PostPayload(ctx context.Context, endpoint string, payload map[string]any) e
 <a name="add-headers-retries-and-decoding-deliberately"></a>
 ## Adicione headers, tentativas e decodificação deliberadamente
 
-Configure URL base e headers imutáveis na construção, adicione autorização específica sem registrá-la, propague contexto, limite corpos de resposta e repita apenas operações idempotentes ou com chave explícita de idempotência, usando backoff limitado. `Batch.Send` não tem testes próprios neste release; prefira o caminho de requisição única.
+Configure URL base e headers imutáveis na construção, adicione autorização específica sem registrá-la, propague contexto, limite corpos de resposta e repita apenas operações idempotentes ou com chave explícita de idempotência, usando backoff limitado.
 
 - Use contexto em todo verbo.
 - Defina prazos para cliente e operação.

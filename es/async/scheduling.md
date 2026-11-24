@@ -47,7 +47,7 @@ func Tasks(d *foundation.Drivers) []foundation.Task {
 <a name="inspect-and-invoke-the-registered-schedule"></a>
 ## Inspecciona y ejecuta la programación registrada
 
-`aru schedule:list` informa id, cron, ámbito, singleton, próxima ejecución, última ejecución y último error. `schedule:run` utiliza el mismo recorrido de Grant, bloqueo e instrumentación; una ejecución manual por tenant exige `--tenant`.
+`aru schedule:list` informa id, cron, ámbito, singleton, próxima ejecución, última ejecución y último error. `schedule:run` utiliza el mismo recorrido de Grant, bloqueo e instrumentación; una ejecución manual por tenant exige `--tenant`, y la ejecución manual de un singleton toma la misma reclamación, así que una segunda en el mismo minuto UTC no hace nada.
 
 - Inspecciona el registro antes de esperar al cron.
 - Ejecute una tarea manualmente para un tenant seleccionado.
@@ -57,10 +57,7 @@ func Tasks(d *foundation.Drivers) []foundation.Task {
 <a name="treat-a-missing-lock-as-a-deployment-defect"></a>
 ## Trate la ausencia de bloqueo como un defecto de despliegue
 
-Los procesos que sirven comprueban cerca de cada minuto. Sin un store compartido, `drivers.Locks` es nil y cada réplica puede ejecutar un singleton. Las claves de lock cubren tarea, tenant y minuto durante el timeout; una tarea por tenant sin `WithTenants` no se ejecuta, y el programador lo informa en lugar de saltarla en silencio.
-
-> [!WARNING]
-> El programador no tiene un presupuesto de reintentos. Una tarea que ejecuta directamente un efecto externo puede perder o repetir trabajo; encole un job duradero e idempotente.
+Los procesos que sirven comprueban cerca de cada minuto. Sin un store compartido, `drivers.Locks` es nil y cada réplica puede ejecutar un singleton. Un singleton reclama su tarea, el tenant y el minuto UTC (`sched:<tenant>:<id>:<minuto>`) y nunca libera la reclamación: expira tras una hora, o tras el timeout si es mayor, así que una ejecución que falla no la repite otra réplica en el mismo minuto. Una tarea por tenant sin `WithTenants` no se ejecuta, y el programador lo informa en lugar de saltarla en silencio. Una ejecución que falla no se reintenta, así que una tarea que ejecuta directamente un efecto externo puede perder ese trabajo; encole un job duradero e idempotente.
 
 <a name="global-tasks-cannot-touch-tenant-data"></a>
 ## Las tareas Global no pueden acceder a datos de tenant

@@ -56,7 +56,7 @@ func Update(ctx context.Context, policy security.Policy[Invoice], subject securi
 <a name="keep-the-decision-beside-the-protected-action"></a>
 ## Keep the decision beside the protected action
 
-Use a small policy per domain resource, map operations to stable named actions, and keep controller transport separate. Reauthorize background and queued work from durable provenance rather than serializing a Grant from the original request. A Grant issued while an operator views somebody else's account is read-only: `Grant.ReadOnly` answers true, and every repository, cache, disk, and queue write refuses it with `auth.ErrReadOnly`, so leave the action out of such a page rather than letting it fail.
+Use a small policy per domain resource, map operations to stable named actions, and keep controller transport separate. Never serialize the request's Grant for background work. A queue job, a scheduled task, and a webhook delivery run under a Grant the framework rebuilds from the recorded tenant and action, and from the operator when someone was acting in the account. An outbox listener receives the stored event instead, with `TenantID`, `Action`, and `AuthorizedBy`, and builds its own Grant with `auth.SystemGrant(<action>, stored.TenantID)` on a line marked `//arandu:system-grant <reason>`, which `aru doctor` checks. A Grant issued while an operator views somebody else's account is read-only: `Grant.ReadOnly` answers true, and every repository, cache, disk, and queue write refuses it with `auth.ErrReadOnly`, so leave the action out of such a page rather than letting it fail.
 
 - Authorize before protected reads and writes.
 - Pass Grant through service and repository seams.
