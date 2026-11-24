@@ -1,0 +1,50 @@
+# Collections
+
+- [Use uma collection quando a operação expressar o que você precisa](#use-a-collection-when-the-operation-is-the-vocabulary)
+- [Construa, transforme e finalize valores tipados](#build-transform-and-finish-typed-values)
+- [Avaliação sob demanda e maps mudam o custo](#laziness-and-maps-change-the-cost-model)
+
+<a name="use-a-collection-when-the-operation-is-the-vocabulary"></a>
+## Use uma collection quando a operação expressar o que você precisa
+
+`collections.Collection[T]` é um slice tipado com transformações nomeadas. É útil quando uma sequência de filtros, agrupamentos ou reduções fica mais clara que loops locais. Indexação comum, um loop curto e a ordenação da biblioteca padrão continuam sendo a primeira escolha quando forem mais claros.
+
+<a name="build-transform-and-finish-typed-values"></a>
+## Construa, transforme e finalize valores tipados
+
+Collect, Make, Empty, Range e Wrap constroem valores. Filter, Reject, First, Sole, Take, Skip e Slice os selecionam. Map, `FlatMap`, `GroupBy`, `KeyBy` e `MapWithKeys` os transformam; Reduce, Percentage, Count, Join e Implode concluem um cálculo. Ordenação, unicidade, diferença e interseção acontecem em memória, sem garantias de banco de dados ou autorização.
+
+Operações que mudam o tipo, como `Map[T,U]`, são funções de pacote porque métodos Go não podem introduzir um segundo parâmetro de tipo. Operações que alteram valores, como Push, Pop e Splice, usam receivers de ponteiro; uma chamada com aparência fluente não é automaticamente uma cópia independente.
+
+| Superfície | Contrato publicado |
+| --- | --- |
+| Construção | Collect, Make, Empty, Range, Wrap, `FromJSON` |
+| Seleção | Filter, Reject, First, Sole, Take, Skip, Slice |
+| Transformação | Map, `FlatMap`, `GroupBy`, `KeyBy`, `MapWithKeys` |
+| Agregação | Reduce, Percentage, Count, Join, Implode |
+| Trabalho sob demanda | `RangeLazy`, `MapLazy`, Take, Remember, All |
+
+```go example
+func LargeAmounts() (collections.Collection[string], int) {
+	amounts := collections.Collect([]int{125, 200, 75, 200})
+	large := amounts.Filter(func(value, _ int) bool { return value >= 200 })
+	labels := collections.Map(large, func(value, _ int) string {
+		return strconv.Itoa(value)
+	})
+	total := collections.Reduce(amounts, func(sum, value, _ int) int {
+		return sum + value
+	}, 0)
+	return labels, total
+}
+```
+
+<a name="laziness-and-maps-change-the-cost-model"></a>
+## Avaliação sob demanda e maps mudam o custo
+
+Uma collection sob demanda adia o trabalho até ser percorrida; Remember memoriza o que já foi obtido. Ela não acrescenta cancelamento de I/O, portanto um produtor bloqueante ainda precisa de código sensível ao contexto. Auxiliares de maps só definem ordem quando seu contrato de resultado a prevê.
+
+collections/arr contém auxiliares tipados de acesso e apresentação no Hesape :hesapeVersion. Prefira um loop local quando ele for menor
+
+- [API de collections](https://pkg.go.dev/github.com/arandu-io/hesape/collections)
+- [Auxiliares de arrays](https://pkg.go.dev/github.com/arandu-io/hesape/collections/arr)
+- [Concorrência](/docs/{{version}}/architecture/concurrency)

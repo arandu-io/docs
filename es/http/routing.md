@@ -8,9 +8,6 @@
 - [API de enrutamiento publicada](#released-routing-api)
 - [Continúe por el recorrido de petición](#continue-the-request-path)
 
-> [!WARNING]
-> **Limitaciones actuales.** El router y las URLs con nombre están publicados. Las cachés de ruta y configuración están ausentes intencionalmente; los ejemplos avanzados se limitan a patrones ejercitados por el esqueleto y la suite de feature.
-
 <a name="routes-are-executable-contracts"></a>
 ## Las rutas son contratos ejecutables
 
@@ -51,7 +48,7 @@ Los grupos comparten un prefijo y un límite de política. Las restricciones rec
 
 Los nombres de ruta desconocidos y la cantidad equivocada de parámetros hacen que `Routes.URL` devuelva un error. Las discrepancias de restricción son respuestas 404, no resultados de autorización. Los registros duplicados o en conflicto son defectos de arranque, y el orden de registro debe seguir siendo determinista. El arranque también rechaza una ruta de la aplicación que responde a una ruta que el framework monta bajo `/_arandu/`, como `/_arandu/health`, en un método que la ruta del framework no acepta, nombrando el módulo y el patrón. La causa habitual es `r.Post("/", ...)`, cuyo patrón coincide con toda ruta debajo de la raíz; registre la raíz como "`/{$}`". La autenticación RPC se ejecuta antes de decodificar la petición, pero solo identifica un Subject: los servicios de la aplicación siguen autorizando y emitiendo Grants. La admisión se cierra durante el apagado, los streams observan la cancelación y el framework no abre un listener h2c ni un segundo listener RPC.
 
-> [!WARNING]
+> [!NOTE]
 > `Route.SetURI` cambia metadatos tras el registro, pero no mueve el patrón instalado en `ServeMux`. Defina la URI final antes del arranque.
 
 <a name="inspect-and-dispatch-the-same-table"></a>

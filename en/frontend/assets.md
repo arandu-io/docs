@@ -10,9 +10,6 @@
 - [Rebuild from sources and verify the embedded result](#rebuild-from-sources-and-verify-the-embedded-result)
 - [Trace an asset from source to response](#trace-an-asset-from-source-to-response)
 
-> [!WARNING]
-> **Current limitations.** The released asset registry serves a fixed self-hosted set and the CLI compiles CSS with a pinned standalone binary. A layout requesting an unregistered asset fails at render time; keep the layout and registry covered by one application test.
-
 <a name="the-binary-serves-content-addressed-assets"></a>
 ## The binary serves content-addressed assets
 

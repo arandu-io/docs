@@ -9,9 +9,6 @@
 - [Teste transporte e policy separadamente](#test-transport-and-policy-separately)
 - [Complete a fronteira do controller](#complete-the-controller-boundary)
 
-> [!WARNING]
-> **Limitações atuais.** Controllers são dependências comuns e explícitas. O framework não resolve construtores nem autoriza registros automaticamente; cada ação protegida precisa obter e passar seu Grant.
-
 <a name="translate-http-and-keep-policy-downstream"></a>
 ## Traduza HTTP e mantenha a policy no serviço seguinte
 

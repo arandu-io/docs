@@ -10,9 +10,6 @@
 - [Recompila desde los fuentes y verifica el resultado embebido](#rebuild-from-sources-and-verify-the-embedded-result)
 - [Rastrea un asset desde el fuente hasta la respuesta](#trace-an-asset-from-source-to-response)
 
-> [!WARNING]
-> **Limitaciones actuales.** El registro de assets publicado sirve un conjunto fijo alojado por la propia aplicación, y la CLI compila CSS con un binario standalone de versión fija. Un layout que pide un asset no registrado falla al renderizarse; cubre el layout y el registro con una sola prueba de la aplicación.
-
 <a name="the-binary-serves-content-addressed-assets"></a>
 ## El binario sirve assets identificados por su contenido
 

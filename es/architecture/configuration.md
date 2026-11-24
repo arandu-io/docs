@@ -8,16 +8,12 @@
 - [Loaders y configuración tipada](#loaders-and-typed-configuration)
 - [La configuración elige adapters; el código conserva el contrato](#configuration-chooses-adapters-code-keeps-the-contract)
 
-> [!WARNING]
-> **Limitaciones actuales.** El framework lee toda configuración de driver en `bootstrap.Settings` y construye los drivers a partir de ella, y el esqueleto publicado añade solo sus propias secciones. `LOG_SAMPLING` todavía se lee y valida sin llegar al logger, así que pruebe cada variable adicional en el consumidor que debería leerla.
-
 <a name="configuration-is-a-typed-boot-input"></a>
 ## La configuración es una entrada tipada del inicio
 
 La aplicación lee la configuración una vez, la valida antes de abrir el servidor y pasa valores tipados a los constructores. Los handlers no consultan variables de entorno y los componentes no buscan claves de texto al usarlas.
 
-> [!WARNING]
-> El framework es dueño de toda configuración que construye un driver. `bootstrap.LoadSettings` lee las variables de aplicación, HTTP, base de datos, caché, sesión, cola, correo, sistema de archivos y logging en `bootstrap.Settings`, y el `config.Config` del esqueleto incorpora esa configuración junto a sus propias secciones Auth, Geo y Services. No lea una variable del framework por segunda vez en `config/`: dos lectores de un mismo nombre divergen.
+El framework es dueño de toda configuración que construye un driver. `bootstrap.LoadSettings` lee las variables de aplicación, HTTP, base de datos, caché, sesión, cola, correo, sistema de archivos y logging en `bootstrap.Settings`, y el `config.Config` del esqueleto incorpora esa configuración junto a sus propias secciones Auth, Geo y Services. No lea una variable del framework por segunda vez en `config/`: dos lectores de un mismo nombre divergen.
 
 <a name="load-once-and-fail-before-serving-traffic"></a>
 ## Carga una vez y falla antes de atender tráfico
@@ -62,7 +58,7 @@ return foundation.Configure(drivers).WithProviders(app).Create()
 | `LOG_LEVEL`, `LOG_FORMAT` y `LOG_SAMPLING` | `bootstrap.Settings` del framework | nivel; json o text; uno de cada N |
 | `ARANDU_TENANT_ID`, `AUTH_*`, `GEO_*` y credenciales de servicios | las secciones propias de la aplicación en `config/` | campos tipados |
 
-El archivo `.env` completa valores que el entorno del proceso no haya proporcionado. Por tanto, las variables del entorno de despliegue tienen prioridad. Mantén los secretos fuera del control de versiones y usa el archivo de ejemplo solo como catálogo de entradas posibles, no como prueba de que todas lleguen a un consumidor.
+El archivo `.env` completa valores que el entorno del proceso no haya proporcionado. Por tanto, las variables del entorno de despliegue tienen prioridad. Mantén los secretos fuera del control de versiones y usa el archivo de ejemplo solo como catálogo de entradas posibles, no como prueba de que todas lleguen a un consumidor. `LOG_SAMPLING` se lee y se valida, pero el logger todavía no lo aplica.
 
 ### `APP_ENV` decide lo que producción rechaza
 
@@ -80,8 +76,7 @@ Booleanos malformados, recuentos no positivos, URL inválidas, claves ausentes y
 > [!WARNING]
 > Producción rechaza dos valores en el arranque. `SESSION_SECURE_COOKIE=false` enviaría la sesión, la propia credencial, en texto claro; un despliegue servido por http es de staging y define `APP_ENV=staging`. `MAIL_URL=log://`, que también es el valor de un `MAIL_URL` sin definir, escribiría cada mensaje, incluidos los códigos de restablecimiento de contraseña, en el log; producción define `smtp://`, `smtps://`, `resend://` o `sendgrid://`.
 
-> [!WARNING]
-> En framework :frameworkVersion, el nombre y el alcance de la cookie de sesión no son configuraciones: es `arandu_session`, en la ruta /, para el host que respondió. `SESSION_PATH`, `SESSION_DOMAIN` o `SESSION_SAME_SITE` pidiendo otro alcance detienen el arranque, `SESSION_SECURE` lo detiene nombrando `SESSION_SECURE_COOKIE`, y `SESSION_COOKIE` no lo lee nada.
+En framework :frameworkVersion, el nombre y el alcance de la cookie de sesión no son configuraciones: es `arandu_session`, en la ruta /, para el host que respondió. `SESSION_PATH`, `SESSION_DOMAIN` o `SESSION_SAME_SITE` pidiendo otro alcance detienen el arranque, `SESSION_SECURE` lo detiene nombrando `SESSION_SECURE_COOKIE`, y `SESSION_COOKIE` no lo lee nada.
 
 <a name="trace-a-value-into-the-constructor-that-uses-it"></a>
 ## Rastrea un valor hasta el constructor que lo utiliza

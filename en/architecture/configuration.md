@@ -8,16 +8,12 @@
 - [Loaders and typed configuration](#loaders-and-typed-configuration)
 - [Configuration chooses adapters; code keeps the contract](#configuration-chooses-adapters-code-keeps-the-contract)
 
-> [!WARNING]
-> **Current limitations.** The framework reads every driver setting into `bootstrap.Settings` and builds the drivers from it, and the released skeleton adds only its own sections. `LOG_SAMPLING` is still read and validated without reaching the logger, so test every additional variable at the consumer that should read it.
-
 <a name="configuration-is-a-typed-boot-input"></a>
 ## Configuration is a typed boot input
 
 The application reads configuration once, validates it before opening the server, and passes typed values into constructors. Handlers do not query environment variables and components do not look up string keys at the point of use.
 
-> [!WARNING]
-> The framework owns every setting that builds a driver. `bootstrap.LoadSettings` reads the application, HTTP, database, cache, session, queue, mail, filesystem, and logging variables into `bootstrap.Settings`, and the skeleton's `config.Config` embeds those settings beside its own Auth, Geo, and Services sections. Do not read a framework variable a second time under `config/`: two readers of one name drift apart.
+The framework owns every setting that builds a driver. `bootstrap.LoadSettings` reads the application, HTTP, database, cache, session, queue, mail, filesystem, and logging variables into `bootstrap.Settings`, and the skeleton's `config.Config` embeds those settings beside its own Auth, Geo, and Services sections. Do not read a framework variable a second time under `config/`: two readers of one name drift apart.
 
 <a name="load-once-and-fail-before-serving-traffic"></a>
 ## Load once and fail before serving traffic
@@ -62,7 +58,7 @@ return foundation.Configure(drivers).WithProviders(app).Create()
 | `LOG_LEVEL`, `LOG_FORMAT`, and `LOG_SAMPLING` | framework `bootstrap.Settings` | level; json or text; one in N |
 | `ARANDU_TENANT_ID`, `AUTH_*`, `GEO_*`, and service credentials | the application's own sections under `config/` | typed fields |
 
-The `.env` file fills values that the process environment did not already provide. Deployment environment values therefore win. Keep secrets outside source control, and use the example file only as a catalogue of candidate inputs—not as proof that every candidate reaches a consumer.
+The `.env` file fills values that the process environment did not already provide. Deployment environment values therefore win. Keep secrets outside source control, and use the example file only as a catalogue of candidate inputs—not as proof that every candidate reaches a consumer. `LOG_SAMPLING` is read and validated, but the logger does not apply it yet.
 
 ### `APP_ENV` decides what production refuses
 
@@ -80,8 +76,7 @@ Malformed booleans, non-positive counts, invalid URLs, missing keys, and unsuppo
 > [!WARNING]
 > Production refuses two values at boot. `SESSION_SECURE_COOKIE=false` would send the session, the credential itself, in the clear; a deployment served over http is a staging one and sets `APP_ENV=staging`. `MAIL_URL=log://`, which is also the value of an unset `MAIL_URL`, would write every message, password-reset codes included, into the log; production sets `smtp://`, `smtps://`, `resend://`, or `sendgrid://`.
 
-> [!WARNING]
-> In framework :frameworkVersion, the session cookie's name and scope are not settings: it is `arandu_session`, on path /, for the host that answered. `SESSION_PATH`, `SESSION_DOMAIN`, or `SESSION_SAME_SITE` asking for another scope stops the boot, `SESSION_SECURE` stops it naming `SESSION_SECURE_COOKIE`, and `SESSION_COOKIE` is read by nothing.
+In framework :frameworkVersion, the session cookie's name and scope are not settings: it is `arandu_session`, on path /, for the host that answered. `SESSION_PATH`, `SESSION_DOMAIN`, or `SESSION_SAME_SITE` asking for another scope stops the boot, `SESSION_SECURE` stops it naming `SESSION_SECURE_COOKIE`, and `SESSION_COOKIE` is read by nothing.
 
 <a name="trace-a-value-into-the-constructor-that-uses-it"></a>
 ## Trace a value into the constructor that uses it

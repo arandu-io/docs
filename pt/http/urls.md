@@ -8,9 +8,6 @@
 - [Superfícies de URL publicadas e sua fronteira](#released-url-surfaces-and-boundary)
 - [Use links conforme seu nível real de confiança](#use-links-at-their-real-trust-level)
 
-> [!WARNING]
-> **Limitações atuais.** Geração de rota nomeada é estável na aplicação framework. Rotas assinadas estão publicadas e testadas no Hesape, mas a tabela de `framework/http.Router` não pode ser passada a `hesape/routing.SignedRoute`; a aplicação padrão ainda não tem um fluxo completo publicado de rota assinada.
-
 <a name="route-names-are-the-address-source"></a>
 ## Nomes de rota são a fonte dos endereços
 
@@ -50,7 +47,7 @@ Mantenha decisões de host e protocolo na configuração confiável da implanta�
 <a name="do-not-hide-the-framework-bridge-gap"></a>
 ## Não esconda a lacuna da integração do framework
 
-Nome de rota desconhecido, contagem incorreta de parâmetros, query alterada, assinatura expirada e host não confiável são recusas distintas. Nunca use destino sem assinatura como fallback quando assinar falhar.
+Nome de rota desconhecido, contagem incorreta de parâmetros, query alterada, assinatura expirada e host não confiável são recusas distintas. Nunca use destino sem assinatura como fallback quando assinar falhar. `hesape/routing.SignedRoute` recebe a tabela de rotas de `hesape/routing`, não a de `framework/http.Router`; com o router do framework, obtenha o caminho por `Table().URL` e assine-o com `security.Signer`, como no exemplo acima.
 
 > [!WARNING]
 > Assinatura válida comprova integridade e expiração, não identidade ou permissão. O handler ainda carrega Subject atual, autoriza a ação e garante uso único no armazenamento durável.

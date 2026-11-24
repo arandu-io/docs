@@ -9,9 +9,6 @@
 - [Prueba el transporte, el schema y el rechazo entre tenants](#exercise-transport-schema-and-tenant-refusal)
 - [Separa la exposición del servidor de la automatización de clientes](#separate-server-exposure-from-client-automation)
 
-> [!WARNING]
-> **Limitaciones actuales.** MCP :mcpVersion publica los contratos de servidor, herramienta, recurso, prompt y destino autorizado, pero ninguna aplicación de referencia actual con etiqueta lo consume. Verifica la integración con el grafo actual de Framework :frameworkVersion y Hesape :hesapeVersion; un runtime general de cliente sigue aplazado.
-
 <a name="expose-application-capabilities-through-existing-policies"></a>
 ## Expón funciones de la aplicación mediante las policies existentes
 
@@ -30,7 +27,7 @@ Fija `github.com/arandu-io/mcp@:mcpVersion` y prepara servicios de la aplicació
 <a name="declare-one-policy-backed-tool"></a>
 ## Declara una herramienta protegida por Policy
 
-Una Tool declara Name, Description, Schema y Handle. Los argumentos se validan mediante schema antes de Handle, `Request.Subject` es de solo lectura y el handler llama al mismo servicio protegido por Policy que usa HTTP, en vez de acceder directamente a un repositorio. `mcp.JSON` recibe un recurso que enumera sus campos, el mismo documento que escribe `Context.JSON`, y no un valor suelto. `mcp.JSON` recibe un recurso que enumera sus campos, el mismo documento que escribe `Context.JSON`, y no un valor suelto.
+Una Tool declara Name, Description, Schema y Handle. Los argumentos se validan mediante schema antes de Handle, `Request.Subject` es de solo lectura y el handler llama al mismo servicio protegido por Policy que usa HTTP, en vez de acceder directamente a un repositorio. `mcp.JSON` recibe un recurso que enumera sus campos, el mismo documento que escribe `Context.JSON`, y no un valor suelto.
 
 ```go example
 type Post struct{ ID, Title string }
@@ -84,10 +81,9 @@ func (t ListPosts) Handle(ctx context.Context, r mcp.Request) (mcp.Response, err
 <a name="return-actionable-protocol-failures"></a>
 ## Devuelve fallos de protocolo que indiquen cómo actuar
 
-Los fallos de herramientas devuelven contenido con `isError`, un rechazo de autorización nunca es un éxito vacío, las herramientas desconocidas indican las opciones disponibles, JSON-RPC y argumentos malformados son errores de protocolo, las notificaciones no reciben respuesta y se rechazan los mensajes superiores a un `MiB`. resources/read usa el tipo MIME declarado por el recurso. `Prompt.Argument.Required` se anuncia, pero prompts/get no lo aplica; por ello, `Prompt.Render` debe validar los argumentos obligatorios.
+Los fallos de herramientas devuelven contenido con `isError`, un rechazo de autorización nunca es un éxito vacío, las herramientas desconocidas indican las opciones disponibles, JSON-RPC y argumentos malformados son errores de protocolo, las notificaciones no reciben respuesta y se rechazan los mensajes superiores a un `MiB`. resources/read usa el tipo MIME declarado por el recurso. `prompts/get` rechaza una llamada que omite un argumento marcado con `Prompt.Argument.Required` o que nombra uno que el prompt no declaró, antes de que se ejecute `Prompt.Render`.
 
-> [!WARNING]
-> Aru :aruVersion tiene dos superficies MCP que no son el runtime de este servidor: `aru mcp` sirve el propio servidor de la CLI, que responde a un asistente de código sobre el proyecto, y los generadores `make:mcp-*` escriben las tools, los resources y los prompts de una aplicación. No tiene comando `mcp:start` ni `mcp:list` para el servidor de la aplicación, que se monta como una ruta. MCP :mcpVersion no tiene un consumidor de aplicación publicado actual, así que esta página queda limitada hasta que la integración se revalide contra Framework :frameworkVersion y Hesape :hesapeVersion.
+Aru :aruVersion tiene dos superficies MCP que no son el runtime de este servidor: `aru mcp` sirve el propio servidor de la CLI, que responde a un asistente de código sobre el proyecto, y los generadores `make:mcp-*` escriben las tools, los resources y los prompts de una aplicación. No tiene comando `mcp:start` ni `mcp:list` para el servidor de la aplicación, que se monta como una ruta.
 
 <a name="keep-the-model-behind-the-same-grant-boundary"></a>
 ## Mantén el modelo sujeto al mismo límite de Grant
@@ -104,7 +100,7 @@ Valida el servidor, inicialízalo y comprueba el protocolo y sus capacidades. Ll
 
 - La revisión del protocolo es 2024-11-05.
 - Los errores de schema no llaman a Handle.
-- El comportamiento MIME de la lectura de recursos y la limitación de argumentos obligatorios de prompts están fijados.
+- El comportamiento MIME de la lectura de recursos y los argumentos obligatorios de prompts están fijados.
 - Se rechazan las entradas de transporte que superan el límite.
 
 <a name="separate-server-exposure-from-client-automation"></a>

@@ -9,9 +9,6 @@
 - [Test transport and policy separately](#test-transport-and-policy-separately)
 - [Complete the controller boundary](#complete-the-controller-boundary)
 
-> [!WARNING]
-> **Current limitations.** Controllers are ordinary explicit dependencies. The framework does not resolve controller constructors or authorize records automatically; each protected action must obtain and pass its Grant.
-
 <a name="translate-http-and-keep-policy-downstream"></a>
 ## Translate HTTP and keep policy downstream
 

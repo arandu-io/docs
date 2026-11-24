@@ -9,9 +9,6 @@
 - [Comprove o fluxo entre réplicas](#prove-the-cross-replica-path)
 - [Autenticação define identidade; policy define autoridade](#authentication-owns-identity-policy-owns-authority)
 
-> [!WARNING]
-> **Limitações atuais.** `foundation.NewDrivers` constrói o store de sessão a partir de `SESSION_DRIVER`, `REDIS_URL`, `SESSION_LIFETIME` e `SESSION_SECURE_COOKIE`, inclusive um store compartilhado sobre RESP para várias réplicas depois que `hesape/redis` é vinculado, e a produção recusa `SESSION_SECURE_COOKIE=false`. O nome e o escopo do cookie são fixos: `arandu_session`, caminho /, o host que respondeu e `SameSite` Lax; o framework recusa `SESSION_TTL` e um `SESSION_PATH`, `SESSION_DOMAIN` ou `SESSION_SAME_SITE` que peça outro escopo.
-
 <a name="a-signed-cookie-points-to-a-typed-subject"></a>
 ## Um cookie assinado aponta para um Subject tipado
 
@@ -20,7 +17,7 @@ O armazenamento de sessão do framework envia ao navegador um ID assinado e mant
 <a name="choose-the-backend-for-the-deployment-topology"></a>
 ## Escolha o backend conforme a topologia de implantação
 
-`foundation.NewDrivers` constrói o único store de sessão, `drivers.Sessions`, a partir da chave da aplicação, de `SESSION_LIFETIME` e da decisão sobre Secure, sobre o backend que `SESSION_DRIVER` nomeia. Memory serve para testes e para um único processo local. Várias réplicas precisam de `SESSION_DRIVER=redis`, do conector `hesape/redis` vinculado pelo seu import em branco em `bootstrap/app.go` e de um `REDIS_URL` acessível. O armazenamento de sessão é independente de `CACHE_STORE`.
+`foundation.NewDrivers` constrói o único store de sessão, `drivers.Sessions`, a partir da chave da aplicação, de `SESSION_LIFETIME` e da decisão sobre Secure, sobre o backend que `SESSION_DRIVER` nomeia. Memory serve para testes e para um único processo local. Várias réplicas precisam de `SESSION_DRIVER=redis`, do conector `hesape/redis` vinculado pelo seu import em branco em `bootstrap/app.go` e de um `REDIS_URL` acessível. O armazenamento de sessão é independente de `CACHE_STORE`. O cookie é `arandu_session`, no caminho /, para o host que respondeu, `HttpOnly` e `SameSite` Lax; o nome e o escopo não são configurações. `SESSION_TTL`, que `SESSION_LIFETIME` substituiu, interrompe o boot.
 
 | Configuração | Efeito publicado |
 | --- | --- |
@@ -51,9 +48,6 @@ func RotateSession(r *stdhttp.Request, w stdhttp.ResponseWriter, drivers *founda
 }
 ```
 
-> [!NOTE]
-> O atributo Secure do store segue `SESSION_SECURE_COOKIE` e fica ligado em todo lugar exceto `APP_ENV=dev` quando a variável não está definida. A produção recusa false no boot, porque ali o cookie é a credencial.
-
 <a name="load-confirm-remember-and-end-sessions"></a>
 ## Carregue, confirme, lembre e encerre sessões
 
@@ -83,9 +77,6 @@ func NewSessions(drivers *foundation.Drivers, appKey []byte, ttl time.Duration) 
 ## Registro ausente permanece não autenticado
 
 Cookie ausente, assinatura inválida, registro expirado ou ID ausente não criam Subject parcial. Middleware considera a requisição não autenticada. Indisponibilidade do backend compartilhado é diferente: falhe a requisição dependente ou saúde, sem trocar silenciosamente por memória e dividir as instâncias.
-
-> [!WARNING]
-> O nome e o escopo do cookie de sessão não são configuráveis. O armazenamento publicado grava `arandu_session` no caminho /, para o host que respondeu, `HttpOnly` e `SameSite` Lax. O framework interrompe o boot com `SESSION_TTL`, que `SESSION_LIFETIME` substituiu, e com `SESSION_PATH`, `SESSION_DOMAIN` ou `SESSION_SAME_SITE` pedindo outro escopo.
 
 <a name="identity-changes-require-id-changes"></a>
 ## Mudanças de identidade exigem mudanças de ID

@@ -9,9 +9,6 @@
 - [Prove the cross-replica path](#prove-the-cross-replica-path)
 - [Authentication owns identity; policy owns authority](#authentication-owns-identity-policy-owns-authority)
 
-> [!WARNING]
-> **Current limitations.** `foundation.NewDrivers` builds the session store from `SESSION_DRIVER`, `REDIS_URL`, `SESSION_LIFETIME`, and `SESSION_SECURE_COOKIE`, including a shared RESP-backed store for multiple replicas once `hesape/redis` is linked, and production refuses `SESSION_SECURE_COOKIE=false`. The cookie's name and scope are fixed: `arandu_session`, path /, the answering host, and `SameSite` Lax; the framework refuses `SESSION_TTL` and a `SESSION_PATH`, `SESSION_DOMAIN`, or `SESSION_SAME_SITE` asking for another scope.
-
 <a name="a-signed-cookie-points-to-a-typed-subject"></a>
 ## A signed cookie points to a typed Subject
 
@@ -20,7 +17,7 @@ The framework session store writes a signed session id to the browser and keeps 
 <a name="choose-the-backend-for-the-deployment-topology"></a>
 ## Choose the backend for the deployment topology
 
-`foundation.NewDrivers` builds the one session store, `drivers.Sessions`, from the application key, `SESSION_LIFETIME`, and the Secure decision, over the backend `SESSION_DRIVER` names. Memory is appropriate for tests and a single local process. Multiple replicas need `SESSION_DRIVER=redis`, the `hesape/redis` connector linked by its blank import in `bootstrap/app.go`, and a reachable `REDIS_URL`. Session storage is independent of `CACHE_STORE`.
+`foundation.NewDrivers` builds the one session store, `drivers.Sessions`, from the application key, `SESSION_LIFETIME`, and the Secure decision, over the backend `SESSION_DRIVER` names. Memory is appropriate for tests and a single local process. Multiple replicas need `SESSION_DRIVER=redis`, the `hesape/redis` connector linked by its blank import in `bootstrap/app.go`, and a reachable `REDIS_URL`. Session storage is independent of `CACHE_STORE`. The cookie is `arandu_session` on path /, for the host that answered, `HttpOnly` and `SameSite` Lax; its name and scope are not settings. `SESSION_TTL`, which `SESSION_LIFETIME` replaced, stops the boot.
 
 | Setting | Released effect |
 | --- | --- |
@@ -51,9 +48,6 @@ func RotateSession(r *stdhttp.Request, w stdhttp.ResponseWriter, drivers *founda
 }
 ```
 
-> [!NOTE]
-> The store's Secure attribute follows `SESSION_SECURE_COOKIE`, and is on everywhere but `APP_ENV=dev` when the variable is unset. Production refuses false at boot, because there the cookie is the credential.
-
 <a name="load-confirm-remember-and-end-sessions"></a>
 ## Load, confirm, remember, and end sessions
 
@@ -83,9 +77,6 @@ func NewSessions(drivers *foundation.Drivers, appKey []byte, ttl time.Duration) 
 ## A missing record stays unauthenticated
 
 A missing cookie, bad signature, expired record, or absent id does not create a partial Subject. Middleware treats the request as unauthenticated. A shared-backend outage is different: fail the dependent request or health check rather than silently switching to memory and splitting the fleet.
-
-> [!WARNING]
-> The session cookie's name and scope are not settings. The released store writes `arandu_session` on path /, for the host that answered, `HttpOnly`, and `SameSite` Lax. The framework stops the boot on `SESSION_TTL`, which `SESSION_LIFETIME` replaced, and on `SESSION_PATH`, `SESSION_DOMAIN`, or `SESSION_SAME_SITE` asking for another scope.
 
 <a name="identity-changes-require-id-changes"></a>
 ## Identity changes require id changes

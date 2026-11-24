@@ -8,9 +8,6 @@
 - [Released URL surfaces and boundary](#released-url-surfaces-and-boundary)
 - [Use links at their real trust level](#use-links-at-their-real-trust-level)
 
-> [!WARNING]
-> **Current limitations.** Named route generation is stable in the framework application. Signed routes are released and tested in Hesape, but `framework/http.Router` exposes a table envelope that cannot be passed to `hesape/routing.SignedRoute`; the default application therefore has no released signed-route round trip yet.
-
 <a name="route-names-are-the-address-source"></a>
 ## Route names are the address source
 
@@ -50,7 +47,7 @@ Keep host and scheme decisions in trusted deployment configuration. Generate abs
 <a name="do-not-hide-the-framework-bridge-gap"></a>
 ## Do not hide the framework bridge gap
 
-Unknown route names, wrong parameter counts, changed queries, expired signatures, and untrusted host data are distinct refusal paths. Never fall back to an unsigned destination when signing fails.
+Unknown route names, wrong parameter counts, changed queries, expired signatures, and untrusted host data are distinct refusal paths. Never fall back to an unsigned destination when signing fails. `hesape/routing.SignedRoute` takes the route table of `hesape/routing`, not the table of `framework/http.Router`; with the framework router, get the path from `Table().URL` and sign it with `security.Signer`, as in the example above.
 
 > [!WARNING]
 > A valid signature proves integrity and expiry, not identity or permission. The handler still loads the current Subject, authorizes the action, and treats a single-use operation as single-use in durable storage.

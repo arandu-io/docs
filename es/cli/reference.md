@@ -4,9 +4,6 @@
 - [Familias de comandos publicadas en :aruVersion](#released-command-families-in-aruversion)
 - [Consulta la guía de la tarea detrás de cada comando](#use-the-task-guide-behind-each-command)
 
-> [!WARNING]
-> **Limitaciones actuales.** El inventario de comandos, los generadores de código, la compilación de vistas y doctor están publicados. Las migraciones, la persistencia de factories y la recuperación de colas conservan las limitaciones descritas en sus propias guías; la CLI no hace estos flujos más seguros de lo que permiten sus contratos.
-
 <a name="aru-is-the-adapter-around-a-project-owned-binary"></a>
 ## Aru es el adapter del binario que pertenece al proyecto
 

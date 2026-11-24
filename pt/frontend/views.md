@@ -48,8 +48,7 @@ Importe cada diretório gerado no bootstrap, pois diretórios aninhados são pac
 
 A ausência de views registradas significa que os pacotes gerados estão ausentes ou não foram importados. Nome pontuado desconhecido, tipo de dados incorreto, registro duplicado, saída gerada antiga ou `RendererProvider` ausente devem interromper de forma visível a resposta ou a inicialização correspondente.
 
-> [!WARNING]
-> As views geradas da aplicação normalmente são ignoradas pelo Git. Um checkout limpo precisa executar `aru view:build` antes que Go resolva controllers que importam tipos gerados. Views comuns usam buffer de saída e não são respostas de streaming ilimitado.
+As views geradas da aplicação normalmente são ignoradas pelo Git. Um checkout limpo precisa executar `aru view:build` antes que Go resolva controllers que importam tipos gerados. Views comuns usam buffer de saída e não são respostas de streaming ilimitado.
 
 <a name="prove-build-escaping-and-response-shape"></a>
 ## Verifique build, escape e formato da resposta

@@ -37,7 +37,7 @@ aru dev
 ```
 
 > [!NOTE]
-> The first server boot needs no seed. When you want an admin, run the named seeder with explicit credentials, `aru db:seed UserSeeder -e you@example.com -p '<password>' -r` admin: `DatabaseSeeder` creates no account, and the credentials belong to the command you run, not to the environment or the source.
+> The first server boot needs no seed. When you want an admin, run the named seeder with explicit credentials, `aru db:seed UserSeeder -e you@example.com -p '<password>' -r admin`: `DatabaseSeeder` creates no account, and the credentials belong to the command you run, not to the environment or the source.
 
 > [!NOTE]
 > `aru new` does not run `go mod tidy` or start the server. If compiling the views fails, the project is still created and the command tells you to run `aru view:build`.

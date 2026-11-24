@@ -10,13 +10,10 @@
 - [Recupere o serviço, não apenas a requisição](#recover-the-service-not-only-the-request)
 - [Acompanhe falhas através das fronteiras](#follow-failures-across-their-boundaries)
 
-> [!WARNING]
-> **Limitações atuais.** Middleware de recuperação e página de erro de desenvolvimento estão publicados. Classificação de erros de domínio na aplicação continua sendo contrato dela; não infira status por strings arbitrárias de erro.
-
 <a name="one-handler-classifies-reports-and-renders"></a>
 ## Um handler classifica, registra e renderiza
 
-Erros atravessam uma fronteira central de recuperação. Falhas esperadas de domínio e transporte preservam significado; panics escapados e erros internos desconhecidos são registrados uma vez e viram resposta de produção limitada, sem stack nem segredos.
+Erros atravessam uma fronteira central de recuperação. Falhas esperadas de domínio e transporte preservam significado; panics escapados e erros internos desconhecidos são registrados uma vez e viram resposta de produção limitada, sem stack nem segredos. Mapear um erro de domínio para um status é tarefa da aplicação: retorne um erro que declare o próprio status e nunca deduza o status pelo texto do erro.
 
 <a name="build-the-handler-from-loaded-configuration"></a>
 ## Construa o handler pela configuração carregada

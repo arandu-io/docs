@@ -8,16 +8,12 @@
 - [Loaders e configuração tipada](#loaders-and-typed-configuration)
 - [A configuração escolhe adapters; o código mantém o contrato](#configuration-chooses-adapters-code-keeps-the-contract)
 
-> [!WARNING]
-> **Limitações atuais.** O framework lê toda configuração de driver em `bootstrap.Settings` e constrói os drivers a partir dela, e o esqueleto publicado acrescenta apenas suas próprias seções. `LOG_SAMPLING` ainda é lido e validado sem chegar ao logger, então teste cada variável adicional no consumidor que deveria lê-la.
-
 <a name="configuration-is-a-typed-boot-input"></a>
 ## Configuração é uma entrada tipada da inicialização
 
 A aplicação lê a configuração uma vez, valida-a antes de abrir o servidor e passa valores tipados aos construtores. Handlers não consultam variáveis de ambiente, e componentes não buscam chaves de texto no momento do uso.
 
-> [!WARNING]
-> O framework é dono de toda configuração que constrói um driver. `bootstrap.LoadSettings` lê as variáveis de aplicação, HTTP, banco de dados, cache, sessão, fila, e-mail, sistema de arquivos e logging em `bootstrap.Settings`, e o `config.Config` do esqueleto incorpora essas configurações ao lado de suas próprias seções Auth, Geo e Services. Não leia uma variável do framework uma segunda vez em `config/`: dois leitores de um mesmo nome se afastam.
+O framework é dono de toda configuração que constrói um driver. `bootstrap.LoadSettings` lê as variáveis de aplicação, HTTP, banco de dados, cache, sessão, fila, e-mail, sistema de arquivos e logging em `bootstrap.Settings`, e o `config.Config` do esqueleto incorpora essas configurações ao lado de suas próprias seções Auth, Geo e Services. Não leia uma variável do framework uma segunda vez em `config/`: dois leitores de um mesmo nome se afastam.
 
 <a name="load-once-and-fail-before-serving-traffic"></a>
 ## Carregue uma vez e falhe antes de atender tráfego
@@ -62,7 +58,7 @@ return foundation.Configure(drivers).WithProviders(app).Create()
 | `LOG_LEVEL`, `LOG_FORMAT` e `LOG_SAMPLING` | `bootstrap.Settings` do framework | nível; json ou text; um a cada N |
 | `ARANDU_TENANT_ID`, `AUTH_*`, `GEO_*` e credenciais de serviços | as seções da própria aplicação em `config/` | campos tipados |
 
-O arquivo `.env` preenche valores ainda não fornecidos pelo ambiente do processo. Portanto, as variáveis do ambiente de publicação têm prioridade. Mantenha segredos fora do controle de versão e use o arquivo de exemplo apenas como catálogo de entradas possíveis, não como prova de que todas chegam a um consumidor.
+O arquivo `.env` preenche valores ainda não fornecidos pelo ambiente do processo. Portanto, as variáveis do ambiente de publicação têm prioridade. Mantenha segredos fora do controle de versão e use o arquivo de exemplo apenas como catálogo de entradas possíveis, não como prova de que todas chegam a um consumidor. `LOG_SAMPLING` é lido e validado, mas o logger ainda não o aplica.
 
 ### `APP_ENV` decide o que a produção recusa
 
@@ -80,8 +76,7 @@ Booleanos malformados, contagens não positivas, URLs inválidas, chaves ausente
 > [!WARNING]
 > A produção recusa dois valores no boot. `SESSION_SECURE_COOKIE=false` enviaria a sessão, a própria credencial, em texto claro; uma implantação servida por http é de staging e define `APP_ENV=staging`. `MAIL_URL=log://`, que também é o valor de um `MAIL_URL` não definido, escreveria cada mensagem, inclusive os códigos de redefinição de senha, no log; a produção define `smtp://`, `smtps://`, `resend://` ou `sendgrid://`.
 
-> [!WARNING]
-> No framework :frameworkVersion, o nome e o escopo do cookie de sessão não são configurações: ele é `arandu_session`, no caminho /, para o host que respondeu. `SESSION_PATH`, `SESSION_DOMAIN` ou `SESSION_SAME_SITE` pedindo outro escopo interrompem o boot, `SESSION_SECURE` o interrompe nomeando `SESSION_SECURE_COOKIE`, e `SESSION_COOKIE` não é lido por nada.
+No framework :frameworkVersion, o nome e o escopo do cookie de sessão não são configurações: ele é `arandu_session`, no caminho /, para o host que respondeu. `SESSION_PATH`, `SESSION_DOMAIN` ou `SESSION_SAME_SITE` pedindo outro escopo interrompem o boot, `SESSION_SECURE` o interrompe nomeando `SESSION_SECURE_COOKIE`, e `SESSION_COOKIE` não é lido por nada.
 
 <a name="trace-a-value-into-the-constructor-that-uses-it"></a>
 ## Rastreie um valor até o construtor que o utiliza

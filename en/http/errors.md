@@ -10,13 +10,10 @@
 - [Recover the service, not only the request](#recover-the-service-not-only-the-request)
 - [Follow failures across their boundaries](#follow-failures-across-their-boundaries)
 
-> [!WARNING]
-> **Current limitations.** The recovery middleware and development error page are released. Application-wide domain error classification remains an application contract; do not infer status codes from arbitrary error strings.
-
 <a name="one-handler-classifies-reports-and-renders"></a>
 ## One handler classifies, reports, and renders
 
-Errors cross one centralized recovery boundary. Expected domain and transport failures keep their meaning, while escaped panics and unknown internal errors are recorded once and become a bounded production response without stack frames or secrets.
+Errors cross one centralized recovery boundary. Expected domain and transport failures keep their meaning, while escaped panics and unknown internal errors are recorded once and become a bounded production response without stack frames or secrets. Mapping a domain error to a status is the application's job: return an error that states its own status, and never infer one from the error text.
 
 <a name="build-the-handler-from-loaded-configuration"></a>
 ## Build the handler from loaded configuration

@@ -6,9 +6,6 @@
 - [Check structure and imports together](#check-structure-and-imports-together)
 - [The tree leads to the composition root](#the-tree-leads-to-the-composition-root)
 
-> [!WARNING]
-> **Current limitations.** The directory contract is application-owned metadata verified in the tagged starter itself; it has no independent tagged consumer because it describes that starter's source tree rather than a reusable runtime integration.
-
 <a name="a-directory-states-who-owns-the-code"></a>
 ## A directory states who owns the code
 

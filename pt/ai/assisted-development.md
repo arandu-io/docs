@@ -6,9 +6,6 @@
 - [Verifique se editor e CLI usam a mesma raiz](#prove-the-editor-and-cli-agree-on-the-selected-root)
 - [Continue pela CLI ou pelas views geradas](#continue-with-the-cli-or-generated-views)
 
-> [!WARNING]
-> **Limitações atuais.** A extensão para VS Code é uma ferramenta de prévia para seleção de projetos, comandos, sintaxe Kyse, snippets e integração com a aru. Ela não oferece runtime de IA na aplicação nem ponte privada para assistentes. A disponibilidade dos comandos ainda depende do projeto selecionado e da instalação local da aru.
-
 <a name="editor-intelligence-not-an-application-ai-runtime"></a>
 ## Inteligência do editor, não um runtime de IA na aplicação
 
@@ -22,7 +19,7 @@ Use VS Code 1.96 ou posterior, instale a CLI aru atual, baixe arandu-:vscodeVers
 - Descubra projetos aninhados e com várias raízes a partir de `arandu.toml`.
 - Selecione explicitamente um projeto quando houver vários.
 - Defina `arandu.aru.path` no escopo do recurso apenas para usar um executável personalizado.
-- Mantenha o runtime de IA e a ponte privada fora desta página sobre ferramentas de prévia.
+- Não procure aqui um runtime de IA nem uma ponte privada: a extensão não traz nenhum dos dois.
 
 <a name="choose-one-project-and-open-its-source-map"></a>
 ## Escolha um projeto e abra seu mapa de código
@@ -34,8 +31,7 @@ brew install arandu-io/tap/aru
 code --install-extension ./arandu-:vscodeVersionNoPrefix.vsix
 ```
 
-> [!NOTE]
-> A resolução da aru segue esta ordem: `arandu.aru.path` no escopo do recurso, PATH, `/opt/homebrew/bin/aru` e `/usr/local/bin/aru`.
+A resolução da aru segue esta ordem: `arandu.aru.path` no escopo do recurso, PATH, `/opt/homebrew/bin/aru` e `/usr/local/bin/aru`.
 
 <a name="prove-the-editor-and-cli-agree-on-the-selected-root"></a>
 ## Verifique se editor e CLI usam a mesma raiz

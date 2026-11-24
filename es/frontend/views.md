@@ -48,8 +48,7 @@ Importa cada directorio generado en el bootstrap, porque los directorios anidado
 
 La ausencia de vistas registradas significa que faltan los paquetes generados o no se han importado. Un nombre con puntos desconocido, un tipo de datos incorrecto, un registro duplicado, una salida generada antigua o la falta de `RendererProvider` deben interrumpir visiblemente la respuesta o el inicio correspondiente.
 
-> [!WARNING]
-> Las vistas generadas de la aplicación normalmente se ignoran en Git. Un checkout limpio debe ejecutar `aru view:build` antes de que Go resuelva controllers que importan tipos generados. Las vistas comunes usan buffer de salida y no son respuestas de streaming ilimitado.
+Las vistas generadas de la aplicación normalmente se ignoran en Git. Un checkout limpio debe ejecutar `aru view:build` antes de que Go resuelva controllers que importan tipos generados. Las vistas comunes usan buffer de salida y no son respuestas de streaming ilimitado.
 
 <a name="prove-build-escaping-and-response-shape"></a>
 ## Verifica build, escape y formato de respuesta

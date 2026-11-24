@@ -4,9 +4,6 @@
 - [Construa, transforme e finalize valores tipados](#build-transform-and-finish-typed-values)
 - [Avaliação sob demanda e maps mudam o custo](#laziness-and-maps-change-the-cost-model)
 
-> [!WARNING]
-> **Limitações atuais.** Os auxiliares genéricos de collections e arrays estão publicados e testados, mas nenhuma aplicação oficial com tag os utiliza. Prefira slices comuns, salvo quando a operação documentada eliminar repetição no código da aplicação, e verifique o auxiliar escolhido na aplicação consumidora.
-
 <a name="use-a-collection-when-the-operation-is-the-vocabulary"></a>
 ## Use uma collection quando a operação expressar o que você precisa
 
@@ -46,7 +43,7 @@ func LargeAmounts() (collections.Collection[string], int) {
 
 Uma collection sob demanda adia o trabalho até ser percorrida; Remember memoriza o que já foi obtido. Ela não acrescenta cancelamento de I/O, portanto um produtor bloqueante ainda precisa de código sensível ao contexto. Auxiliares de maps só definem ordem quando seu contrato de resultado a prevê.
 
-collections/arr contém auxiliares tipados de acesso e apresentação no Hesape :hesapeVersion. Prefira um loop local quando ele for menor e verifique o auxiliar escolhido na aplicação consumidora, pois o ecossistema com tags não tem um fluxo de aplicação oficial para essas collections genéricas.
+collections/arr contém auxiliares tipados de acesso e apresentação no Hesape :hesapeVersion. Prefira um loop local quando ele for menor.
 
 - [API de collections](https://pkg.go.dev/github.com/arandu-io/hesape/collections)
 - [Auxiliares de arrays](https://pkg.go.dev/github.com/arandu-io/hesape/collections/arr)

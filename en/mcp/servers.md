@@ -9,9 +9,6 @@
 - [Exercise transport, schema, and tenant refusal](#exercise-transport-schema-and-tenant-refusal)
 - [Separate server exposure from client automation](#separate-server-exposure-from-client-automation)
 
-> [!WARNING]
-> **Current limitations.** MCP :mcpVersion releases the server, tool, resource, prompt, and authorized sink contracts, but no current tagged baseline application consumes it. Verify the integration against the current Framework :frameworkVersion and Hesape :hesapeVersion graph; a general client runtime remains deferred.
-
 <a name="expose-application-capabilities-through-existing-policies"></a>
 ## Expose application capabilities through existing policies
 
@@ -30,7 +27,7 @@ Pin `github.com/arandu-io/mcp@:mcpVersion`, prepare application services whose m
 <a name="declare-one-policy-backed-tool"></a>
 ## Declare one policy-backed tool
 
-A Tool declares Name, Description, Schema, and Handle. Arguments are schema-validated before Handle, `Request.Subject` is read-only, and the handler calls the same policy-backed service used by HTTP rather than reaching a repository directly. `mcp.JSON` takes a resource that lists its fields, the same document `Context.JSON` writes, and not a bare value. `mcp.JSON` takes a resource that lists its fields, the same document `Context.JSON` writes, and not a bare value.
+A Tool declares Name, Description, Schema, and Handle. Arguments are schema-validated before Handle, `Request.Subject` is read-only, and the handler calls the same policy-backed service used by HTTP rather than reaching a repository directly. `mcp.JSON` takes a resource that lists its fields, the same document `Context.JSON` writes, and not a bare value.
 
 ```go example
 type Post struct{ ID, Title string }
@@ -84,10 +81,9 @@ func (t ListPosts) Handle(ctx context.Context, r mcp.Request) (mcp.Response, err
 <a name="return-actionable-protocol-failures"></a>
 ## Return actionable protocol failures
 
-Tool failures return content with `isError`, authorization refusal is never an empty success, unknown tools name available choices, malformed JSON-RPC and arguments are protocol errors, notifications have no response, and messages above one `MiB` are refused. resources/read uses the MIME type declared by the resource. `Prompt.Argument.Required` is advertised yet not enforced by prompts/get, so `Prompt.Render` must validate required arguments.
+Tool failures return content with `isError`, authorization refusal is never an empty success, unknown tools name available choices, malformed JSON-RPC and arguments are protocol errors, notifications have no response, and messages above one `MiB` are refused. resources/read uses the MIME type declared by the resource. `prompts/get` refuses a call that omits a `Prompt.Argument.Required` argument or names one the prompt did not declare, before `Prompt.Render` runs.
 
-> [!WARNING]
-> Aru :aruVersion has two MCP surfaces that are not this server's runtime: `aru mcp` serves the CLI's own server, which answers a coding assistant about the project, and the `make:mcp-*` generators write an application's tools, resources, and prompts. It has no `mcp:start` or `mcp:list` command for the application's server, which is mounted as a route. MCP :mcpVersion has no current tagged application consumer, so this page is limited until integration is revalidated against Framework :frameworkVersion and Hesape :hesapeVersion.
+Aru :aruVersion has two MCP surfaces that are not this server's runtime: `aru mcp` serves the CLI's own server, which answers a coding assistant about the project, and the `make:mcp-*` generators write an application's tools, resources, and prompts. It has no `mcp:start` or `mcp:list` command for the application's server, which is mounted as a route.
 
 <a name="keep-the-model-behind-the-same-grant-boundary"></a>
 ## Keep the model behind the same Grant boundary
@@ -104,7 +100,7 @@ Validate the server, initialize and assert protocol and capabilities, call valid
 
 - Protocol revision is 2024-11-05.
 - Schema errors do not call Handle.
-- Resource read MIME behavior and the prompt-required limitation are pinned.
+- Resource read MIME behavior and required prompt arguments are pinned.
 - Oversized transport input is bounded.
 
 <a name="separate-server-exposure-from-client-automation"></a>

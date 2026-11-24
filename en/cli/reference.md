@@ -4,9 +4,6 @@
 - [Released command families in :aruVersion](#released-command-families-in-aruversion)
 - [Use the task guide behind each command](#use-the-task-guide-behind-each-command)
 
-> [!WARNING]
-> **Current limitations.** The command inventory, code generators, view build, and doctor are released. Migration, factory persistence, and queue recovery retain the limitations stated in their dedicated guides; the CLI does not make those paths safer than their underlying contracts.
-
 <a name="aru-is-the-adapter-around-a-project-owned-binary"></a>
 ## Aru is the adapter around a project-owned binary
 

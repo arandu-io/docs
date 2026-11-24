@@ -4,9 +4,6 @@
 - [Build, transform, and finish typed values](#build-transform-and-finish-typed-values)
 - [Laziness and maps change the cost model](#laziness-and-maps-change-the-cost-model)
 
-> [!WARNING]
-> **Current limitations.** The generic collection and array helpers are released and tested, but no tagged first-party application consumer uses them. Prefer ordinary slices unless the documented operation removes repeated application code, and verify the chosen helper in the consuming application.
-
 <a name="use-a-collection-when-the-operation-is-the-vocabulary"></a>
 ## Use a collection when the operation is the vocabulary
 
@@ -46,7 +43,7 @@ func LargeAmounts() (collections.Collection[string], int) {
 
 A lazy collection defers work until it is walked; Remember memoizes what has been pulled. It does not add I/O cancellation, so a blocking producer still needs context-aware code. Map helpers define order only where their result contract says so.
 
-collections/arr contains typed access and presentation helpers in Hesape :hesapeVersion. Prefer a local loop when it is shorter, and verify a chosen helper in the consuming application because the tagged ecosystem has no first-party application journey for these generic collections.
+collections/arr contains typed access and presentation helpers in Hesape :hesapeVersion. Prefer a local loop when it is shorter.
 
 - [Collections API](https://pkg.go.dev/github.com/arandu-io/hesape/collections)
 - [Array helpers](https://pkg.go.dev/github.com/arandu-io/hesape/collections/arr)

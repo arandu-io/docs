@@ -8,9 +8,6 @@
 - [API de roteamento publicada](#released-routing-api)
 - [Continue pelo caminho da requisição](#continue-the-request-path)
 
-> [!WARNING]
-> **Limitações atuais.** Router e URLs nomeadas estão publicados. Caches de rota e configuração são intencionalmente ausentes; exemplos avançados se limitam a padrões exercitados pelo esqueleto e pela suíte de feature.
-
 <a name="routes-are-executable-contracts"></a>
 ## Rotas são contratos executáveis
 
@@ -51,7 +48,7 @@ Grupos compartilham um prefixo e uma fronteira de política. Restrições recusa
 
 Nomes de rota desconhecidos e a contagem errada de parâmetros fazem `Routes.URL` retornar erro. Divergências de restrição são respostas 404, não resultados de autorização. Registros duplicados ou conflitantes são defeitos de boot, e a ordem de registro precisa permanecer determinística. O boot também recusa uma rota da aplicação que responde a um caminho que o framework monta sob `/_arandu/`, como `/_arandu/health`, num método que a rota do framework não aceita, nomeando o módulo e o padrão. A causa habitual é `r.Post("/", ...)`, cujo padrão corresponde a todo caminho abaixo da raiz; registre a raiz como "`/{$}`". A autenticação RPC roda antes da decodificação da requisição, mas apenas identifica um Subject: os serviços da aplicação ainda autorizam e emitem Grants. A admissão fecha durante o desligamento, os streams observam o cancelamento, e o framework não abre um listener h2c nem um segundo listener RPC.
 
-> [!WARNING]
+> [!NOTE]
 > `Route.SetURI` altera metadados após o registro, mas não move o padrão instalado no `ServeMux`. Defina a URI final antes do boot.
 
 <a name="inspect-and-dispatch-the-same-table"></a>

@@ -48,8 +48,7 @@ Import every generated directory in bootstrap because nested directories are dis
 
 No registered views means generated packages are absent or not imported. An unknown dotted name, wrong data type, duplicate registration, stale generated output, or missing `RendererProvider` must stop the relevant response or boot path visibly.
 
-> [!WARNING]
-> Generated application views are normally gitignored. A clean checkout must run `aru view:build` before Go can resolve controllers that import generated types; normal views buffer output and are not unbounded streaming responses.
+Generated application views are normally gitignored. A clean checkout must run `aru view:build` before Go can resolve controllers that import generated types; normal views buffer output and are not unbounded streaming responses.
 
 <a name="prove-build-escaping-and-response-shape"></a>
 ## Prove build, escaping, and response shape

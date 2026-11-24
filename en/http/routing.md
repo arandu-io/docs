@@ -8,9 +8,6 @@
 - [Released routing API](#released-routing-api)
 - [Continue the request path](#continue-the-request-path)
 
-> [!WARNING]
-> **Current limitations.** The router and named URLs are released. Route and configuration caches are intentionally absent, and advanced routing examples are limited to patterns exercised by the skeleton and feature suite.
-
 <a name="routes-are-executable-contracts"></a>
 ## Routes are executable contracts
 
@@ -51,7 +48,7 @@ Groups share a prefix and policy boundary. Constraints refuse malformed identifi
 
 Unknown route names and the wrong parameter count make `Routes.URL` return an error. Constraint mismatches are 404 responses, not authorization results. Duplicate or conflicting registrations are boot defects and registration order must stay deterministic. Boot also refuses an application route that answers a path the framework mounts under `/_arandu/`, such as `/_arandu/health`, in a method the framework route does not take, naming the module and the pattern. The usual cause is `r.Post("/", ...)`, whose pattern matches every path below the root; register the root as "`/{$}`". RPC authentication runs before request decoding, but it identifies a Subject only: application services still authorize and issue Grants. Admission closes during shutdown, streams observe cancellation, and the framework does not open an h2c or second RPC listener.
 
-> [!WARNING]
+> [!NOTE]
 > `Route.SetURI` changes metadata after registration but cannot move the pattern already installed in the underlying `ServeMux`. Define the final URI before the application boots.
 
 <a name="inspect-and-dispatch-the-same-table"></a>

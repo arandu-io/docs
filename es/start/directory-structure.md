@@ -6,9 +6,6 @@
 - [Verifica la estructura y los imports en conjunto](#check-structure-and-imports-together)
 - [El árbol conduce a la raíz de composición](#the-tree-leads-to-the-composition-root)
 
-> [!WARNING]
-> **Limitaciones actuales.** El contrato de directorios pertenece a la aplicación y se verifica en la versión etiquetada del propio proyecto inicial. No tiene un consumidor independiente con tag porque describe el árbol de ese proyecto, no una integración reutilizable de runtime.
-
 <a name="a-directory-states-who-owns-the-code"></a>
 ## El directorio indica a quién pertenece el código
 

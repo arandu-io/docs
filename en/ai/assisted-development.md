@@ -6,9 +6,6 @@
 - [Prove the editor and CLI agree on the selected root](#prove-the-editor-and-cli-agree-on-the-selected-root)
 - [Continue with the CLI or generated views](#continue-with-the-cli-or-generated-views)
 
-> [!WARNING]
-> **Current limitations.** The VS Code extension is preview tooling for project selection, commands, Kyse syntax, snippets, and Aru integration. It does not provide an in-application AI runtime or a private assistant bridge, and command availability still depends on the selected project and local Aru installation.
-
 <a name="editor-intelligence-not-an-application-ai-runtime"></a>
 ## Editor intelligence, not an application AI runtime
 
@@ -22,7 +19,7 @@ Use VS Code 1.96 or newer, install the current Aru CLI, download arandu-:vscodeV
 - Discover nested and multi-root projects from `arandu.toml`.
 - Select a project explicitly when several exist.
 - Set resource-scoped `arandu.aru.path` only for a custom executable.
-- Keep runtime AI and the private bridge outside this preview tooling page.
+- Look elsewhere for a runtime AI or a private bridge: the extension ships neither.
 
 <a name="choose-one-project-and-open-its-source-map"></a>
 ## Choose one project and open its source map
@@ -34,8 +31,7 @@ brew install arandu-io/tap/aru
 code --install-extension ./arandu-:vscodeVersionNoPrefix.vsix
 ```
 
-> [!NOTE]
-> Aru resolution is resource-scoped `arandu.aru.path`, PATH, `/opt/homebrew/bin/aru`, then `/usr/local/bin/aru`.
+Aru resolution is resource-scoped `arandu.aru.path`, PATH, `/opt/homebrew/bin/aru`, then `/usr/local/bin/aru`.
 
 <a name="prove-the-editor-and-cli-agree-on-the-selected-root"></a>
 ## Prove the editor and CLI agree on the selected root
