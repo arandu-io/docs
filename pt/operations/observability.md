@@ -10,9 +10,6 @@
 - [Reproduza com escopo restrito e remova o acesso](#reproduce-narrowly-and-remove-access)
 - [Conecte traces a logs, saúde e chamadas externas](#connect-traces-to-logs-health-and-outbound-calls)
 
-> [!WARNING]
-> **Limitações atuais.** O console de desenvolvimento e a timeline de requisições estão publicados. São diagnósticos, não um serviço de monitoramento de desempenho. A exportação em produção usa a fronteira de telemetria configurada e o console deve permanecer protegido ou desabilitado.
-
 <a name="inspect-one-request-without-making-tracing-universal"></a>
 ## Inspecione uma requisição sem tornar o tracing universal
 
@@ -57,10 +54,7 @@ Leia os achados de lentidão e N+1 antes da timeline bruta. Inspecione origem e 
 <a name="know-why-a-request-has-no-record"></a>
 ## Entenda por que uma requisição não tem registro
 
-A ausência de registro pode indicar tracing desligado, header ausente, perda do Collector no middleware, atendimento por outra réplica ou descarte pelo buffer circular limitado. Dependências não instrumentadas ficam sem atribuição; registros protegidos ou ausentes retornam 404 deliberadamente.
-
-> [!WARNING]
-> O recorder usa memória local e desaparece ao reiniciar. Rastrear uma requisição de produção não coleta outras requisições nem substitui um backend durável de telemetria.
+A ausência de registro pode indicar tracing desligado, header ausente, perda do Collector no middleware, atendimento por outra réplica ou descarte pelo buffer circular limitado. Dependências não instrumentadas ficam sem atribuição; registros protegidos ou ausentes retornam 404 deliberadamente. O recorder usa memória local e desaparece ao reiniciar. Rastrear uma requisição de produção não coleta outras requisições nem substitui um backend durável de telemetria.
 
 <a name="minimize-the-diagnostic-data-window"></a>
 ## Minimize a janela de dados diagnósticos

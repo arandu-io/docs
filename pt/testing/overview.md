@@ -6,13 +6,10 @@
 - [Comprove o comportamento na menor fronteira completa](#prove-behavior-at-the-narrowest-complete-boundary)
 - [Continue com HTTP, console, banco ou detalhes de contratos](#choose-http-console-database-or-contract-detail-next)
 
-> [!WARNING]
-> **Limitações atuais.** Os helpers de teste são publicados em vários módulos, sem uma fachada única. Componha testes Go comuns com o helper responsável pela fronteira e deixe explícita a preparação de cada pacote.
-
 <a name="tests-boot-the-same-application-graph-without-serving-a-port"></a>
 ## Os testes inicializam a mesma aplicação sem servir uma porta
 
-O Arandu usa testes Go comuns e helpers da aplicação. Um teste pode construir um serviço, inicializar a aplicação composta e despachar seu Handler ou executar um adapter de comando. A melhor fronteira é a menor que ainda comprova o comportamento, sem um framework de testes separado.
+O Arandu usa testes Go comuns e helpers da aplicação. Um teste pode construir um serviço, inicializar a aplicação composta e despachar seu Handler ou executar um adapter de comando. A melhor fronteira é a menor que ainda comprova o comportamento, sem um framework de testes separado. Os helpers vêm do pacote dono de cada fronteira, então mantenha visível no teste a preparação de cada um.
 
 <a name="generate-views-and-isolate-external-state"></a>
 ## Gere as views e isole o estado externo

@@ -9,9 +9,6 @@
 - [Cover the complete route matrix](#cover-the-complete-route-matrix)
 - [Move service and adapter details to focused contracts](#move-service-and-adapter-details-to-focused-contracts)
 
-> [!WARNING]
-> **Current limitations.** The request harness exercises the real router and middleware. `test.NewClient` keeps cookies and the CSRF token, and its Response asserts status, text, and redirects; assert protected state directly beside it.
-
 <a name="dispatch-the-registered-pipeline-with-httptest"></a>
 ## Dispatch the registered pipeline with httptest
 
@@ -57,10 +54,7 @@ Test normal and YPY-Request representation, named redirects, JSON resources, for
 <a name="do-not-let-production-recovery-hide-a-test-defect"></a>
 ## Do not let production recovery hide a test defect
 
-A panic should reach the testing boundary when configured to expose defects; do not write a green test merely because production recovery converted it to 500. Partial writes, swallowed errors, unknown routes, and stale generated views need explicit cases.
-
-> [!WARNING]
-> A controller unit fake does not prove middleware, route names, session cookies, CSRF, renderer registration, or error mapping. Keep at least one complete route journey for every public flow.
+A panic should reach the testing boundary when configured to expose defects; do not write a green test merely because production recovery converted it to 500. Partial writes, swallowed errors, unknown routes, and stale generated views need explicit cases. A controller unit fake does not prove middleware, route names, session cookies, CSRF, renderer registration, or error mapping, so keep at least one complete route journey for every public flow.
 
 <a name="keep-credentials-and-tenant-data-out-of-fixtures-and-output"></a>
 ## Keep credentials and tenant data out of fixtures and output

@@ -9,9 +9,6 @@
 - [Execute o contrato em todo conector suportado](#run-the-contract-against-every-supported-connector)
 - [Use factories para a estrutura e migrations para o estado do catálogo](#use-factories-for-shape-and-migrations-for-catalogue-state)
 
-> [!WARNING]
-> **Limitações atuais.** Helpers de banco, models e asserções de tenant estão publicados. A persistência de factories e a identidade de migrations ainda têm limites; crie nos testes apenas os registros necessários, pelo mesmo caminho de dados verificado da aplicação.
-
 <a name="database-tests-prove-transactions-dialects-and-tenant-scope"></a>
 ## Testes de banco comprovam transações, dialetos e escopo do tenant
 
@@ -54,10 +51,7 @@ Teste commit e rollback, aninhamento onde suportado, cancelamento, conflitos, au
 <a name="do-not-let-shared-state-make-a-green-suite-order-dependent"></a>
 ## Não deixe estado compartilhado tornar a suíte dependente da ordem
 
-Schema, relógio, IDs ou registros globais compartilhados podem fazer testes passarem apenas em determinada ordem. Detecte registros vazados, nomes fixos de migration, conexões retidas, colisões de portas em paralelo e suposições de que SQLite se comporta como todo dialeto de produção.
-
-> [!WARNING]
-> Uma expectativa de mock sobre uma chamada SQL não comprova que a consulta retornou apenas registros autorizados. Mantenha pelo menos um contrato com conector concreto para cada caminho de implantação suportado.
+Schema, relógio, IDs ou registros globais compartilhados podem fazer testes passarem apenas em determinada ordem. Detecte registros vazados, nomes fixos de migration, conexões retidas, colisões de portas em paralelo e suposições de que SQLite se comporta como todo dialeto de produção. Uma expectativa de mock de que o SQL foi chamado não prova que a consulta devolveu apenas linhas autorizadas; mantenha ao menos um contrato com conector real para cada caminho de implantação suportado.
 
 <a name="every-fixture-and-assertion-stays-tenant-scoped"></a>
 ## Todo fixture e asserção permanecem no escopo do tenant

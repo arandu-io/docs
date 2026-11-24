@@ -10,9 +10,6 @@
 - [Reproduce narrowly and remove access](#reproduce-narrowly-and-remove-access)
 - [Connect traces to logs, health, and outbound calls](#connect-traces-to-logs-health-and-outbound-calls)
 
-> [!WARNING]
-> **Current limitations.** The development console and request timeline are released. They are diagnostics, not an application performance service; production export uses the configured telemetry boundary and the console must remain protected or disabled.
-
 <a name="inspect-one-request-without-making-tracing-universal"></a>
 ## Inspect one request without making tracing universal
 
@@ -57,10 +54,7 @@ Read slow and N+1 findings before the raw timeline, inspect SQL origin and durat
 <a name="know-why-a-request-has-no-record"></a>
 ## Know why a request has no record
 
-No record can mean tracing was disabled, the header was absent, middleware lost the Collector, another replica served the request, or the bounded ring evicted it. An uninstrumented dependency remains unattributed, and protected or absent records deliberately answer 404.
-
-> [!WARNING]
-> The recorder is local memory and disappears on restart. Tracing one production request does not collect other requests and cannot stand in for a durable telemetry backend.
+No record can mean tracing was disabled, the header was absent, middleware lost the Collector, another replica served the request, or the bounded ring evicted it. An uninstrumented dependency remains unattributed, and protected or absent records deliberately answer 404. The recorder is local memory and disappears on restart. Tracing one production request does not collect other requests and does not replace a durable telemetry backend.
 
 <a name="minimize-the-diagnostic-data-window"></a>
 ## Minimize the diagnostic data window

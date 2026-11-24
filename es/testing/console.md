@@ -8,9 +8,6 @@
 - [Superficies publicadas de pruebas de consola](#released-console-testing-surfaces)
 - [Asocie comandos con sus guías de recuperación operativa](#pair-commands-with-their-operational-recovery-guide)
 
-> [!WARNING]
-> **Limitaciones actuales.** `Application.HandleCommand` con `WithConsole` es el harness de comandos publicado: recibe el contexto y los buffers del test y responde el código de salida. Las señales y la salida real del binario siguen necesitando un subproceso.
-
 <a name="console-tests-execute-the-project-owned-command-boundary"></a>
 ## Las pruebas de consola ejecutan la frontera de comando del proyecto
 
@@ -45,10 +42,7 @@ Pruebe argumentos inválidos, valores predeterminados frente a flags, invocació
 <a name="a-registered-name-is-not-proof-that-its-operation-runs"></a>
 ## Un nombre registrado no demuestra que la operación se ejecute
 
-Un comando puede aceptar la sintaxis y aun ignorar un valor de configuración o usar el valor predeterminado incorrecto del constructor. Nombres desconocidos, marcadores de proyecto ausentes, operaciones de producción rechazadas, bloqueos retenidos, dependencias indisponibles y escrituras parciales necesitan su estado real de salida y evidencia.
-
-> [!WARNING]
-> Una prueba que comprueba catorce nombres de cola no sustituye un recorrido que inicia, pausa, reintenta o drena un worker. El comportamiento operativo exige el almacenamiento y la frontera de proceso elegidos.
+Un comando puede aceptar la sintaxis y aun ignorar un valor de configuración o usar el valor predeterminado incorrecto del constructor. Nombres desconocidos, marcadores de proyecto ausentes, operaciones de producción rechazadas, bloqueos retenidos, dependencias indisponibles y escrituras parciales necesitan su estado real de salida y evidencia. Un test que solo lista nombres de comandos no sustituye un recorrido que inicia, pausa, reintenta o drena un worker; eso exige el almacenamiento elegido y la frontera de proceso.
 
 <a name="exercise-the-delegated-command-through-aru-and-the-binary"></a>
 ## Ejercite el comando delegado mediante Aru y el binario

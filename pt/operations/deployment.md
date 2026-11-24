@@ -10,9 +10,6 @@
 - [Reverta o artefato sem tratar rollback de schema como gratuito](#roll-back-the-artifact-without-pretending-schema-rollback-is-free)
 - [Continue com atualizações, migrations e operações de fila](#continue-with-upgrades-migrations-and-queue-operations)
 
-> [!WARNING]
-> **Limitações atuais.** Binário, container e etapa explícita de migration estão publicados. Um contrato completo de saúde e rollback automático ainda não é universal: defina probes pelas dependências realmente conectadas e ensaie rollback fora do boot de requisições.
-
 <a name="deploy-one-immutable-binary-in-more-than-one-process"></a>
 ## Implante um binário imutável em mais de um processo
 
@@ -76,7 +73,7 @@ Em um checkout limpo, gere views, teste com race, execute vet e build, crie a im
 <a name="roll-back-the-artifact-without-pretending-schema-rollback-is-free"></a>
 ## Reverta o artefato sem tratar rollback de schema como gratuito
 
-Retire o tráfego do artefato defeituoso e reimplante a imagem imutável anterior. Migrations aditivas devem mantê-la funcional. Execute `migrate:rollback` apenas se o lote exato tiver Down testado; remover colunas de forma destrutiva exige dois releases, não um comando de emergência.
+Retire o tráfego do artefato defeituoso e reimplante a imagem imutável anterior. Migrations aditivas devem mantê-la funcional. Execute `migrate:rollback` apenas se o lote exato tiver Down testado; remover colunas de forma destrutiva exige dois releases, não um comando de emergência. O rollback é uma etapa da sua plataforma de implantação: a aplicação não traz rollback automático, então ensaie a reimplantação da imagem anterior antes de precisar dela.
 
 <a name="continue-with-upgrades-migrations-and-queue-operations"></a>
 ## Continue com atualizações, migrations e operações de fila

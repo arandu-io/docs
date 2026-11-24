@@ -10,9 +10,6 @@
 - [Recupere o estado antes de apagá-lo](#recover-state-before-deleting-it)
 - [Separe o desenho da fila de sua operação](#separate-queue-design-from-queue-operations)
 
-> [!WARNING]
-> **Limitações atuais.** A CLI e o esqueleto publicados expõem comandos de worker, pausa, retry, jobs falhos e poda, mas a suíte na tag comprova principalmente inventário e recusas; `queue:listen` não é executado nela. Ensaie recuperação e comportamento do listener com o armazenamento escolhido antes de produção.
-
 <a name="operate-the-queue-through-the-application-binary"></a>
 ## Opere a fila pelo binário da aplicação
 
@@ -53,9 +50,6 @@ Pause e retome um destino, solicite reinício gracioso dos workers, inspecione f
 ## Trate reservas e jobs falhos como estado recuperável
 
 Erros do handler geram novas tentativas até `MaxAttempts` e depois estacionam em `failed_jobs`. Um worker morto só libera o job após a reserva; uma reserva menor que a execução permite duplicidade. Corrija handlers, tabelas, stores escolhidos ou cache compartilhado de sinais ausentes antes de confiar nos comandos de recuperação.
-
-> [!WARNING]
-> Testes na tag comprovam inventário e recusas dos comandos, mas não executam `queue:listen` nem um fluxo completo de pausa e retry entre processos. Esta página operacional é limitada até que esse caminho semelhante à produção seja publicado e consumido.
 
 <a name="keep-tenant-scope-in-payload-handler-and-command"></a>
 ## Mantenha o escopo do tenant em payload, handler e comando

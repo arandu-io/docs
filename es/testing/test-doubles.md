@@ -8,9 +8,6 @@
 - [Superficies publicadas de captura y fakes](#released-capture-and-fake-surfaces)
 - [Combine dobles específicos con recorridos completos de feature](#combine-narrow-doubles-with-complete-feature-journeys)
 
-> [!WARNING]
-> **Limitaciones actuales.** Los fakes viven junto al componente sustituido y no forman un contenedor global de mocks. Dependa de interfaces pequeñas, pase relojes explícitamente cuando el tiempo controle el comportamiento y use fakes solo en la frontera que modelan.
-
 <a name="a-test-double-implements-the-consumer-owned-contract"></a>
 ## Un doble de prueba implementa el contrato del consumidor
 
@@ -59,10 +56,7 @@ Use fakes del cliente HTTP bloqueando peticiones inesperadas, Capture de notific
 <a name="do-not-fake-away-the-behavior-being-proved"></a>
 ## No sustituya por un fake el comportamiento que se está demostrando
 
-Un fake que siempre tiene éxito puede ocultar reintentos, rollback, cancelación y fallos parciales. Un adapter en memoria puede diferir en transacciones, orden, bloqueos, TTL y semántica entre procesos. Nunca use el doble para probar el comportamiento que omite intencionalmente.
-
-> [!WARNING]
-> Los fakes de parser o constructor no demuestran que un valor configurado llegue al componente en ejecución. Añada un recorrido de feature que cambie la configuración y observe el comportamiento resultante.
+Un fake que siempre tiene éxito puede ocultar reintentos, rollback, cancelación y fallos parciales. Un adapter en memoria puede diferir en transacciones, orden, bloqueos, TTL y semántica entre procesos. Nunca use el doble para probar el comportamiento que omite intencionalmente. Los fakes de parser o de constructor no prueban que un valor configurado llegue al componente en ejecución; agregue un recorrido de feature que cambie la configuración y observe el comportamiento posterior.
 
 <a name="run-the-same-contract-against-fake-and-real-adapter"></a>
 ## Ejecute el mismo contrato en el fake y en el adapter real

@@ -8,9 +8,6 @@
 - [Superfícies publicadas de testes de console](#released-console-testing-surfaces)
 - [Associe comandos aos seus guias de recuperação operacional](#pair-commands-with-their-operational-recovery-guide)
 
-> [!WARNING]
-> **Limitações atuais.** `Application.HandleCommand` com `WithConsole` é o harness de comandos publicado: ele recebe o contexto e os buffers do teste e responde o código de saída. Sinais e a saída real do binário ainda exigem um subprocesso.
-
 <a name="console-tests-execute-the-project-owned-command-boundary"></a>
 ## Testes de console executam a fronteira de comando do projeto
 
@@ -45,10 +42,7 @@ Teste argumentos inválidos, padrões contra flags, invocação repetida e o efe
 <a name="a-registered-name-is-not-proof-that-its-operation-runs"></a>
 ## Um nome registrado não comprova que a operação executa
 
-Um comando pode aceitar a sintaxe e ainda ignorar um valor de configuração ou usar o padrão errado do construtor. Nomes desconhecidos, marcadores de projeto ausentes, operações de produção recusadas, locks retidos, dependências indisponíveis e escritas parciais precisam do status real de saída e sua evidência.
-
-> [!WARNING]
-> Um teste que verifica catorze nomes de fila não substitui um fluxo que inicia, pausa, repete ou drena um worker. O comportamento operacional exige o armazenamento e a fronteira de processo escolhidos.
+Um comando pode aceitar a sintaxe e ainda ignorar um valor de configuração ou usar o padrão errado do construtor. Nomes desconhecidos, marcadores de projeto ausentes, operações de produção recusadas, locks retidos, dependências indisponíveis e escritas parciais precisam do status real de saída e sua evidência. Um teste que apenas lista nomes de comandos não substitui uma jornada que inicia, pausa, repete ou drena um worker; isso exige o armazenamento escolhido e a fronteira de processo.
 
 <a name="exercise-the-delegated-command-through-aru-and-the-binary"></a>
 ## Exercite o comando delegado pela Aru e pelo binário

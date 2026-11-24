@@ -9,13 +9,10 @@
 - [Test preference, tenant, and retry paths](#test-preference-tenant-and-retry-paths)
 - [Use mail, queues, and outbox as their real boundaries](#use-mail-queues-and-outbox-as-their-real-boundaries)
 
-> [!WARNING]
-> **Current limitations.** Notification primitives are released, but there is no complete first-party fan-out journey with durable authorization and retry semantics. Keep channel delivery explicit and use the transactional outbox for work that must survive process failure.
-
 <a name="a-notification-selects-channels-around-one-public-message"></a>
 ## A notification selects channels around one public message
 
-The released notification primitives describe a notification and its channels, but no tagged first-party application proves a complete preference-to-transport journey. Use them as a limited composition surface and keep actual mail, queue, and recipient policy explicit.
+A notification names its channels in `Via` and builds one message for each. The starter wires a `Notifier` with the database channel in `app/Providers/AppServiceProvider.go`, and its `NotifyNoteAuthor` listener sends the example `NotePublished` notification when the outbox relay delivers `note.published`. `aru make:notification` generates a notification for the channels you choose. Add mail, recipient preferences, and queued delivery explicitly, as the rest of this page describes.
 
 <a name="own-recipient-preferences-addresses-and-transports"></a>
 ## Own recipient preferences, addresses, and transports
@@ -77,9 +74,6 @@ Resolve preferences just before delivery, render channel-specific public resourc
 ## Treat partial channel delivery as explicit state
 
 One channel can succeed while another fails. Decide retry state per channel, avoid resending successful side effects, and distinguish invalid address, explicit opt-out, provider refusal, and provider outage. The component package alone does not supply this end-to-end lifecycle.
-
-> [!WARNING]
-> The current released contract does not include a complete application notification subsystem. Before relying on one, prove recipient preference, queue, transport, idempotency, and operator recovery together in the tagged application you deploy.
 
 <a name="a-recipient-address-is-protected-data"></a>
 ## A recipient address is protected data

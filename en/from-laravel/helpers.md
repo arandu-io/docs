@@ -6,9 +6,6 @@
 - [What deliberately has no helper](#what-deliberately-has-no-helper)
 - [Where each family is documented](#where-each-family-is-documented)
 
-> [!WARNING]
-> **Current limitations.** The str and pagination functions are consumed by tagged releases: the framework derives field labels with `str.Headline` and the starter's note service returns a `pagination.Page`. The support, number and collections functions are released and tested in Hesape :hesapeVersion without a tagged first-party application consumer, so verify a chosen function in the consuming application. No released Arandu module validates Brazilian documents.
-
 <a name="helpers-are-package-functions"></a>
 ## Helpers are package functions
 
@@ -137,7 +134,7 @@ Three things look alike and are not interchangeable. `ctx.URL` belongs to the re
 > [!WARNING]
 > `number.UseLocale`, `number.WithLocale`, `number.UseCurrency`, `str.UseLanguage`, `str.CreateUUIDsUsing` and `str.FreezeUUIDs` change a default shared by the whole process, and `WithLocale` does so for every goroutine while its callback runs. Call them once at boot or inside a test, never while serving a request; for one request, pass the currency code to `number.Currency` or `number.CurrencyFromCents` instead of changing the default.
 
-National documents are not core helpers. Hesape names no CPF, CNPJ or CEP: the mask package applies and removes any shape the application declares, such as 000.000.000-00, and deliberately does not check the digits, because that arithmetic belongs to whoever owns the document. number writes BRL amounts with pt-BR separators when the process locale is pt-BR, set once at boot. No released Arandu module validates Brazilian documents yet, so an application that needs the check keeps one implementation of it rather than a copy per feature.
+National documents are not core helpers. Hesape names no CPF, CNPJ or CEP: the mask package applies and removes any shape the application declares, such as 000.000.000-00, and deliberately does not check the digits, because that arithmetic belongs to whoever owns the document. number writes BRL amounts with pt-BR separators when the process locale is pt-BR, set once at boot. The `github.com/hyz-is/arandu-br` module owns that check: it registers the `cpf`, `cnpj`, `cpf_or_cnpj`, `cep`, `celular` and `brl` rules with `hesape/validation` and offers `ParseCPF`, `ParseCNPJ` and `ParseCEP`.
 
 <a name="where-each-family-is-documented"></a>
 ## Where each family is documented

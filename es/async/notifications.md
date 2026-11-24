@@ -9,13 +9,10 @@
 - [Pruebe preferencias, tenant y reintentos](#test-preference-tenant-and-retry-paths)
 - [Use correo, colas y outbox respetando sus fronteras](#use-mail-queues-and-outbox-as-their-real-boundaries)
 
-> [!WARNING]
-> **Limitaciones actuales.** Las primitivas de notificación están publicadas, pero no hay un recorrido completo de primera parte para distribuir a múltiples canales con autorización duradera y semántica de reintentos. Mantenga explícita la entrega por canal y use la outbox transaccional para trabajo que deba sobrevivir a un fallo del proceso.
-
 <a name="a-notification-selects-channels-around-one-public-message"></a>
 ## Una notificación selecciona canales para un mensaje público
 
-Las primitivas publicadas de notificación describen una notificación y sus canales, pero ninguna aplicación de primera parte en una etiqueta demuestra el recorrido completo desde las preferencias hasta el transporte. Úselas como una superficie limitada de composición y mantenga explícitos el envío de correo, la cola y la policy del destinatario.
+Una notificación nombra sus canales en `Via` y construye un mensaje para cada uno. El esqueleto conecta un `Notifier` con el canal de base de datos en `app/Providers/AppServiceProvider.go`, y su listener `NotifyNoteAuthor` envía la notificación de ejemplo `NotePublished` cuando el relay de la outbox entrega `note.published`. `aru make:notification` genera una notificación para los canales que usted elija. Agregue correo, preferencias del destinatario y entrega en cola de forma explícita, como describe el resto de esta página.
 
 <a name="own-recipient-preferences-addresses-and-transports"></a>
 ## Asume la responsabilidad de preferencias, direcciones y transportes de los destinatarios
@@ -77,9 +74,6 @@ Resuelve las preferencias justo antes de la entrega, renderiza resources públic
 ## Trate las entregas parciales entre canales como estado explícito
 
 Un canal puede tener éxito mientras otro falla. Defina el estado de reintento por canal, evite repetir efectos ya completados y distinga dirección inválida, cancelación explícita, rechazo e indisponibilidad del proveedor. El paquete de componentes, por sí solo, no proporciona este ciclo completo.
-
-> [!WARNING]
-> El contrato publicado actualmente no incluye un subsistema completo de notificaciones de la aplicación. Antes de depender de uno, verifica conjuntamente preferencias de destinatarios, cola, transporte, idempotencia y recuperación operativa en la aplicación etiquetada que vas a desplegar.
 
 <a name="a-recipient-address-is-protected-data"></a>
 ## La dirección del destinatario es un dato protegido

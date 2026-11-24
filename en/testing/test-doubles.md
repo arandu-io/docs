@@ -8,9 +8,6 @@
 - [Released capture and fake surfaces](#released-capture-and-fake-surfaces)
 - [Combine narrow doubles with complete feature journeys](#combine-narrow-doubles-with-complete-feature-journeys)
 
-> [!WARNING]
-> **Current limitations.** Fakes live with the component they replace and do not form a global mocking container. Depend on small interfaces, pass clocks explicitly where time controls behavior, and use component fakes only for the boundary they model.
-
 <a name="a-test-double-implements-the-consumer-owned-contract"></a>
 ## A test double implements the consumer-owned contract
 
@@ -59,10 +56,7 @@ Use HTTP client fakes with stray requests prevented, notification Capture per te
 <a name="do-not-fake-away-the-behavior-being-proved"></a>
 ## Do not fake away the behavior being proved
 
-A fake that always succeeds can hide retry, rollback, cancellation, and partial failure. A memory adapter can differ in transaction, ordering, lock, TTL, and cross-process semantics. Never use the double to prove the behavior it intentionally omits.
-
-> [!WARNING]
-> Parser or constructor fakes do not prove a configured value reaches the live component. Add a feature journey that changes the setting and observes downstream behavior.
+A fake that always succeeds can hide retry, rollback, cancellation, and partial failure. A memory adapter can differ in transaction, ordering, lock, TTL, and cross-process semantics. Never use the double to prove the behavior it intentionally omits. Parser or constructor fakes do not prove that a configured value reaches the live component, so add a feature journey that changes the setting and observes the downstream behavior.
 
 <a name="run-the-same-contract-against-fake-and-real-adapter"></a>
 ## Run the same contract against fake and real adapter

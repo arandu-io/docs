@@ -6,13 +6,10 @@
 - [Prove behavior at the narrowest complete boundary](#prove-behavior-at-the-narrowest-complete-boundary)
 - [Choose HTTP, console, database, or contract detail next](#choose-http-console-database-or-contract-detail-next)
 
-> [!WARNING]
-> **Current limitations.** Testing helpers are released across several modules rather than one unified facade. Compose ordinary Go tests from the helper that owns the boundary, and keep package-specific setup visible in the test.
-
 <a name="tests-boot-the-same-application-graph-without-serving-a-port"></a>
 ## Tests boot the same application graph without serving a port
 
-Arandu uses ordinary Go tests plus application helpers. A test may construct one service, boot the composed application and dispatch its Handler, or run a command adapter. The valuable boundary is the smallest one that still proves the behavior, not a separate testing framework.
+Arandu uses ordinary Go tests plus application helpers. A test may construct one service, boot the composed application and dispatch its Handler, or run a command adapter. The valuable boundary is the smallest one that still proves the behavior, not a separate testing framework. The helpers come from the package that owns each boundary, so keep each test's setup visible in the test.
 
 <a name="generate-views-and-isolate-external-state"></a>
 ## Generate views and isolate external state

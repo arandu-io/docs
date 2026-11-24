@@ -10,13 +10,10 @@
 - [Degrade explicitly when the bus is unavailable](#degrade-explicitly-when-the-bus-is-unavailable)
 - [Protocol, transport, and application remain separate](#protocol-transport-and-application-remain-separate)
 
-> [!WARNING]
-> **Current limitations.** The server, the protocol and the browser client are proved by Joaju's own journey and end-to-end tests. No tagged application in the working set mounts it, so prove the mounted handler and its three policies in the application that serves it.
-
 <a name="a-websocket-server-behind-application-policy"></a>
 ## A `WebSocket` server behind application policy
 
-Joaju implements the Pusher wire protocol as an `http.Handler`. The application mounts it behind subject authentication and supplies three policies: Connect decides whether a subject may hold a socket, Subscribe decides whether that subject may reach each channel, and Operate decides who may call the HTTP API. The server itself does not invent an identity.
+Joaju implements the Pusher wire protocol as an `http.Handler`. The application mounts it behind subject authentication and supplies three policies: Connect decides whether a subject may hold a socket, Subscribe decides whether that subject may reach each channel, and Operate decides who may call the HTTP API. The server itself does not invent an identity. The starter does not mount it, so mount the handler in the application that serves it and test the three policies there.
 
 <a name="choose-one-process-or-a-relayed-fleet"></a>
 ## Choose one process or a relayed fleet

@@ -10,13 +10,10 @@
 - [Define explícitamente la degradación cuando el bus no esté disponible](#degrade-explicitly-when-the-bus-is-unavailable)
 - [Protocolo, transporte y aplicación siguen separados](#protocol-transport-and-application-remain-separate)
 
-> [!WARNING]
-> **Limitaciones actuales.** El servidor, el protocolo y el cliente del navegador se prueban con el recorrido y los tests de extremo a extremo del propio Joaju. Ninguna aplicación publicada del conjunto de trabajo lo monta, así que pruebe el handler montado y sus tres policies en la aplicación que lo sirve.
-
 <a name="a-websocket-server-behind-application-policy"></a>
 ## Un servidor `WebSocket` protegido por la Policy de la aplicación
 
-Joaju implementa el protocolo de cable de Pusher como un `http.Handler`. La aplicación lo monta detrás de la autenticación de subject y proporciona tres policies: Connect decide si un subject puede mantener un socket, Subscribe decide si ese subject puede llegar a cada canal, y Operate decide quién puede llamar a la API HTTP. El propio servidor no inventa una identidad.
+Joaju implementa el protocolo de cable de Pusher como un `http.Handler`. La aplicación lo monta detrás de la autenticación de subject y proporciona tres policies: Connect decide si un subject puede mantener un socket, Subscribe decide si ese subject puede llegar a cada canal, y Operate decide quién puede llamar a la API HTTP. El propio servidor no inventa una identidad. El esqueleto no lo monta; monte el handler en la aplicación que lo sirve y pruebe allí las tres policies.
 
 <a name="choose-one-process-or-a-relayed-fleet"></a>
 ## Elige un proceso o varias instancias conectadas mediante relay
