@@ -8,9 +8,6 @@
 - [Required and optional interfaces](#required-and-optional-interfaces)
 - [Put primitives in components and state with its owner](#put-primitives-in-components-and-state-with-its-owner)
 
-> [!WARNING]
-> **Current limitations.** The package skeleton is released and self-tested, but no independent tagged application imports it. Treat its module, policy, resource, migration, and route surfaces as a verified starting point and add a consuming application journey before claiming integration.
-
 <a name="a-package-is-a-go-module-with-an-explicit-entry-point"></a>
 ## A package is a Go module with an explicit entry point
 

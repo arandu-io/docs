@@ -9,9 +9,6 @@
 - [Run the contract against every supported connector](#run-the-contract-against-every-supported-connector)
 - [Use factories for shape and migrations for catalogue state](#use-factories-for-shape-and-migrations-for-catalogue-state)
 
-> [!WARNING]
-> **Current limitations.** Database helpers, models, and tenant assertions are released. Factory persistence and migration identity still have limits, so tests should create only the rows they need through the same verified data path as the application.
-
 <a name="database-tests-prove-transactions-dialects-and-tenant-scope"></a>
 ## Database tests prove transactions, dialects, and tenant scope
 
@@ -54,10 +51,7 @@ Test commit and rollback, nested behavior where supported, cancellation, conflic
 <a name="do-not-let-shared-state-make-a-green-suite-order-dependent"></a>
 ## Do not let shared state make a green suite order-dependent
 
-Shared schema, clock, ids, or global registrations can make tests pass only in one order. Detect leaked rows, fixed migration names, held connections, parallel port collisions, and assumptions that SQLite behavior equals every production dialect.
-
-> [!WARNING]
-> A mock expectation that SQL was called does not prove the query returned only authorized rows. Keep at least one concrete connector contract for each supported deployment path.
+Shared schema, clock, ids, or global registrations can make tests pass only in one order. Detect leaked rows, fixed migration names, held connections, parallel port collisions, and assumptions that SQLite behavior equals every production dialect. A mock expectation that SQL was called does not prove the query returned only authorized rows, so keep at least one concrete connector contract for each supported deployment path.
 
 <a name="every-fixture-and-assertion-stays-tenant-scoped"></a>
 ## Every fixture and assertion stays tenant-scoped

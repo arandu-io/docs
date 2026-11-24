@@ -10,9 +10,6 @@
 - [Correct with a new version](#correct-with-a-new-version)
 - [Upgrade guides carry the longer path](#upgrade-guides-carry-the-longer-path)
 
-> [!WARNING]
-> **Current limitations.** This page explains immutable release evidence; it does not authorize a promotion. Repository-owned release gates and an explicit maintainer decision remain required before any branch, tag, or release changes.
-
 <a name="a-release-note-describes-an-immutable-version"></a>
 ## A release note describes an immutable version
 

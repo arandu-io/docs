@@ -10,9 +10,6 @@
 - [Diagnose from the last durable signal](#diagnose-from-the-last-durable-signal)
 - [Open the request timeline only when needed](#open-the-request-timeline-only-when-needed)
 
-> [!WARNING]
-> **Current limitations.** Structured logs and request collection are released, and the root logger follows `LOG_LEVEL` and `LOG_FORMAT`. `LOG_SAMPLING` is read and has no effect, export and retention are deployment choices, and no secret or Grant internal belongs in a log line.
-
 <a name="write-structured-events-through-the-request-context"></a>
 ## Write structured events through the request context
 
@@ -21,7 +18,7 @@ Create builds one root slog logger from the logging settings: the standard outpu
 <a name="set-the-level-and-preserve-middleware-order"></a>
 ## Set the level and preserve middleware order
 
-Set a released `LOG_LEVEL` and, when the environment's default is wrong for the collector, `LOG_FORMAT`. The composed pipeline already runs Observe after Recover, the body limits, and `TrustProxies`. Pass `context.Context` through controllers, services, and outbound work so `observability.Log` retrieves the scoped logger and Collector.
+Set a released `LOG_LEVEL` and, when the environment's default is wrong for the collector, `LOG_FORMAT`. The composed pipeline already runs Observe after Recover, the body limits, and `TrustProxies`. Pass `context.Context` through controllers, services, and outbound work so `observability.Log` retrieves the scoped logger and Collector. `LOG_SAMPLING` is read into `Settings.Logging` but changes no logger, so it does not reduce log volume. Export and retention belong to the platform that collects stdout.
 
 - Use the configured root logger.
 - Preserve request context.
@@ -59,10 +56,7 @@ Use `observability.Client` for bounded outbound calls, `WithLogger` for controll
 <a name="make-missing-telemetry-visible"></a>
 ## Make missing telemetry visible
 
-Dropping context falls back to the default logger and loses correlation. A raw client omits outbound time and may wait indefinitely without a timeout. Disabled Collector methods are intentional no-ops, not evidence that instrumentation ran.
-
-> [!WARNING]
-> In framework :frameworkVersion `LOG_SAMPLING` is read and validated into `Settings.Logging` and reaches no logger; do not operate it as a control. A query on the log aggregator that reads source finds nothing, because lines carry channel instead.
+Dropping context falls back to the default logger and loses correlation. A raw client omits outbound time and may wait indefinitely without a timeout. Disabled Collector methods are intentional no-ops, not evidence that instrumentation ran. A query on the log aggregator that reads `source` finds nothing, because lines carry `channel` instead.
 
 <a name="log-identifiers-never-credentials-or-authority"></a>
 ## Log identifiers, never credentials or authority

@@ -10,9 +10,6 @@
 - [Restaure el servicio antes de decidir revertir el esquema](#restore-service-before-choosing-a-schema-down-action)
 - [Coordine esquema, despliegue y datos iniciales](#coordinate-schema-deployment-and-seed-data)
 
-> [!WARNING]
-> **Limitaciones actuales.** Las migraciones y el registro están publicados como paso explícito de pipeline, pero la identidad generada y el orden de aplicación aún exigen revisión. Inspeccione plan y rollback exactos del dialecto desplegado y nunca cambie esquema durante el arranque del proceso de peticiones.
-
 <a name="a-migration-is-registered-go-code-with-immutable-identity"></a>
 ## Una migración es código Go registrado con identidad inmutable
 
@@ -64,7 +61,7 @@ Genere una migration, inspeccione el estado y la salida de pretend, aplique norm
 ShouldRun=false se omite y no se registra, por lo que se evaluará de nuevo. El DDL transaccional varía según la gramática, y `OutsideTransaction` puede dejar el esquema parcialmente modificado. El rollback valida el lote antes de ejecutar: la ausencia de Down sin declaración explícita impide el trabajo; una migración explícitamente Irreversible permanece aplicada y registrada.
 
 > [!WARNING]
-> Hesape :hesapeVersion no informa una migración irreversible como revertida ni elimina su registro. Un fallo de Down en runtime aún puede detenerse tras haberse completado entradas reversibles anteriores.
+> Un fallo de Down en tiempo de ejecución puede detener el rollback después de que entradas reversibles anteriores ya se hayan completado.
 
 <a name="separate-deployment-authority-from-request-authority"></a>
 ## Separe la autoridad de despliegue de la autoridad de la solicitud

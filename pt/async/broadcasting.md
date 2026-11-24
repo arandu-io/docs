@@ -9,13 +9,10 @@
 - [Teste isolamento de canais e recusa do transporte](#test-channel-isolation-and-transport-refusal)
 - [Use outbox e filas quando a entrega precisar sobreviver](#use-outbox-and-queues-when-delivery-must-survive)
 
-> [!WARNING]
-> **Limitações atuais.** A autorização de canais em tempo real está publicada. A distribuição geral de notificações e a entrega durável são fluxos separados ainda incompletos; este guia cobre apenas a publicação autorizada de eventos no broadcaster configurado.
-
 <a name="a-channel-name-is-a-typed-publication-boundary"></a>
 ## O nome de um canal é uma fronteira tipada de publicação
 
-O pacote de broadcasting publicado oferece canais tipados, eventos e contratos de driver. Ele não comprova a composição completa de um gerenciador na aplicação nem o fluxo de assinatura no navegador. Este guia documenta a fronteira útil do componente e indica os limites da integração ponta a ponta.
+O pacote de broadcasting oferece canais tipados, eventos e contratos de driver. O esqueleto não conecta um gerenciador de broadcast nem uma assinatura no navegador por você: você escolhe um driver no bootstrap e escreve a policy de assinatura, e esta página cobre a fronteira de canais e eventos entre os dois.
 
 <a name="choose-transport-and-authorization-before-publishing"></a>
 ## Escolha transporte e autorização antes de publicar
@@ -63,10 +60,7 @@ Mantenha nomes de eventos estáveis, serialize um recurso deliberado em vez de u
 <a name="do-not-confuse-a-typed-channel-with-delivered-fan-out"></a>
 ## Não confunda canal tipado com distribuição concluída
 
-Indisponibilidade do driver, cliente desconectado, falha de serialização e assinatura negada são resultados distintos. A API tipada publicada, sozinha, não garante reconexão, replay, ordenação nem um gerenciador integrado ao esqueleto.
-
-> [!WARNING]
-> O contrato publicado atual não inclui um fluxo completo de broadcasting da aplicação. Antes de depender disso, comprove juntos a inicialização, a policy de assinatura, o transporte escolhido e a entrega no navegador ou serviço na aplicação com a tag que você implanta.
+Indisponibilidade do driver, cliente desconectado, falha de serialização e assinatura negada são resultados distintos. A API tipada publicada, sozinha, não garante reconexão, replay, ordenação nem um gerenciador integrado ao esqueleto. Teste juntos o bootstrap, a policy de assinatura, o transporte escolhido e a entrega na aplicação que você implanta.
 
 <a name="authorize-subscription-and-publication-separately"></a>
 ## Autorize assinatura e publicação separadamente

@@ -10,9 +10,6 @@
 - [Restaure o código primeiro e reverta o schema apenas com evidência](#restore-code-first-and-undo-schema-only-with-evidence)
 - [Leia as evidências do release antes de mudar produção](#read-release-evidence-before-changing-production)
 
-> [!WARNING]
-> **Limitações atuais.** Atualizações de módulos são explícitas e mudanças de schema devem ser compatíveis com rollback. Identidade de migration e relato de rollback irreversível ainda exigem cuidado; inspecione o changelog exato e exercite rollout com versões mistas antes de produção.
-
 <a name="upgrade-the-module-graph-and-application-owned-wiring"></a>
 ## Atualize o grafo de módulos e a composição pertencente à aplicação
 
@@ -81,7 +78,7 @@ Execute geração de views, formatação, vet, testes com race, build, doctor, t
 <a name="restore-code-first-and-undo-schema-only-with-evidence"></a>
 ## Restaure o código primeiro e reverta o schema apenas com evidência
 
-Reimplante a imagem anterior ou restaure arquivos de módulo e composição da aplicação. Mantenha schema aditivo durante rollback do binário. Reverta uma migration de release só após inspecionar lote e Down testado; nunca use fresh, reset ou refresh como rollback.
+Reimplante a imagem anterior ou restaure arquivos de módulo e composição da aplicação. Mantenha schema aditivo durante rollback do binário. Reverta uma migration de release só após inspecionar lote e Down testado; nunca use fresh, reset ou refresh como rollback. `aru migrate:rollback` recusa um lote que contenha uma migration sem Down nem declaração `Irreversible`, e a nomeia. Uma migration que declara `Irreversible` é nomeada de antemão e permanece aplicada.
 
 <a name="read-release-evidence-before-changing-production"></a>
 ## Leia as evidências do release antes de mudar produção

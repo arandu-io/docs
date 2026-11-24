@@ -55,8 +55,7 @@ Count and Seed choose volume and repeatability; State runs in order; Sequence cy
 
 Make can fail during model assignment. Create saves sequentially, so a later Save or callback error can leave earlier rows because Factory does not wrap the whole batch. Count below zero becomes zero, and a valid but wrong relationship callback creates misleading data.
 
-> [!WARNING]
-> Wrap factory creation in a caller-owned transaction when atomicity matters, and assert relationship keys rather than assuming a compiling callback connected the intended records.
+Wrap factory creation in a caller-owned transaction when atomicity matters, and assert relationship keys rather than assuming a compiling callback connected the intended records.
 
 <a name="creation-still-carries-the-caller-s-grant"></a>
 ## Creation still carries the caller's Grant

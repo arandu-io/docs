@@ -6,9 +6,6 @@
 - [Prove que cada nova proteção pode falhar](#prove-every-new-guard-can-fail)
 - [Mantenha cada alteração associada a um motivo](#keep-one-change-attributable-to-one-reason)
 
-> [!WARNING]
-> **Limitações atuais.** O contrato de contribuição é verificado pela CI e pela guarda de estrutura da versão marcada do próprio repositório. Não há consumidor independente com tag, pois ele rege alterações nesse repositório, não em um pacote de runtime.
-
 <a name="repository-gates-define-a-reviewable-change"></a>
 ## As verificações do repositório definem uma alteração revisável
 

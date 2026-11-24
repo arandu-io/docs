@@ -9,13 +9,10 @@
 - [Test channel isolation and transport refusal](#test-channel-isolation-and-transport-refusal)
 - [Use outbox and queues when delivery must survive](#use-outbox-and-queues-when-delivery-must-survive)
 
-> [!WARNING]
-> **Current limitations.** Realtime channel authorization is released. General notification fan-out and durable delivery are separate incomplete paths; this guide covers authorized event publication to the configured broadcaster only.
-
 <a name="a-channel-name-is-a-typed-publication-boundary"></a>
 ## A channel name is a typed publication boundary
 
-The released broadcasting package provides typed channels, events, and driver contracts. It does not prove a fully wired application manager or browser subscription journey, so this page documents the useful component boundary and marks end-to-end integration as limited.
+The broadcasting package provides typed channels, events, and driver contracts. The starter does not wire a broadcast manager or a browser subscription for you: you select a driver at bootstrap and write the subscription policy, and this page covers the channel and event boundary between the two.
 
 <a name="choose-transport-and-authorization-before-publishing"></a>
 ## Choose transport and authorization before publishing
@@ -63,10 +60,7 @@ Keep event names stable, serialize a deliberate resource rather than a model, at
 <a name="do-not-confuse-a-typed-channel-with-delivered-fan-out"></a>
 ## Do not confuse a typed channel with delivered fan-out
 
-A driver outage, disconnected client, serialization failure, and denied subscription are different outcomes. The released typed API alone does not guarantee reconnect, replay, ordering, or a manager wired into the starter application.
-
-> [!WARNING]
-> The current released contract does not include a complete application broadcasting journey. Before relying on one, prove bootstrap, subscription policy, selected transport, and browser or service delivery together in the tagged application you deploy.
+A driver outage, disconnected client, serialization failure, and denied subscription are different outcomes. The released typed API alone does not guarantee reconnect, replay, ordering, or a manager wired into the starter application. Test bootstrap, subscription policy, the selected transport, and delivery together in the application you deploy.
 
 <a name="authorize-subscription-and-publication-separately"></a>
 ## Authorize subscription and publication separately

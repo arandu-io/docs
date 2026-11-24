@@ -52,13 +52,12 @@ Use `--views` apenas para republicar as telas: ele deixa intactos os controllers
 O publicador recusa raiz sem projeto, caminho de módulo inválido, argumentos posicionais não suportados e versão mínima antiga de Aru antes de escrever. Arquivos existentes não acoplados permanecem salvo force; uma escrita bem-sucedida ainda exige composição impressa, geração de views, migration e testes.
 
 > [!WARNING]
-> Blocos customizados são correspondidos por posição e templates esperam atualmente um por arquivo. Código fora dos marcadores pode ser substituído; dry-run e diff versionado são obrigatórios antes de republicar.
+> Blocos customizados são correspondidos por posição e templates esperam um por arquivo. Código fora dos marcadores pode ser substituído; dry-run e diff versionado são obrigatórios antes de republicar.
 
 <a name="generated-screens-do-not-become-authorization"></a>
 ## Telas geradas não se tornam autorização
 
-> [!WARNING]
-> O kit inclui telas de login, registro, verificação, recuperação, confirmação e dois fatores. O projeto decide abertura de registro, policy, resolução de tenant, regras de senha, e-mail, backend de sessão e ordem CSRF. Crie sessão final só após os fatores exigidos.
+O kit inclui telas de login, registro, verificação, recuperação, confirmação e dois fatores. O projeto decide abertura de registro, policy, resolução de tenant, regras de senha, e-mail, backend de sessão e ordem CSRF. Crie a sessão final só após os fatores exigidos.
 
 Rotas e formulários publicados não são permissão. Preserve Rotate, propósitos de uso único, middleware de senha recente e verificações de Grant no servidor ao editar.
 

@@ -9,9 +9,6 @@
 - [Ejecute el contrato en cada conector compatible](#run-the-contract-against-every-supported-connector)
 - [Use factories para la estructura y migraciones para el estado del catálogo](#use-factories-for-shape-and-migrations-for-catalogue-state)
 
-> [!WARNING]
-> **Limitaciones actuales.** Los helpers de base, models y aserciones de tenant están publicados. La persistencia de factories y la identidad de migraciones aún tienen límites; cree en las pruebas solo las filas necesarias, por el mismo recorrido de datos verificado de la aplicación.
-
 <a name="database-tests-prove-transactions-dialects-and-tenant-scope"></a>
 ## Las pruebas de base demuestran transacciones, dialectos y ámbito del tenant
 
@@ -54,10 +51,7 @@ Pruebe commit y rollback, anidamiento donde se admita, cancelación, conflictos,
 <a name="do-not-let-shared-state-make-a-green-suite-order-dependent"></a>
 ## No deje que el estado compartido haga que la suite dependa del orden
 
-Un esquema, reloj, IDs o registros globales compartidos pueden hacer que las pruebas pasen solo en cierto orden. Detecte filas filtradas, nombres fijos de migración, conexiones retenidas, colisiones de puertos en paralelo y supuestos de que SQLite se comporta como cada dialecto de producción.
-
-> [!WARNING]
-> Una expectativa de mock sobre una llamada SQL no demuestra que la consulta devuelva solo filas autorizadas. Mantenga al menos un contrato con conector concreto por cada despliegue compatible.
+Un esquema, reloj, IDs o registros globales compartidos pueden hacer que las pruebas pasen solo en cierto orden. Detecte filas filtradas, nombres fijos de migración, conexiones retenidas, colisiones de puertos en paralelo y supuestos de que SQLite se comporta como cada dialecto de producción. Una expectativa de mock de que se llamó al SQL no prueba que la consulta devolviera solo filas autorizadas; mantenga al menos un contrato con un conector real para cada ruta de despliegue soportada.
 
 <a name="every-fixture-and-assertion-stays-tenant-scoped"></a>
 ## Cada fixture y aserción permanece dentro del ámbito del tenant

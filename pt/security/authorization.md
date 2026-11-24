@@ -9,9 +9,6 @@
 - [Comprove recusa e isolamento de tenant no armazenamento](#prove-denial-and-tenant-isolation-at-storage)
 - [Identidade inicia a fronteira; Grant a completa](#identity-starts-the-boundary-and-grant-finishes-it)
 
-> [!WARNING]
-> **Limitações atuais.** Leituras e escritas síncronas exigem Grant e derivam tenant dele. Nem todos os fluxos duráveis de segundo plano e distribuição migraram; persista proveniência confiável e reautorize antes do trabalho assíncrono protegido.
-
 <a name="a-policy-turns-identity-into-bounded-authority"></a>
 ## Uma policy transforma identidade em autoridade limitada
 

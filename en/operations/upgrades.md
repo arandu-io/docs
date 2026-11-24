@@ -10,9 +10,6 @@
 - [Restore code first and undo schema only with evidence](#restore-code-first-and-undo-schema-only-with-evidence)
 - [Read release evidence before changing production](#read-release-evidence-before-changing-production)
 
-> [!WARNING]
-> **Current limitations.** Module upgrades are explicit and rollback-compatible schema changes are required. Migration identity and irreversible rollback reporting still need care; inspect the exact changelog and exercise mixed-version rollout before production.
-
 <a name="upgrade-the-module-graph-and-application-owned-wiring"></a>
 ## Upgrade the module graph and application-owned wiring
 
@@ -81,7 +78,7 @@ Run view generation, formatting, vet, race tests, build, doctor, production-shap
 <a name="restore-code-first-and-undo-schema-only-with-evidence"></a>
 ## Restore code first and undo schema only with evidence
 
-Redeploy the previous image or restore module files and application wiring. Leave an additive schema in place during binary rollback. Undo a release migration only after inspecting its batch and tested Down; never use fresh, reset, or refresh as rollback.
+Redeploy the previous image or restore module files and application wiring. Leave an additive schema in place during binary rollback. Undo a release migration only after inspecting its batch and tested Down; never use fresh, reset, or refresh as rollback. `aru migrate:rollback` refuses a batch that holds a migration with neither a Down nor an `Irreversible` declaration, and names it. A migration that declares `Irreversible` is named up front and left applied.
 
 <a name="read-release-evidence-before-changing-production"></a>
 ## Read release evidence before changing production

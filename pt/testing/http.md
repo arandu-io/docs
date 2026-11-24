@@ -9,9 +9,6 @@
 - [Cubra a matriz completa de rotas](#cover-the-complete-route-matrix)
 - [Leve detalhes de serviços e adapters a contratos focados](#move-service-and-adapter-details-to-focused-contracts)
 
-> [!WARNING]
-> **Limitações atuais.** O harness de requisições exercita o router e o middleware reais. `test.NewClient` guarda cookies e o token CSRF, e seu Response verifica status, texto e redirecionamentos; verifique o estado protegido diretamente ao lado dele.
-
 <a name="dispatch-the-registered-pipeline-with-httptest"></a>
 ## Despache o pipeline registrado com httptest
 
@@ -57,10 +54,7 @@ Teste representação normal e YPY-Request, redirecionamentos nomeados, recursos
 <a name="do-not-let-production-recovery-hide-a-test-defect"></a>
 ## Não deixe a recuperação de produção esconder um defeito do teste
 
-Um panic deve chegar à fronteira do teste quando configurado para expor defeitos; não aprove um teste apenas porque a recuperação de produção converteu o panic em 500. Escritas parciais, erros engolidos, rotas desconhecidas e views geradas desatualizadas exigem casos explícitos.
-
-> [!WARNING]
-> Um fake de teste unitário do controller não comprova middleware, nomes de rotas, cookies de sessão, CSRF, registro do renderizador ou mapeamento de erros. Mantenha ao menos um percurso completo de rota para cada fluxo público.
+Um panic deve chegar à fronteira do teste quando configurado para expor defeitos; não aprove um teste apenas porque a recuperação de produção converteu o panic em 500. Escritas parciais, erros engolidos, rotas desconhecidas e views geradas desatualizadas exigem casos explícitos. Um fake de controller em teste unitário não prova middleware, nomes de rota, cookies de sessão, CSRF, registro do renderer nem mapeamento de erros; mantenha ao menos uma jornada completa de rota para cada fluxo público.
 
 <a name="keep-credentials-and-tenant-data-out-of-fixtures-and-output"></a>
 ## Mantenha credenciais e dados de tenants fora de fixtures e saídas

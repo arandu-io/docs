@@ -9,9 +9,6 @@
 - [Run every seeder twice on a non-empty database](#run-every-seeder-twice-on-a-non-empty-database)
 - [Use factories for data shape and services for policy](#use-factories-for-data-shape-and-services-for-policy)
 
-> [!WARNING]
-> **Current limitations.** Seeder registration and execution are released, but factory persistence is not a uniformly verified path. Seed through explicit model or repository calls and make repeated execution safe for the environment where it runs.
-
 <a name="seeders-are-explicit-named-application-operations"></a>
 ## Seeders are explicit named application operations
 
@@ -41,9 +38,9 @@ aru db:seed UserSeeder -e you@example.com -p '<choose-a-password>' -r admin
 <a name="create-bootstrap-accounts-through-application-services"></a>
 ## Create bootstrap accounts through application services
 
-The starter root is empty by default: migrating or running `aru db:seed` never creates an account. When an application needs a bootstrap or recovery user, run `UserSeeder` by name with an explicit email and password; add `-r` admin only when that role is intended. Application policy and hashing stay on the normal service path.
+The starter root creates no account: migrating or running `aru db:seed` never does, and in development it seeds the example notes, whose authors have no usable password. When an application needs a bootstrap or recovery user, run `UserSeeder` by name with an explicit email and password; add `-r` admin only when that role is intended. Application policy and hashing stay on the normal service path.
 
-- Keep `DatabaseSeeder` empty until the application deliberately adds data.
+- Keep accounts out of `DatabaseSeeder` until the application deliberately adds them.
 - Run `UserSeeder` by name to create an account.
 - Add `-r` admin only as an explicit authorization decision.
 - Leave existing roles unchanged during a password-only recovery.

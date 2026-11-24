@@ -10,9 +10,6 @@
 - [Reproduzca con ámbito reducido y elimine el acceso](#reproduce-narrowly-and-remove-access)
 - [Conecte traces con logs, salud y llamadas externas](#connect-traces-to-logs-health-and-outbound-calls)
 
-> [!WARNING]
-> **Limitaciones actuales.** La consola de desarrollo y la timeline de peticiones están publicadas. Son diagnósticos, no un servicio de monitorización de rendimiento. La exportación en producción usa la frontera de telemetría configurada y la consola debe permanecer protegida o deshabilitada.
-
 <a name="inspect-one-request-without-making-tracing-universal"></a>
 ## Inspeccione una petición sin hacer universal el tracing
 
@@ -57,10 +54,7 @@ Lea los hallazgos de lentitud y N+1 antes de la timeline sin procesar. Inspeccio
 <a name="know-why-a-request-has-no-record"></a>
 ## Entienda por qué una petición no tiene registro
 
-La ausencia de registro puede indicar tracing desactivado, header ausente, pérdida del Collector en middleware, atención por otra réplica o descarte por el búfer circular limitado. Las dependencias no instrumentadas quedan sin atribución; los registros protegidos o ausentes devuelven 404 deliberadamente.
-
-> [!WARNING]
-> El recorder usa memoria local y desaparece al reiniciar. Rastrear una petición de producción no recopila otras peticiones ni sustituye un backend duradero de telemetría.
+La ausencia de registro puede indicar tracing desactivado, header ausente, pérdida del Collector en middleware, atención por otra réplica o descarte por el búfer circular limitado. Las dependencias no instrumentadas quedan sin atribución; los registros protegidos o ausentes devuelven 404 deliberadamente. El recorder usa memoria local y desaparece al reiniciar. Rastrear una petición de producción no recoge otras peticiones ni sustituye un backend duradero de telemetría.
 
 <a name="minimize-the-diagnostic-data-window"></a>
 ## Minimice la ventana de datos diagnósticos

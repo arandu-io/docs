@@ -9,16 +9,12 @@
 - [Test the redirect and callback as one pair](#test-the-redirect-and-callback-as-one-pair)
 - [The callback produces identity input, not a session](#the-callback-produces-identity-input-not-a-session)
 
-> [!WARNING]
-> **Current limitations.** The OAuth client, cookie-backed state verification, and `GitHub`, Google, Facebook, and Stripe provider constructors are released. Account linking, application user persistence, and a complete social-login journey remain application work; no Twitter constructor is available in this release.
-
 <a name="an-oauth-client-completes-the-authorization-code-exchange"></a>
 ## An OAuth client completes the authorization-code exchange
 
-The released provider package sends a browser to an external authorization endpoint, verifies the callback state, exchanges the code, and retrieves normalized `oauth.UserData`. Constructors exist for `GitHub`, Google, Facebook, and Stripe, plus `NewProvider` for an explicitly configured service.
+The released provider package sends a browser to an external authorization endpoint, verifies the callback state, exchanges the code, and retrieves normalized `oauth.UserData`. Constructors exist for `GitHub`, Google, Facebook, Stripe, and Apple, plus `NewProvider` for an explicitly configured service.
 
-> [!WARNING]
-> This package is an OAuth client, not an authorization server or a complete social-login feature. The released skeleton and UI kit do not provide callback routes, credential configuration, account linking, tenant policy, or a durable identity model for this flow.
+This package is an OAuth client, not an authorization server or a complete social-login feature. The skeleton and UI kit provide no callback routes, credential configuration, account linking, tenant policy, or durable identity model for this flow; those stay application work.
 
 <a name="register-an-exact-callback-and-keep-the-secret-at-boot"></a>
 ## Register an exact callback and keep the secret at boot
@@ -77,10 +73,10 @@ The entry route calls `startGithub` and returns as soon as Redirect writes 302. 
 | `NewGoogleProvider` | Google |
 | `NewFacebookProvider` | Facebook |
 | `NewStripeProvider` | Stripe |
+| `NewAppleProvider` | Apple |
 | `NewProvider` | caller-supplied endpoints |
 
-> [!NOTE]
-> An older package comment names Twitter, but :hesapeVersion exports `NewStripeProvider` and no `NewTwitterProvider`. Public documentation follows the released functions.
+`NewAppleProvider` takes a Services ID, a Team ID, a Key ID, and the private key instead of a client secret, and makes the client secret for each exchange. Apple answers the redirect with a POST from its own site, so the callback route accepts POST and is exempt from CSRF protection for that one path with `CSRFExcept`; the state check takes its place. The site must be served over HTTPS, and the state cookie is sent SameSite=None. The package documentation of `NewAppleProvider` describes the whole flow.
 
 <a name="keep-refusal-before-the-token-exchange"></a>
 ## Keep refusal before the token exchange
@@ -97,8 +93,7 @@ The state cookie has one default name. Starting another OAuth attempt in the sam
 
 Never auto-link solely because an external service returns an email string. Verify the provider's assurance, handle collisions deliberately, and authorize the tenant transition. Do not place client secrets or access tokens in logs, query strings, session payloads, or rendered errors.
 
-> [!WARNING]
-> `CookieStateStore` :hesapeVersion sends its state cookie Secure by default, whatever scheme the request arrived with, so the cookie keeps the attribute behind a proxy that terminates TLS. A development server on plain http calls `Secure(false)` on the store, because a browser never returns a Secure cookie over http; leave it on everywhere else.
+`CookieStateStore` :hesapeVersion sends its state cookie Secure by default, whatever scheme the request arrived with, so the cookie keeps the attribute behind a proxy that terminates TLS. A development server on plain http calls `Secure(false)` on the store, because a browser never returns a Secure cookie over http; leave it on everywhere else.
 
 <a name="test-the-redirect-and-callback-as-one-pair"></a>
 ## Test the redirect and callback as one pair
@@ -107,7 +102,7 @@ Never auto-link solely because an external service returns an email string. Veri
 - Callback with the stored state reaches the fake token and user-data servers.
 - Missing, altered, reused, and cross-browser state fail before any exchange request.
 - Provider refusal and provider outage have different operator evidence without exposing secrets.
-- The deployed HTTPS and proxy path emits a Secure, `HttpOnly`, SameSite=Lax state cookie.
+- The deployed HTTPS and proxy path emits a Secure, `HttpOnly` state cookie, SameSite=Lax (SameSite=None for Apple).
 - Linking cannot cross tenants or seize an account through an email collision.
 
 ```sh

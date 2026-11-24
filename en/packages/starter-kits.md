@@ -17,7 +17,7 @@ Arandu has two source-delivery paths. `aru new` creates the base application fro
 <a name="create-a-project-and-pin-the-publisher"></a>
 ## Create a project and pin the publisher
 
-Install Aru, Git, and Go. `aru new` creates a project, removes skeleton history, writes a private environment with fresh secrets, and attempts view compilation. Commit or back up the project before the pinned UI publisher and ensure `arandu.toml` declares its supported Aru floor.
+Install Aru, Git, and Go. `aru new` creates a project, removes skeleton history, writes a private environment with fresh secrets, and attempts view compilation. Commit or back up the project before the pinned UI publisher and ensure `arandu.toml` declares its supported Aru floor. `aru new` :aruVersion creates the project from the immutable skeleton :aranduVersion and takes no flag to pick another one, so check that tag's `go.mod` and the generated project before treating the baseline as reproducible.
 
 - Record or verify the starter commit.
 - Use an exact UI publisher tag.
@@ -51,14 +51,10 @@ Pin the publisher in automation and preserve application changes inside arandu c
 
 The publisher refuses a non-project root, invalid module path, unexpected arguments, and an old Aru floor before writing. A sequential filesystem error can still leave a partial set; version control and rerunning the same pinned tag provide recovery.
 
-> [!WARNING]
-> `aru new` :aruVersion selects the immutable skeleton :aranduVersion and exposes no override flag. Verify that tag's `go.mod` and the generated project before treating the baseline as reproducible.
-
 <a name="recheck-the-published-identity-flow-as-application-code"></a>
 ## Recheck the published identity flow as application code
 
-> [!WARNING]
-> The kit supplies transport flows but the project owns policy, tenant resolution, password rules, mail, session, CSRF, and registration availability. Preserve session rotation, purpose-bound codes, factor completion, and recent-password gates when editing.
+The kit supplies transport flows but the project owns policy, tenant resolution, password rules, mail, session, CSRF, and registration availability. Preserve session rotation, purpose-bound codes, factor completion, and recent-password gates when editing.
 
 Generated screens and routes do not authorize application data. Every operation still reaches the application service and Policy.
 

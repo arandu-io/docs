@@ -10,9 +10,6 @@
 - [Recover state before deleting it](#recover-state-before-deleting-it)
 - [Separate queue design from queue operations](#separate-queue-design-from-queue-operations)
 
-> [!WARNING]
-> **Current limitations.** The released CLI and skeleton expose worker, pause, retry, failed-job, and pruning commands, but the tagged command suite primarily proves inventory and refusal behavior; `queue:listen` is not executed there. Rehearse recovery and listener behavior against the selected store before production use.
-
 <a name="operate-the-queue-through-the-application-binary"></a>
 ## Operate the queue through the application binary
 
@@ -53,9 +50,6 @@ Pause and resume a target, request graceful worker restart, inspect tenant-scope
 ## Treat leases and failed jobs as recoverable state
 
 Handler errors retry until `MaxAttempts` and then park in `failed_jobs`. A dead worker releases only after its lease; a lease shorter than runtime can execute twice. Missing handlers, tables, selected stores, or shared signal cache must be repaired before recovery commands are trusted.
-
-> [!WARNING]
-> Tagged tests prove command inventory and refusals but do not execute `queue:listen` or a complete cross-process pause and retry journey. This operational page is limited until that production-shaped path is released and consumed.
 
 <a name="keep-tenant-scope-in-payload-handler-and-command"></a>
 ## Keep tenant scope in payload, handler, and command

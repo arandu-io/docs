@@ -9,9 +9,6 @@
 - [Prove denial and tenant isolation at storage](#prove-denial-and-tenant-isolation-at-storage)
 - [Identity starts the boundary and Grant finishes it](#identity-starts-the-boundary-and-grant-finishes-it)
 
-> [!WARNING]
-> **Current limitations.** Synchronous reads and writes require a Grant and derive tenancy from it. Durable background and fan-out paths are not all migrated, so persist trusted authorization provenance and re-authorize before protected asynchronous work.
-
 <a name="a-policy-turns-identity-into-bounded-authority"></a>
 ## A policy turns identity into bounded authority
 

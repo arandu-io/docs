@@ -9,9 +9,6 @@
 - [Cubra la matriz completa de rutas](#cover-the-complete-route-matrix)
 - [Lleve los detalles de servicios y adapters a contratos específicos](#move-service-and-adapter-details-to-focused-contracts)
 
-> [!WARNING]
-> **Limitaciones actuales.** El harness de peticiones ejercita el router y el middleware reales. `test.NewClient` guarda cookies y el token CSRF, y su Response verifica estado, texto y redirecciones; verifique el estado protegido directamente junto a él.
-
 <a name="dispatch-the-registered-pipeline-with-httptest"></a>
 ## Despache el pipeline registrado con httptest
 
@@ -57,10 +54,7 @@ Pruebe representación normal y YPY-Request, redirecciones con nombre, recursos 
 <a name="do-not-let-production-recovery-hide-a-test-defect"></a>
 ## No deje que la recuperación de producción oculte un defecto de la prueba
 
-Un panic debe llegar a la frontera de la prueba cuando se configure para exponer defectos; no apruebe una prueba solo porque la recuperación de producción convirtió el panic en 500. Escrituras parciales, errores ocultos, rutas desconocidas y vistas generadas desactualizadas necesitan casos explícitos.
-
-> [!WARNING]
-> Un fake unitario del controller no demuestra middleware, nombres de rutas, cookies de sesión, CSRF, registro del renderizador ni mapeo de errores. Mantenga al menos un recorrido completo de ruta por cada flujo público.
+Un panic debe llegar a la frontera de la prueba cuando se configure para exponer defectos; no apruebe una prueba solo porque la recuperación de producción convirtió el panic en 500. Escrituras parciales, errores ocultos, rutas desconocidas y vistas generadas desactualizadas necesitan casos explícitos. Un fake de controller en un test unitario no prueba middleware, nombres de ruta, cookies de sesión, CSRF, registro del renderer ni mapeo de errores; mantenga al menos un recorrido completo de ruta para cada flujo público.
 
 <a name="keep-credentials-and-tenant-data-out-of-fixtures-and-output"></a>
 ## Mantenga credenciales y datos de tenants fuera de fixtures y salidas

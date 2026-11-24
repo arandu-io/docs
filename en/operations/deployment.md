@@ -10,9 +10,6 @@
 - [Roll back the artifact without pretending schema rollback is free](#roll-back-the-artifact-without-pretending-schema-rollback-is-free)
 - [Continue with upgrades, migrations, and queue operations](#continue-with-upgrades-migrations-and-queue-operations)
 
-> [!WARNING]
-> **Current limitations.** The binary, container, and explicit migration step are released. A complete health and automated rollback contract is not universal yet; define probes from the dependencies actually wired by the application and rehearse rollback outside request boot.
-
 <a name="deploy-one-immutable-binary-in-more-than-one-process"></a>
 ## Deploy one immutable binary in more than one process
 
@@ -76,7 +73,7 @@ From a clean checkout, generate views, test with race, vet, build, create the im
 <a name="roll-back-the-artifact-without-pretending-schema-rollback-is-free"></a>
 ## Roll back the artifact without pretending schema rollback is free
 
-Stop traffic to the bad artifact and redeploy the previous immutable image. Additive migrations should leave it working. Run `migrate:rollback` only when the exact batch has a tested Down; destructive column removal takes two releases, not an emergency command.
+Stop traffic to the bad artifact and redeploy the previous immutable image. Additive migrations should leave it working. Run `migrate:rollback` only when the exact batch has a tested Down; destructive column removal takes two releases, not an emergency command. Rollback is a step of your deployment platform: the application ships no automatic rollback, so rehearse redeploying the previous image before you need it.
 
 <a name="continue-with-upgrades-migrations-and-queue-operations"></a>
 ## Continue with upgrades, migrations, and queue operations

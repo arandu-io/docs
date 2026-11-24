@@ -10,9 +10,6 @@
 - [Diagnostique desde la última señal duradera](#diagnose-from-the-last-durable-signal)
 - [Abra la timeline de petición solo cuando haga falta](#open-the-request-timeline-only-when-needed)
 
-> [!WARNING]
-> **Limitaciones actuales.** Los logs estructurados y la recolección de peticiones están publicados, y el logger raíz sigue `LOG_LEVEL` y `LOG_FORMAT`. `LOG_SAMPLING` se lee y no tiene efecto, la exportación y la retención son decisiones de despliegue, y ningún secreto ni detalle interno de Grant pertenece a una línea de log.
-
 <a name="write-structured-events-through-the-request-context"></a>
 ## Escriba eventos estructurados mediante el contexto de petición
 
@@ -21,7 +18,7 @@ Create construye un único logger slog raíz a partir de la configuración de lo
 <a name="set-the-level-and-preserve-middleware-order"></a>
 ## Defina el nivel y preserve el orden de los middlewares
 
-Defina un `LOG_LEVEL` publicado y, cuando el valor predeterminado del entorno no sirva al colector, `LOG_FORMAT`. El pipeline compuesto ya ejecuta Observe después de Recover, de los límites de cuerpo y de `TrustProxies`. Pase `context.Context` por controllers, servicios y trabajo saliente para que `observability.Log` recupere el logger y el Collector del alcance.
+Defina un `LOG_LEVEL` publicado y, cuando el valor predeterminado del entorno no sirva al colector, `LOG_FORMAT`. El pipeline compuesto ya ejecuta Observe después de Recover, de los límites de cuerpo y de `TrustProxies`. Pase `context.Context` por controllers, servicios y trabajo saliente para que `observability.Log` recupere el logger y el Collector del alcance. `LOG_SAMPLING` se lee en `Settings.Logging`, pero no cambia ningún logger, así que no reduce el volumen de logs. La exportación y la retención corresponden a la plataforma que recoge el stdout.
 
 - Use el logger raíz configurado.
 - Preserve el contexto de petición.
@@ -59,10 +56,7 @@ Use `observability.Client` para llamadas externas acotadas, `WithLogger` para tr
 <a name="make-missing-telemetry-visible"></a>
 ## Haga visible la ausencia de telemetría
 
-Perder el contexto utiliza el logger predeterminado y pierde correlación. Un cliente sin instrumentar omite tiempo externo y puede esperar indefinidamente sin timeout. Los métodos del Collector deshabilitado son no-ops intencionales, no prueba de instrumentación ejecutada.
-
-> [!WARNING]
-> En framework :frameworkVersion, `LOG_SAMPLING` se lee y valida en `Settings.Logging` y no llega a ningún logger; no lo opere como control. Una consulta en el agregador de logs que lee source no encuentra nada, porque las líneas llevan channel en su lugar.
+Perder el contexto utiliza el logger predeterminado y pierde correlación. Un cliente sin instrumentar omite tiempo externo y puede esperar indefinidamente sin timeout. Los métodos del Collector deshabilitado son no-ops intencionales, no prueba de instrumentación ejecutada. Una consulta en el agregador de logs que lee `source` no encuentra nada, porque las líneas llevan `channel` en su lugar.
 
 <a name="log-identifiers-never-credentials-or-authority"></a>
 ## Registre identificadores, nunca credenciales ni autoridad

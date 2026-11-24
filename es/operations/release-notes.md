@@ -10,9 +10,6 @@
 - [Corrija con una nueva versión](#correct-with-a-new-version)
 - [Las guías de actualización describen transiciones más largas](#upgrade-guides-carry-the-longer-path)
 
-> [!WARNING]
-> **Limitaciones actuales.** Esta página explica evidencias inmutables de release; no autoriza una promoción. Las verificaciones del repositorio y la decisión explícita del mantenedor siguen siendo obligatorias antes de cambiar ramas, etiquetas o releases.
-
 <a name="a-release-note-describes-an-immutable-version"></a>
 ## Una nota de release describe una versión inmutable
 

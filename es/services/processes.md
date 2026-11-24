@@ -8,13 +8,10 @@
 - [Frontera del componente de procesos publicado](#released-process-component-boundary)
 - [Prefiera APIs Go y reserve procesos para herramientas reales](#prefer-go-apis-and-reserve-processes-for-real-tools)
 
-> [!WARNING]
-> **Limitaciones actuales.** La API de procesos está publicada y probada, pero no tiene consumidor de primera parte. Nunca interpole entrada no fiable en el shell; pase ejecutable y argumentos explícitamente, defina un plazo de contexto y limite la salida capturada.
-
 <a name="execute-an-argument-vector-never-a-shell-sentence"></a>
 ## Ejecute un vector de argumentos, nunca una frase de shell
 
-El componente de procesos publicado envuelve `os/exec` con contexto, vectores de argumentos, directorio de trabajo, entorno heredado con sustituciones, salida capturada e información de terminación. Ninguna aplicación actual etiquetada lo consume; esta guía limitada también explicita que stdout y stderr se retienen sin límite de bytes.
+El componente de procesos publicado envuelve `os/exec` con contexto, vectores de argumentos, directorio de trabajo, entorno heredado con sustituciones, salida capturada e información de terminación. Stdout y stderr se retienen sin límite de bytes.
 
 <a name="run-one-bounded-child-process"></a>
 ## Ejecute un proceso hijo acotado

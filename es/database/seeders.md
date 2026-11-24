@@ -9,9 +9,6 @@
 - [Ejecute cada seeder dos veces en una base no vacía](#run-every-seeder-twice-on-a-non-empty-database)
 - [Use factories para los datos y servicios para las políticas](#use-factories-for-data-shape-and-services-for-policy)
 
-> [!WARNING]
-> **Limitaciones actuales.** El registro y ejecución de seeders están publicados, pero la persistencia de factories no es un recorrido verificado uniformemente. Haga seed mediante llamadas explícitas de model o repositorio y haga segura la repetición en su entorno.
-
 <a name="seeders-are-explicit-named-application-operations"></a>
 ## Los seeders son operaciones explícitas de la aplicación, identificadas por nombre
 
@@ -41,9 +38,9 @@ aru db:seed UserSeeder -e you@example.com -p '<choose-a-password>' -r admin
 <a name="create-bootstrap-accounts-through-application-services"></a>
 ## Cree cuentas iniciales mediante los servicios de la aplicación
 
-La raíz del starter está vacía por defecto: migrar o ejecutar `aru db:seed` nunca crea una cuenta. Cuando una aplicación necesita un usuario de bootstrap o recuperación, ejecuta `UserSeeder` por nombre con correo y contraseña explícitos; añade `-r` admin sólo cuando ese rol sea intencional. La policy de la aplicación y el hashing permanecen en la ruta normal del servicio.
+La raíz del starter no crea ninguna cuenta: migrar o ejecutar `aru db:seed` nunca la crea, y en desarrollo siembra las notas de ejemplo, cuyos autores no tienen contraseña utilizable. Cuando una aplicación necesita un usuario de bootstrap o recuperación, ejecuta `UserSeeder` por nombre con correo y contraseña explícitos; añade `-r` admin sólo cuando ese rol sea intencional. La policy de la aplicación y el hashing permanecen en la ruta normal del servicio.
 
-- Mantén `DatabaseSeeder` vacío hasta que la aplicación añada datos deliberadamente.
+- Mantén las cuentas fuera de `DatabaseSeeder` hasta que la aplicación las añada deliberadamente.
 - Ejecuta `UserSeeder` por nombre para crear una cuenta.
 - Añade `-r` admin sólo como una decisión explícita de autorización.
 - No modifique los roles existentes al recuperar solo la contraseña.

@@ -9,16 +9,12 @@
 - [Pruebe redirección y callback como un par](#test-the-redirect-and-callback-as-one-pair)
 - [El callback produce entrada de identidad, no una sesión](#the-callback-produces-identity-input-not-a-session)
 
-> [!WARNING]
-> **Limitaciones actuales.** El cliente OAuth, la verificación de estado por cookie y los constructores `GitHub`, Google, Facebook y Stripe están publicados. Vinculación, persistencia de usuarios y recorrido completo de login social siguen en la aplicación; no existe constructor Twitter en este release.
-
 <a name="an-oauth-client-completes-the-authorization-code-exchange"></a>
 ## Un cliente OAuth completa el intercambio del código de autorización
 
-El paquete de proveedores publicado envía el navegador al endpoint externo de autorización, verifica el estado del callback, intercambia el código y recupera `oauth.UserData` normalizado. Hay constructores para `GitHub`, Google, Facebook y Stripe, además de `NewProvider` para un servicio configurado explícitamente.
+El paquete de proveedores publicado envía el navegador al endpoint externo de autorización, verifica el estado del callback, intercambia el código y recupera `oauth.UserData` normalizado. Hay constructores para `GitHub`, Google, Facebook, Stripe y Apple, además de `NewProvider` para un servicio configurado explícitamente.
 
-> [!WARNING]
-> Este paquete es un cliente OAuth, no un servidor de autorización ni un login social completo. El esqueleto y kit UI publicados no proporcionan rutas de callback, configuración de credenciales, vinculación de cuentas, policy de tenant ni model duradero de identidad para ese flujo.
+Este paquete es un cliente OAuth, no un servidor de autorización ni un login social completo. El esqueleto y el kit UI no proporcionan rutas de callback, configuración de credenciales, vinculación de cuentas, policy de tenant ni model duradero de identidad para ese flujo; eso sigue siendo trabajo de la aplicación.
 
 <a name="register-an-exact-callback-and-keep-the-secret-at-boot"></a>
 ## Registre un callback exacto y mantenga el secreto en el arranque
@@ -77,10 +73,10 @@ La entrada llama a `startGithub` y retorna en cuanto Redirect escribe 302. El ca
 | `NewGoogleProvider` | Google |
 | `NewFacebookProvider` | Facebook |
 | `NewStripeProvider` | Stripe |
+| `NewAppleProvider` | Apple |
 | `NewProvider` | endpoints proporcionados por el llamador |
 
-> [!NOTE]
-> Un comentario antiguo menciona Twitter, pero :hesapeVersion exporta `NewStripeProvider` y no `NewTwitterProvider`. La documentación pública sigue las funciones publicadas.
+`NewAppleProvider` recibe un Services ID, un Team ID, un Key ID y la clave privada en lugar de un client secret, y construye el client secret en cada intercambio. Apple responde a la redirección con un POST desde su propio sitio, así que la ruta de callback acepta POST y queda exenta de la protección CSRF solo para esa ruta, con `CSRFExcept`; la verificación de estado ocupa su lugar. El sitio debe servirse por HTTPS, y la cookie de estado se envía con SameSite=None. La documentación del paquete, en `NewAppleProvider`, describe el flujo completo.
 
 <a name="keep-refusal-before-the-token-exchange"></a>
 ## Rechace antes de intercambiar el token
@@ -97,8 +93,7 @@ La cookie de estado tiene un nombre predeterminado. Iniciar otro OAuth en el mis
 
 Nunca vincule automáticamente solo porque un servicio externo devolvió correo. Verifique la garantía del proveedor, trate colisiones deliberadamente y autorice la transición de tenant. No ponga secretos del cliente ni tokens en logs, query, payload de sesión ni errores renderizados.
 
-> [!WARNING]
-> `CookieStateStore` :hesapeVersion envía su cookie de estado con Secure por defecto, sea cual sea el esquema con el que llegó la petición, así que la cookie conserva el atributo detrás de un proxy que termina TLS. Un servidor de desarrollo en http simple llama a `Secure(false)` en el store, porque un navegador nunca devuelve una cookie Secure por http; déjelo activado en todos los demás casos.
+`CookieStateStore` :hesapeVersion envía su cookie de estado con Secure por defecto, sea cual sea el esquema con el que llegó la petición, así que la cookie conserva el atributo detrás de un proxy que termina TLS. Un servidor de desarrollo en http simple llama a `Secure(false)` en el store, porque un navegador nunca devuelve una cookie Secure por http; déjelo activado en todos los demás casos.
 
 <a name="test-the-redirect-and-callback-as-one-pair"></a>
 ## Pruebe redirección y callback como un par
@@ -107,7 +102,7 @@ Nunca vincule automáticamente solo porque un servicio externo devolvió correo.
 - Un callback con estado almacenado alcanza los servidores fake de token y usuario.
 - Un estado ausente, alterado, reutilizado o de otro navegador falla antes de cualquier intercambio.
 - El rechazo y la indisponibilidad del proveedor tienen evidencias operativas distintas sin exponer secretos.
-- El recorrido HTTPS con proxy desplegado emite una cookie de estado Secure, `HttpOnly` y SameSite=Lax.
+- El recorrido HTTPS con proxy desplegado emite una cookie de estado Secure y `HttpOnly`, con SameSite=Lax (SameSite=None para Apple).
 - La vinculación no puede cruzar tenants ni apropiarse de una cuenta por colisión de correo.
 
 ```sh

@@ -9,9 +9,6 @@
 - [Capture the exact MIME contract](#capture-the-exact-mime-contract)
 - [Use mail inside purpose-bound application flows](#use-mail-inside-purpose-bound-application-flows)
 
-> [!WARNING]
-> **Current limitations.** The Hesape mail component and the framework bridge render and deliver the documented messages. Attachment storage and asynchronous authorization are not complete end to end; attach only data already authorized and queue mail through persisted trusted provenance.
-
 <a name="a-mailable-owns-representation-and-the-transport-owns-delivery"></a>
 ## A mailable owns representation and the transport owns delivery
 
@@ -66,8 +63,7 @@ Queue network delivery when the response need not wait, preserve tenant and acti
 
 Rendering, address validation, attachment open or read, TLS, authentication, provider refusal, and timeout each need operator evidence. Do not mark a verification or reset message sent when only construction succeeded.
 
-> [!WARNING]
-> The released bridge does not make every attachment or Grant path automatically safe. Open attachments inside the authorized delivery operation, bound bytes, and ensure queued handlers reconstruct current policy rather than trusting payload paths.
+Open attachments inside the authorized delivery operation, bound their bytes, and have queued handlers rebuild current policy rather than trusting payload paths.
 
 <a name="mail-is-an-external-disclosure-boundary"></a>
 ## Mail is an external disclosure boundary

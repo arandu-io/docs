@@ -8,9 +8,6 @@
 - [Repository and store boundaries](#repository-and-store-boundaries)
 - [A protocol-compatible server is a deployment choice](#a-protocol-compatible-server-is-a-deployment-choice)
 
-> [!WARNING]
-> **Current limitations.** `foundation.NewDrivers` builds `drivers.Store`, the tenant-scoped `cache.Repository` over the store `CACHE_STORE` names, and the tagged skeleton hands its underlying store to the one-time codes and the second factor rather than caching through the repository. Test the Grant-based namespace in the application that caches through it.
-
 <a name="the-application-uses-a-tenant-scoped-repository"></a>
 ## The application uses a tenant-scoped repository
 

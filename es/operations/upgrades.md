@@ -10,9 +10,6 @@
 - [Restaure primero el código y revierta el esquema solo con evidencia](#restore-code-first-and-undo-schema-only-with-evidence)
 - [Lea las evidencias del release antes de cambiar producción](#read-release-evidence-before-changing-production)
 
-> [!WARNING]
-> **Limitaciones actuales.** Las actualizaciones de módulos son explícitas y los cambios de esquema deben ser compatibles con rollback. La identidad de migración y el informe de rollback irreversible aún requieren cuidado; inspeccione el changelog exacto y ejercite rollout con versiones mixtas antes de producción.
-
 <a name="upgrade-the-module-graph-and-application-owned-wiring"></a>
 ## Actualice el grafo de módulos y la composición perteneciente a la aplicación
 
@@ -81,7 +78,7 @@ Ejecute generación de vistas, formato, vet, pruebas con race, build, doctor, pr
 <a name="restore-code-first-and-undo-schema-only-with-evidence"></a>
 ## Restaure primero el código y revierta el esquema solo con evidencia
 
-Redespliegue la imagen anterior o restaure archivos de módulo y composición de aplicación. Mantenga el esquema aditivo durante el rollback del binario. Revierta una migración de release solo tras inspeccionar el lote y el Down probado; nunca use fresh, reset ni refresh como rollback.
+Redespliegue la imagen anterior o restaure archivos de módulo y composición de aplicación. Mantenga el esquema aditivo durante el rollback del binario. Revierta una migración de release solo tras inspeccionar el lote y el Down probado; nunca use fresh, reset ni refresh como rollback. `aru migrate:rollback` rechaza un lote que contenga una migration sin Down ni declaración `Irreversible`, y la nombra. Una migration que declara `Irreversible` se nombra de antemano y queda aplicada.
 
 <a name="read-release-evidence-before-changing-production"></a>
 ## Lea las evidencias del release antes de cambiar producción

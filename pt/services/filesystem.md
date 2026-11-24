@@ -8,9 +8,6 @@
 - [Operações de Disk e capacidade do adapter](#disk-operations-and-adapter-capability)
 - [Storage não é o filesystem comum da aplicação](#storage-is-not-the-application-s-plain-filesystem)
 
-> [!WARNING]
-> **Limitações atuais.** `foundation.NewDrivers` constrói `drivers.Disks` a partir de `FILESYSTEM_DISK`, local, r2 ou s3, então toda aplicação publicada recebe o Disk com escopo de tenant; o recurso de exemplo do esqueleto não guarda arquivo, e nenhuma jornada própria publicada envia e serve um. Verifique Put, Get e Serve na aplicação consumidora antes de tratá-lo como serviço da aplicação.
-
 <a name="a-disk-owns-tenancy-before-an-adapter-sees-a-path"></a>
 ## Disk controla o tenant antes de o adapter receber um caminho
 

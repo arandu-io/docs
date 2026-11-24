@@ -8,9 +8,6 @@
 - [Released console testing surfaces](#released-console-testing-surfaces)
 - [Pair commands with their operational recovery guide](#pair-commands-with-their-operational-recovery-guide)
 
-> [!WARNING]
-> **Current limitations.** `Application.HandleCommand` with `WithConsole` is the released command harness: it takes the test's context and buffers and answers the exit code. Signals and the real binary's exit still need a subprocess.
-
 <a name="console-tests-execute-the-project-owned-command-boundary"></a>
 ## Console tests execute the project-owned command boundary
 
@@ -45,10 +42,7 @@ Test invalid arguments, defaults versus flags, repeated invocation, and the sele
 <a name="a-registered-name-is-not-proof-that-its-operation-runs"></a>
 ## A registered name is not proof that its operation runs
 
-A command can parse and still ignore a configuration value or call the wrong constructor default. Unknown names, missing project markers, refused production operations, held locks, unavailable dependencies, and partial writes all need their real exit and evidence.
-
-> [!WARNING]
-> Do not substitute a test that checks fourteen queue names for a journey that starts, pauses, retries, or drains a worker. Operational behavior needs the chosen store and process boundary.
+A command can parse and still ignore a configuration value or call the wrong constructor default. Unknown names, missing project markers, refused production operations, held locks, unavailable dependencies, and partial writes all need their real exit and evidence. A test that only lists command names does not replace a journey that starts, pauses, retries, or drains a worker; that needs the chosen store and process boundary.
 
 <a name="exercise-the-delegated-command-through-aru-and-the-binary"></a>
 ## Exercise the delegated command through Aru and the binary

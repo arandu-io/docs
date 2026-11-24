@@ -55,8 +55,7 @@ Count y Seed definen volumen y repetibilidad; State ejecuta en orden; Sequence s
 
 Make puede fallar al asignar valores al modelo. Create guarda secuencialmente: un error posterior en Save o en un callback puede dejar registros anteriores persistidos, porque Factory no envuelve todo el lote en una transacción. Un Count negativo se convierte en cero, y un callback de relación válido pero incorrecto genera datos engañosos.
 
-> [!WARNING]
-> Envuelva la creación mediante la factory en una transacción controlada por el llamador cuando importe la atomicidad. Verifique las claves de las relaciones, sin suponer que un callback que compila conectó los registros previstos.
+Envuelva la creación por la factory en una transacción controlada por quien llama cuando la atomicidad importe, y compruebe las claves de relación en lugar de suponer que un callback que compila conectó los registros correctos.
 
 <a name="creation-still-carries-the-caller-s-grant"></a>
 ## La creación aún lleva el Grant del llamador

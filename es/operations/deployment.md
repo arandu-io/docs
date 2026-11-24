@@ -10,9 +10,6 @@
 - [Revierta el artefacto sin tratar el rollback del esquema como gratuito](#roll-back-the-artifact-without-pretending-schema-rollback-is-free)
 - [Continúe con actualizaciones, migraciones y operaciones de cola](#continue-with-upgrades-migrations-and-queue-operations)
 
-> [!WARNING]
-> **Limitaciones actuales.** El binario, el contenedor y el paso explícito de migración están publicados. Un contrato completo de salud y rollback automático aún no es universal: defina probes según las dependencias realmente conectadas y ensaye el rollback fuera del arranque de peticiones.
-
 <a name="deploy-one-immutable-binary-in-more-than-one-process"></a>
 ## Despliegue un binario inmutable en más de un proceso
 
@@ -76,7 +73,7 @@ En un checkout limpio, genere vistas, pruebe con race, ejecute vet y build, cree
 <a name="roll-back-the-artifact-without-pretending-schema-rollback-is-free"></a>
 ## Revierta el artefacto sin tratar el rollback del esquema como gratuito
 
-Retire el tráfico del artefacto defectuoso y redespliegue la imagen inmutable anterior. Las migraciones aditivas deben mantenerla funcional. Ejecute `migrate:rollback` solo si el lote exacto tiene Down probado; eliminar columnas de forma destructiva exige dos releases, no un comando de emergencia.
+Retire el tráfico del artefacto defectuoso y redespliegue la imagen inmutable anterior. Las migraciones aditivas deben mantenerla funcional. Ejecute `migrate:rollback` solo si el lote exacto tiene Down probado; eliminar columnas de forma destructiva exige dos releases, no un comando de emergencia. El rollback es un paso de su plataforma de despliegue: la aplicación no trae rollback automático, así que ensaye el redespliegue de la imagen anterior antes de necesitarlo.
 
 <a name="continue-with-upgrades-migrations-and-queue-operations"></a>
 ## Continúe con actualizaciones, migraciones y operaciones de cola

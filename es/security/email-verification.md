@@ -57,8 +57,7 @@ Reemita tras cambiar la dirección, sustituya códigos anteriores según el cont
 
 Los códigos desconocidos, alterados, expirados, ya consumidos, de otro propósito y de otro tenant fallan sin revelar qué cuenta existe. Un propósito y un subject pueden presentar veinte códigos erróneos en veinticuatro horas sumando todos los códigos emitidos; después Consume rechaza todo código con `ErrTooManyFailures` hasta que se cierre la ventana, y emitir un código nuevo no reinicia la cuenta. Las pantallas de ui :uiVersion responden a ese rechazo con "too many attempts, try again later" en lugar de llamar inválido al código. Una caída del correo es distinta de un POST inválido; un fallo de base de datos después de Consume necesita un camino de reparación idempotente.
 
-> [!WARNING]
-> No marque como verificado solo por ID de cuenta. El POST publicado depende de almacenamiento de un solo uso, propósito y dirección capturada.
+No marque como verificado a partir solo del id de la cuenta. El flujo POST publicado depende de la frontera del almacén de un solo uso, de la finalidad y de la dirección capturada.
 
 <a name="verification-is-not-account-linking"></a>
 ## Verificación no es vinculación de cuenta

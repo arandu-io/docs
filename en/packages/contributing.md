@@ -6,9 +6,6 @@
 - [Prove every new guard can fail](#prove-every-new-guard-can-fail)
 - [Keep one change attributable to one reason](#keep-one-change-attributable-to-one-reason)
 
-> [!WARNING]
-> **Current limitations.** The contribution contract is verified by the tagged repository's own CI and layout guard. It has no independent tagged consumer because it governs changes to that repository rather than a runtime package.
-
 <a name="repository-gates-define-a-reviewable-change"></a>
 ## Repository gates define a reviewable change
 
